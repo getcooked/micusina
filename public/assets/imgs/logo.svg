@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Mi Cusina</title>
+  <desc id="desc">Mi Cusina circular restaurant logo</desc>
+  <circle cx="80" cy="80" r="74" fill="#211a19"/>
+  <text x="80" y="66" fill="#fff" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="58" font-weight="700">M</text>
+  <text x="80" y="89" fill="#fff" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="18" font-weight="700" letter-spacing="8">MI CUSINA</text>
+  <text x="80" y="121" fill="#fff" text-anchor="middle" font-family="'Segoe Script', 'Brush Script MT', cursive" font-size="19">by Mi Familia</text>
+</svg>

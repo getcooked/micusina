@@ -1,0 +1,478 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+
+use Illuminate\Http\Request;
+
+use App\Models\Food;
+
+use App\Models\Order;
+
+use App\Models\Book;
+
+use App\Models\User;
+
+use Illuminate\Support\Facades\Hash;
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+
+class AdminController extends Controller
+{
+    public function update_profile_photo(Request $request)
+    {
+        abort_unless($request->user() && in_array($request->user()->usertype, ['admin', 'staff']), 403);
+
+        $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'photo.mimes' => 'The profile picture must be a .jpg, .jpeg, .png, or .webp file.',
+            'photo.max' => 'The profile picture must not be larger than 5 MB.',
+        ]);
+
+        $request->user()->updateProfilePhoto($request->file('photo'));
+
+        return redirect()->back()->with('message', 'Profile picture updated successfully.');
+    }
+
+    public function add_food()
+    {
+        $this->requireAdmin();
+
+        return view('admin.add_food');
+    }
+
+
+    public function upload_food(Request $request)
+    {
+        $this->requireAdmin();
+
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'details' => ['required', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+            'img' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
+        ], [
+            'img.mimes' => 'The food image must be a .jpg, .jpeg, .png, or .webp file.',
+            'img.max' => 'The food image must not be larger than 50 MB.',
+        ]);
+
+        $data = new Food;
+
+        $data->title = $request->title;
+
+        $data->detail = $request->details;
+
+        $data->price = $request->price;
+
+        $data->stock = $request->stock;
+
+        $image = $request->img;
+
+        $filename = Str::uuid().'.'.$image->guessExtension();
+
+        $request->img->move('food_img', $filename);
+
+
+        $data->image = $filename;
+        
+        $data->save();
+
+        return redirect('view_food')->with('message', 'Food Added Successfully');
+
+
+
+
+    }
+
+
+    public function view_food()
+    {
+        $this->requireAdmin();
+        
+        $data = Food::orderByDesc('updated_at')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+        return view('admin.show_food', compact('data'));
+    }
+
+    public function inventory()
+    {
+        $this->requireAdmin();
+
+        $data = Food::orderByDesc('updated_at')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+
+        return view('admin.inventory', compact('data'));
+    }
+
+    public function update_stock(Request $request, $id)
+    {
+        $this->requireAdmin();
+
+        $request->validate([
+            'stock' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $food = Food::findOrFail($id);
+        $food->stock = $request->stock;
+        $food->save();
+
+        return redirect()->back()->with('message', 'Stock Updated Successfully');
+    }
+
+
+
+    public function delete_food($id)
+    {
+        $this->requireAdmin();
+
+        $data = Food::findOrFail($id);
+
+        $data->delete();
+
+        return redirect()->back()->with('message', 'Food Deleted Successfully');
+    }
+
+
+    public function update_food($id)
+    {
+        $this->requireAdmin();
+    
+        $food = Food::findOrFail($id);
+        return view('admin.update_food', compact('food'));
+    }
+
+
+    public function edit_food(Request $request, $id)
+    {
+    $this->requireAdmin();
+
+    $request->validate([
+        'title' => ['required', 'string', 'max:255'],
+        'details' => ['required', 'string'],
+        'price' => ['required', 'numeric', 'min:0'],
+        'stock' => ['required', 'integer', 'min:0'],
+        'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
+    ], [
+        'image.mimes' => 'The food image must be a .jpg, .jpeg, .png, or .webp file.',
+        'image.max' => 'The food image must not be larger than 50 MB.',
+    ]);
+
+    $data = Food::findOrFail($id);
+
+    $data->title = $request->title;
+
+    $data->detail = $request->details;
+
+    $data->price  = $request->price;
+
+    $data->stock  = $request->stock;
+
+    $image = $request->image;
+
+    if($image)
+    {
+        $imagename = Str::uuid().'.'.$image->guessExtension();
+
+        $request->image->move('food_img', $imagename);
+
+        $data->image = $imagename;
+     
+    }
+
+    $data->save();
+
+    return redirect('view_food');
+
+    }
+
+
+    public function orders()
+    {
+        $this->requireStaffOrAdmin();
+
+        $data = Order::orderByDesc('updated_at')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get();
+        $availableRiders = User::where('staff_role', 'rider')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.order', compact('data', 'availableRiders'));
+    }
+
+    public function assign_rider(Request $request, $id)
+    {
+        $this->requireAdminOrCashier();
+
+        $request->validate([
+            'rider_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $order = Order::findOrFail($id);
+        $rider = User::where('id', $request->rider_id)
+            ->where('staff_role', 'rider')
+            ->firstOrFail();
+
+        $this->matchingOrderRows($order)->update([
+            'rider_id' => $rider->id,
+            'confirmed_by' => auth()->id(),
+            'confirmed_at' => now(),
+            'delivery_status' => 'On The Way',
+        ]);
+
+        Order::where('id', $order->id)->update([
+            'rider_id' => $rider->id,
+            'confirmed_by' => auth()->id(),
+            'confirmed_at' => now(),
+            'delivery_status' => 'On The Way',
+        ]);
+
+        $rider->forceFill(['rider_available' => false])->save();
+
+        return redirect()->back()->with('message', $rider->name . ' assigned to this delivery.');
+    }
+
+    public function users()
+    {
+        $this->requireAdmin();
+
+        $users = User::orderByDesc('created_at')->get();
+
+        return view('admin.users', compact('users'));
+    }
+
+    public function riders()
+    {
+        $this->requireStaffOrAdmin();
+
+        $riders = User::where('staff_role', 'rider')
+            ->orderByDesc('rider_available')
+            ->orderBy('name')
+            ->get();
+
+        $availableRiders = $riders->where('rider_available', true)->count();
+        $unavailableRiders = $riders->count() - $availableRiders;
+
+        return view('admin.riders', compact('riders', 'availableRiders', 'unavailableRiders'));
+    }
+
+    public function on_the_way($id)
+    {
+        $this->requireStaffOrAdmin();
+
+        $data = Order::findOrFail($id);
+
+        $this->matchingOrderRows($data)->update([
+            'delivery_status' => "On The Way",
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function delivered($id)
+    {
+        $this->requireStaffOrAdmin();
+
+        $data = Order::findOrFail($id);
+        $riderId = $data->rider_id;
+
+        $this->matchingOrderRows($data)->update([
+            'delivery_status' => "Delivered",
+        ]);
+
+        if($riderId)
+        {
+            User::where('id', $riderId)->update(['rider_available' => true]);
+        }
+
+        return redirect()->back();
+    }
+
+     public function canceled($id)
+    {
+        $this->requireStaffOrAdmin();
+
+        $data = Order::findOrFail($id);
+        $riderId = $data->rider_id;
+
+        $this->matchingOrderRows($data)->update([
+            'delivery_status' => "Canceled",
+        ]);
+
+        if($riderId)
+        {
+            User::where('id', $riderId)->update(['rider_available' => true]);
+        }
+
+        return redirect()->back();
+    }
+
+    public function set_rider_availability(Request $request, $id)
+    {
+        $this->requireStaffOrAdmin();
+
+        $request->validate([
+            'rider_available' => ['required', 'boolean'],
+        ]);
+
+        if(auth()->user()->usertype !== 'admin' && auth()->id() !== (int) $id && auth()->user()->staff_role !== 'cashier')
+        {
+            abort(403);
+        }
+
+        $rider = User::where('id', $id)->where('staff_role', 'rider')->firstOrFail();
+        $rider->forceFill(['rider_available' => (bool) $request->rider_available])->save();
+
+        return redirect()->back()->with('message', $rider->name . ' availability updated.');
+    }
+
+     public function paid($id)
+    {
+        $this->requireStaffOrAdmin();
+
+        $data = Order::findOrFail($id);
+
+        $data->payment_status = "Paid";
+
+        $data->save();
+
+        return redirect()->back()->with('message', 'Payment marked as paid.');
+    }
+
+    public function reservations()
+    {
+        $this->requireStaffOrAdmin();
+
+        $book = Book::orderByRaw("CASE WHEN status = 'Pending' THEN 0 ELSE 1 END")
+            ->orderByDesc('created_at')
+            ->get();
+
+        $salesLabels = [];
+        $depositValues = [];
+        $bookingValues = [];
+
+        for($i = 6; $i >= 0; $i--)
+        {
+            $date = now()->subDays($i);
+            $salesLabels[] = $date->format('M d');
+            $depositValues[] = Book::where('status', 'Approved')
+                ->whereDate('approved_at', $date->toDateString())
+                ->sum('deposit_amount');
+            $bookingValues[] = Book::whereDate('created_at', $date->toDateString())->count();
+        }
+
+        return view('admin.reservation', compact('book', 'salesLabels', 'depositValues', 'bookingValues'));
+    }
+
+    public function approve_reservation($id)
+    {
+        $this->requireStaffOrAdmin();
+
+          $book = Book::findOrFail($id);
+
+          if (($book->payment_status ?? 'Pending') !== 'Paid') {
+              return redirect()->back()->with('message', 'This reservation cannot be approved until payment is verified.');
+          }
+
+          $book->status = 'Approved';
+        $book->approved_by = auth()->id();
+        $book->approved_at = now();
+        $book->save();
+
+        return redirect()->back()->with('message', 'Reservation approved and added to sales.');
+    }
+
+    public function add_staff()
+    {
+        $this->requireAdmin();
+
+        return view('admin.add_staff');
+    }
+
+    public function store_staff(Request $request)
+    {
+        $this->requireAdmin();
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'regex:/^\+639[0-9]{9}$/'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'staff_role' => ['required', 'in:cashier,rider'],
+            'password' => ['required', 'string', 'min:8', 'max:255', 'confirmed'],
+        ]);
+
+        $staffData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'usertype' => 'staff',
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'password' => Hash::make($request->password),
+        ];
+
+        if(Schema::hasColumn('users', 'staff_role'))
+        {
+            $staffData['staff_role'] = $request->staff_role;
+        }
+
+        User::create($staffData);
+
+        return redirect()->back()->with('message', 'Staff Created Successfully');
+    }
+
+    private function requireAdmin()
+    {
+        if(!auth()->check() || auth()->user()->usertype !== 'admin')
+        {
+            abort(403);
+        }
+    }
+
+    private function requireStaffOrAdmin()
+    {
+        if(!auth()->check() || !in_array(auth()->user()->usertype, ['admin', 'staff']))
+        {
+            abort(403);
+        }
+    }
+
+    private function requireAdminOrCashier()
+    {
+        if(!auth()->check())
+        {
+            abort(403);
+        }
+
+        if(auth()->user()->usertype === 'admin')
+        {
+            return;
+        }
+
+        if(auth()->user()->usertype === 'staff' && auth()->user()->staff_role === 'cashier')
+        {
+            return;
+        }
+
+        abort(403);
+    }
+
+    private function matchingOrderRows(Order $order)
+    {
+        return Order::where('email', $order->email)
+            ->whereBetween('created_at', [
+                $order->created_at->copy()->subSeconds(5),
+                $order->created_at->copy()->addSeconds(5),
+            ]);
+    }
+
+}
