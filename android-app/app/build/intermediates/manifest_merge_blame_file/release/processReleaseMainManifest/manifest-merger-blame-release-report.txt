@@ -1,0 +1,47 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.micusina.app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:2:5-67
+11-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:2:22-64
+12
+13    <application
+13-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:4:5-18:19
+14        android:allowBackup="true"
+14-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:5:9-35
+15        android:extractNativeLibs="false"
+16        android:label="Mi Cusina"
+16-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:6:9-34
+17        android:supportsRtl="true"
+17-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:7:9-35
+18        android:theme="@style/Theme.MiCusina"
+18-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:8:9-46
+19        android:usesCleartextTraffic="true" >
+19-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:9:9-44
+20        <activity
+20-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:10:9-17:20
+21            android:name="com.micusina.app.MainActivity"
+21-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:11:13-41
+22            android:exported="true" >
+22-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:12:13-36
+23            <intent-filter>
+23-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:13:13-16:29
+24                <action android:name="android.intent.action.MAIN" />
+24-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:14:17-69
+24-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:14:25-66
+25
+26                <category android:name="android.intent.category.LAUNCHER" />
+26-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:15:17-77
+26-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:15:27-74
+27            </intent-filter>
+28        </activity>
+29    </application>
+30
+31</manifest>

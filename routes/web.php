@@ -12,6 +12,10 @@ Route::post('/paymongo/webhook', [PayMongoWebhookController::class, 'webhook'])-
 
 route::get('/', [HomeController::class, 'my_home']);
 
+Route::get('/download-app', function () {
+    return response()->download(public_path('downloads/Mi-Cusina.apk'), 'Mi-Cusina.apk');
+})->name('mobile-app.download');
+
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegistrationVerificationController::class, 'create'])->name('register');
     Route::post('/register', [RegistrationVerificationController::class, 'send'])
@@ -27,6 +31,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index']);
+    Route::post('/customer/logout', [HomeController::class, 'logout'])->name('customer.logout');
     Route::post('/admin/profile-photo', [AdminController::class, 'update_profile_photo'])->name('admin.profile-photo.update');
     Route::post('/customer/profile-photo', [HomeController::class, 'update_profile_photo'])->name('customer.profile-photo.update');
 

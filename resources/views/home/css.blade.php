@@ -19,7 +19,6 @@
         html body [class],
         html body [id] {
             background-color: #fff !important;
-            background-image: none !important;
             color: #000 !important;
         }
 
@@ -115,10 +114,10 @@
 
         /* Mi Cusina accent system */
         :root { --mi-primary:#f25f5c; --mi-primary-dark:#d94845; --mi-soft:#fff1f0; --mi-border:#eadfdd; }
-        html body a { color:var(--mi-primary-dark) !important; }
-        html body h1, html body h2, html body h3, html body h4, html body h5, html body h6 { color:#1f2937 !important; }
+        html body a { color:#000 !important; }
+        html body h1, html body h2, html body h3, html body h4, html body h5, html body h6 { color:#000 !important; }
         html body .btn-primary, html body .btn-danger, html body .btn-custom, html body button[type="submit"] {
-            background:var(--mi-primary) !important; border-color:var(--mi-primary) !important; color:#fff !important;
+            background:var(--mi-primary) !important; border-color:var(--mi-primary) !important; color:#000 !important;
             box-shadow:0 6px 16px rgba(242,95,92,.22);
         }
         html body .btn-primary:hover, html body .btn-danger:hover, html body .btn-custom:hover, html body button[type="submit"]:hover {
@@ -129,5 +128,60 @@
         }
         html body input:focus, html body textarea:focus, html body select:focus {
             border-color:var(--mi-primary) !important; box-shadow:0 0 0 3px rgba(242,95,92,.14) !important;
+        }
+
+        html body #about,
+        html body #about * {
+            color: #000 !important;
+        }
+
+        html body #about .has-img-bg {
+            background: url("{{ asset('assets/imgs/store.jpg') }}") no-repeat center center !important;
+            background-size: contain !important;
+            min-height: calc(100vh - 96px);
+            margin: 0 auto;
+        }
+
+        /* Shared customer typography — homepage, menu, cart, orders and booking. */
+        :root { --mi-body-font: Arial, Helvetica, sans-serif; --mi-heading-font: Georgia, 'Times New Roman', serif; }
+        html body,
+        html body input,
+        html body select,
+        html body textarea,
+        html body button {
+            font-family: var(--mi-body-font) !important;
+        }
+        html body p,
+        html body li,
+        html body label,
+        html body input,
+        html body select,
+        html body textarea {
+            font-size: 16px !important;
+            line-height: 1.5;
+        }
+        html body h1,
+        html body h2,
+        html body h3,
+        html body h4,
+        html body h5,
+        html body h6 {
+            font-family: var(--mi-heading-font) !important;
+        }
+        html body .nav-link,
+        html body .burger-nav a,
+        html body .burger-login a,
+        html body .inner-navbar .nav-link {
+            font-family: var(--mi-body-font) !important;
+            font-size: 15px !important;
+            font-weight: 600 !important;
+        }
+        html body button,
+        html body .btn,
+        html body .burger-actions a,
+        html body .auth-submit {
+            font-family: var(--mi-body-font) !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
         }
     </style>

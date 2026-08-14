@@ -38,6 +38,16 @@ class HomeController extends Controller
         return redirect()->back()->with('message', 'Profile picture updated successfully.');
     }
 
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('message', 'You have been logged out.');
+    }
+
 
 
         public function my_home()
@@ -590,7 +600,7 @@ class HomeController extends Controller
             'purok' => ['required', 'string', 'max:100'],
             'address_details' => ['nullable', 'string', 'max:255'],
             'payment_method' => ['required', 'in:Cash on Delivery,GCash,Bank Transfer'],
-            'payment_reference' => ['required_if:payment_method,GCash,Bank Transfer', 'nullable', 'string', 'max:100'],
+            'payment_reference' => ['nullable', 'string', 'max:100'],
         ]);
 
         $user_id = Auth()->user()->id;
@@ -652,7 +662,7 @@ class HomeController extends Controller
 
         $order->payment_method = $request->payment_method;
 
-        $order->payment_status = $request->payment_method === 'Cash on Delivery' ? 'Unpaid' : 'Paid';
+        $order->payment_status = $request->payment_method === 'Cash on Delivery' ? 'Unpaid' : 'Pending Verification';
 
         if($hasPaymentReferenceColumn)
         {

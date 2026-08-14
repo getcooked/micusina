@@ -7,7 +7,6 @@
         <div class="mic-chatbot-header">
             <div>
                 <strong>Mi Cusina Assistant</strong>
-                <span>Answers from this system only</span>
             </div>
             <button class="mic-chatbot-close" type="button" aria-label="Close chat assistant">&times;</button>
         </div>
@@ -27,6 +26,10 @@
 
 <style>
     .mic-chatbot {
+        background: transparent !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        padding: 0 !important;
         position: fixed;
         right: 24px;
         bottom: 24px;
@@ -34,7 +37,15 @@
         font-family: inherit;
     }
 
+    .mic-chatbot:not(.is-open) {
+        clip-path: circle(36px at 36px 36px);
+        height: 72px;
+        overflow: hidden;
+        width: 72px;
+    }
+
     .mic-chatbot-toggle {
+        box-sizing: border-box !important;
         width: 72px;
         height: 72px;
         border: 0;
@@ -43,11 +54,41 @@
         background: linear-gradient(135deg, #ff5275, #F88379);
         box-shadow: 0 12px 30px rgba(184, 49, 213, .35);
         cursor: pointer;
+        margin: 0 !important;
+        padding: 0 !important;
         font-size: 32px;
         display: flex;
         align-items: center;
         justify-content: center;
     }
+
+    /* Keep the launcher itself transparent; the circle is drawn by this layer only. */
+    .mic-chatbot .mic-chatbot-toggle {
+        all: unset !important;
+        align-items: center !important;
+        background: transparent !important;
+        box-sizing: border-box !important;
+        cursor: pointer !important;
+        display: flex !important;
+        height: 72px !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: relative !important;
+        width: 72px !important;
+    }
+
+    .mic-chatbot .mic-chatbot-toggle::before {
+        background: #ed0da8;
+        border-radius: 50%;
+        box-shadow: 0 12px 30px rgba(184, 49, 213, .35);
+        content: '';
+        inset: 0;
+        position: absolute;
+        z-index: 0;
+    }
+
+    .mic-chatbot .mic-chatbot-toggle span { color: #111; font-size: 32px; position: relative; z-index: 1; }
 
     .mic-chatbot-panel {
         position: absolute;

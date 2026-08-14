@@ -1,0 +1,2 @@
+com.micusina.app:style/Theme.MiCusina = 0x7f020000
+com.micusina.app:string/app_name = 0x7f010000

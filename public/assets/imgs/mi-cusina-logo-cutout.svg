@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 672 672" role="img" aria-label="Mi Cusina">
+  <defs>
+    <clipPath id="logoCircle">
+      <circle cx="336" cy="336" r="285"/>
+    </clipPath>
+  </defs>
+  <image href="mi-cusina-transparent.png" width="672" height="672" clip-path="url(#logoCircle)"/>
+</svg>

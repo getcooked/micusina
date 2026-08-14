@@ -216,10 +216,11 @@
 
     .mic-sortbar {
         align-items: center;
-        background: #111;
-        border: 1px solid #2a2a2a;
-        color: #fff;
+        background: #fff;
+        border: 1px solid #000;
+        color: #000;
         display: flex;
+        flex-wrap: wrap;
         gap: 12px;
         margin-bottom: 14px;
         padding: 14px 22px;
@@ -228,9 +229,9 @@
     .mic-sort-btn,
     .mic-category-filter summary,
     .mic-price-sort {
-        background: #1c1c1c;
-        border: 0;
-        color: #fff;
+        background: #fff;
+        border: 1px solid #000;
+        color: #000;
         cursor: pointer;
         font-size: 16px;
         height: 42px;
@@ -256,25 +257,25 @@
     .mic-category-filter summary::after {
         border-left: 5px solid transparent;
         border-right: 5px solid transparent;
-        border-top: 6px solid #fff;
+        border-top: 6px solid #000;
         content: "";
         margin-left: 8px;
     }
 
     .mic-category-filter[open] summary {
-        background: #F88379;
+        background: #fff;
     }
 
     .mic-category-filter strong {
-        color: #ffb3c2;
+        color: #000;
         font-size: 13px;
         font-weight: 800;
     }
 
     .mic-category-menu {
-        background: #111;
-        border: 1px solid #343434;
-        box-shadow: 0 18px 38px rgba(0, 0, 0, .35);
+        background: #fff;
+        border: 1px solid #000;
+        box-shadow: 0 18px 38px rgba(0, 0, 0, .16);
         display: grid;
         gap: 6px;
         left: 0;
@@ -287,9 +288,9 @@
 
     .mic-category-menu button {
         background: transparent;
-        border: 0;
+        border: 1px solid transparent;
         border-radius: 5px;
-        color: #fff;
+        color: #000;
         cursor: pointer;
         font-size: 14px;
         padding: 10px 12px;
@@ -298,12 +299,13 @@
 
     .mic-category-menu button:hover,
     .mic-category-menu button.is-active {
-        background: #F88379;
+        background: #fff;
+        border-color: #000;
     }
 
     .mic-sort-btn.is-active {
-        background: #F88379;
-        color: #fff;
+        background: #fff;
+        color: #000;
     }
 
     .mic-price-sort {
@@ -312,18 +314,18 @@
     }
 
     .mic-page-count {
-        color: #fff;
+        color: #000;
         margin-left: auto;
     }
 
     .mic-page-count span {
-        color: #F88379;
+        color: #000;
     }
 
     .mic-product-grid {
         display: grid;
-        gap: 10px;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
     .mic-product-card.is-hidden {
@@ -343,8 +345,8 @@
     }
 
     .mic-product-card {
-        background: #0f0f0f;
-        border: 1px solid #242424;
+        background: #fff;
+        border: 1px solid #d1d5db;
         min-width: 0;
         transition: transform .15s ease, box-shadow .15s ease;
     }
@@ -390,22 +392,22 @@
 
     .mic-product-body {
         display: block;
-        padding: 10px 9px 8px;
+        padding: 12px 14px 10px;
     }
 
     .mic-product-title {
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2;
-        color: #fff;
+        color: #000;
         display: -webkit-box;
-        font-size: 18px;
+        font-size: 17px;
         line-height: 1.24;
-        min-height: 44px;
+        min-height: 42px;
         overflow: hidden;
     }
 
     .mic-product-price {
-        color: #F88379;
+        color: #000;
         display: block;
         font-size: 20px;
         margin-top: 8px;
@@ -414,7 +416,7 @@
     .mic-product-meta,
     .mic-stock,
     .mic-location {
-        color: #c7c7c7;
+        color: #000;
         display: flex;
         font-size: 12px;
         gap: 8px;
@@ -423,22 +425,22 @@
     }
 
     .mic-stars {
-        color: #F88379;
+        color: #000;
     }
 
     .mic-stock {
-        color: #0f766e;
+        color: #000;
         font-weight: 700;
     }
 
     .mic-stock.is-out {
-        color: #b91c1c;
+        color: #000;
     }
 
     .mic-card-cart {
         display: flex;
         gap: 6px;
-        padding: 0 9px 10px;
+        padding: 0 14px 14px;
     }
 
     .mic-card-cart input {
@@ -645,7 +647,7 @@
 
     @media (max-width: 991.98px) {
         .mic-product-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
         }
 
         .mic-product-detail {
@@ -665,11 +667,11 @@
         }
 
         .mic-product-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: minmax(0, 1fr);
         }
 
         .mic-product-title {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .mic-detail-actions {

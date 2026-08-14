@@ -3,7 +3,7 @@
     $userInitial = Auth::check() ? strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) : 'U';
 @endphp
 
-@if(!request('section'))
+@if(!request('section') && empty($forceInnerNavbar))
 <style>
     body.front-only {
         background: #000;
@@ -129,6 +129,7 @@
 
     .front-user-menu {
         position: relative;
+        z-index: 1001;
     }
 
     .front-user-menu summary {
@@ -170,7 +171,8 @@
         position: absolute;
         right: 0;
         top: calc(100% + 12px);
-        z-index: 30;
+        z-index: 1002;
+        pointer-events: auto;
     }
 
     .front-user-info {
@@ -197,16 +199,19 @@
 
     .front-user-dropdown form {
         margin: 0;
+        width: 100%;
     }
 
     .front-user-dropdown button {
-        background: transparent;
-        border: 0;
+        background: transparent !important;
+        border: 0 !important;
         border-radius: 6px;
-        color: #fff;
+        box-sizing: border-box;
+        color: #fff !important;
         cursor: pointer;
         font-size: 14px;
         font-weight: 800;
+        margin: 0;
         padding: 10px;
         text-align: left;
         width: 100%;
@@ -330,7 +335,7 @@
         right: -4%;
         top: 14%;
         width: 92%;
-        z-index: 1;
+        z-index: 4;
     }
 
     .burger-art:after {
@@ -487,7 +492,7 @@
     html body .burger-thumbs { bottom:40px; gap:16px; max-width:52%; }
     html body .burger-thumb,
     html body .burger-thumb.active {
-        background:#050505 !important;
+        background:#fff !important;
         border:2px solid #e5e7eb;
         border-radius:14px;
         flex:0 0 126px;
@@ -495,6 +500,25 @@
         width:126px;
     }
     html body .burger-thumb.active { border-color:#f25f5c !important; box-shadow:0 10px 24px rgba(242,95,92,.2); }
+    html body.front-only .burger-nav a,
+    html body.front-only .burger-login a,
+    html body.front-only .burger-login button,
+    html body.front-only .burger-copy h1,
+    html body.front-only .burger-copy h1 span,
+    html body.front-only .burger-copy p,
+    html body.front-only .burger-primary,
+    html body.front-only .burger-secondary {
+        color:#000 !important;
+    }
+    html body.front-only .burger-primary {
+        background:#fff !important;
+        border:1px solid #d1d5db !important;
+        color:#000 !important;
+    }
+    html body.front-only .burger-copy h1,
+    html body.front-only .burger-copy h1 span {
+        color:#C8A2C8 !important;
+    }
 
     @media (max-width:1199.98px) {
         html body .burger-topbar { grid-template-columns:90px 1fr auto; }
@@ -513,6 +537,147 @@
         html body .burger-art { height:440px; margin:20px 28px 160px; min-height:0; }
         html body .burger-thumbs { bottom:30px; left:28px; max-width:calc(100% - 56px); }
     }
+
+    /* Editorial restaurant hero */
+    body.front-only { background: #fff !important; padding: 0; }
+    html body .burger-front { min-height: 100vh; }
+    html body .burger-panel {
+        background: #fff url("{{ asset('food_img/mi-cusina-hero-food-edge.png') }}") center center / 100% 100% no-repeat !important;
+        box-shadow: none;
+        display: block;
+        min-height: 100vh;
+        overflow: hidden;
+    }
+    .burger-panel::before {
+        background: #fff;
+        border-bottom: 1px solid #f1f0ec;
+        color: #565853;
+        content: '☎  (032) 345 0107     ✉  hello@micusina.com';
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        height: 39px;
+        letter-spacing: .01em;
+        padding-left: clamp(22px, 9vw, 130px);
+    }
+    .burger-panel::before { display: none; }
+    html body .burger-topbar {
+        align-items: center;
+        background: #fff !important;
+        border-bottom: 1px solid #f1f0ec;
+        display: grid;
+        grid-template-columns: 220px 1fr 220px;
+        height: 91px;
+        left: 0;
+        padding: 0 clamp(22px, 9vw, 130px);
+        position: relative;
+        right: auto;
+        top: 0;
+        z-index: 1000;
+    }
+    html body .burger-mark { align-items: center; display: flex; gap: 9px; width: auto; }
+    html body .burger-mark::after { content: 'Mi Cusina'; color: #292b27; font-family: Georgia, serif; font-size: 31px; font-style: italic; font-weight: 700; white-space: nowrap; }
+    html body .burger-mark img { height: 46px; object-fit: contain; width: 54px; }
+    html body .burger-nav { gap: clamp(17px, 2.6vw, 42px); }
+    html body.front-only .burger-nav a { color: #2d302c !important; font-size: 14px; font-weight: 600; padding: 9px 13px; }
+    html body.front-only .burger-nav a.active { background: #e3e8d9; border-radius: 999px; }
+    html body .burger-login { justify-content: flex-end; }
+    html body.front-only .burger-login a, html body.front-only .burger-login button { color: #2d302c !important; font-size: 13px; }
+    html body .mobile-app-button {
+        background: #fff !important;
+        border: 1px solid #272925 !important;
+        border-radius: 999px;
+        box-shadow: none;
+        color: #272925 !important;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 12px 18px;
+        white-space: nowrap;
+    }
+    html body .mobile-app-button:hover { background: #272925 !important; color: #fff !important; }
+    html body .burger-login > a:first-child { border: 1px solid #272925; border-radius: 999px; font-weight: 700; padding: 12px 19px; }
+    html body .burger-login > a.track-order-link:first-child { border: 0 !important; border-radius: 0 !important; font-weight: 600; padding: 9px 0 !important; }
+    html body .burger-login > a:last-child { border: 1px solid #272925; border-radius: 999px; font-weight: 700; padding: 12px 19px; }
+    html body .burger-copy {
+        align-items: center;
+        background: transparent !important;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: calc(100vh - 91px);
+        padding: 70px 24px 122px;
+        text-align: center;
+        z-index: 5;
+    }
+    html body .burger-copy h1, html body .burger-copy h1 span {
+        color: #292b27 !important;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: clamp(55px, 5vw, 88px);
+        font-weight: 400;
+        letter-spacing: -.055em;
+        line-height: .93;
+        margin-bottom: 23px;
+        text-shadow: none;
+        text-transform: none;
+    }
+    html body.front-only .burger-copy h1,
+    html body.front-only .burger-copy h1 span { color: #111 !important; }
+    html body .burger-copy p { color: #4e504c !important; font-size: 17px; line-height: 1.6; max-width: 470px; }
+    html body .burger-actions { gap: 14px; }
+    html body .burger-primary, html body .burger-secondary { border-radius: 999px; font-size: 14px; min-height: 50px; padding: 0 27px; }
+    html body.front-only .burger-primary {
+        background: linear-gradient(135deg, #ff6b72 0%, #ed0da8 100%) !important;
+        border: 0 !important;
+        color: #fff !important;
+        min-width: auto;
+    }
+    html body .burger-secondary { border: 1px solid #292b27; color: #292b27 !important; }
+    html body .burger-art { display: none; }
+    html body .burger-art img { filter: drop-shadow(0 20px 15px rgba(0,0,0,.14)); height: 100%; object-fit: contain; object-position: right center; width: 100%; }
+    html body .burger-thumbs { display: none; }
+    .hero-food-frame {
+        display: none !important;
+        filter: drop-shadow(0 16px 15px rgba(42, 35, 23, .16));
+        pointer-events: none;
+        position: fixed !important;
+        width: clamp(170px, 19vw, 330px);
+        z-index: 4 !important;
+    }
+    .hero-food-frame img {
+        display: block !important;
+        height: auto;
+        max-width: none;
+        mix-blend-mode: screen;
+        visibility: visible !important;
+        width: 100%;
+    }
+    .hero-food-frame--top-left { left: clamp(-45px, 1vw, 24px); top: 135px; transform: rotate(-8deg); }
+    .hero-food-frame--top-right { right: clamp(-55px, 1vw, 24px); top: 135px; transform: rotate(7deg); }
+    .hero-food-frame--bottom-left { bottom: clamp(-46px, -1vw, -12px); left: clamp(-35px, 2vw, 55px); transform: rotate(7deg); }
+    .hero-food-frame--bottom-right { bottom: clamp(-48px, -1vw, -10px); right: clamp(-45px, 1vw, 45px); transform: rotate(-7deg); }
+    html body .burger-thumb, html body .burger-thumb.active { background: transparent !important; border: 0; border-radius: 0; box-shadow: none; flex-basis: 82px; height: 82px; width: 82px; }
+    html body .burger-thumb:not(.active) { display: none; }
+    html body .burger-thumb img { object-fit: contain; }
+
+    @media (max-width: 991.98px) {
+        body.front-only { padding: 0; }
+        html body .burger-front, html body .burger-panel { min-height: 100vh; }
+        html body .burger-topbar { grid-template-columns: auto 1fr auto; height: auto; min-height: 76px; padding: 12px 20px; }
+        html body .burger-mark::after { font-size: 24px; }
+        html body .burger-mark img { height: 36px; width: 42px; }
+        html body .burger-nav { display: none; }
+        html body .burger-copy { min-height: calc(100vh - 180px); padding: 72px 22px 125px; }
+        html body .burger-art { opacity: .24; right: -14vw; top: 42%; width: 78vw; }
+        html body .burger-thumbs { bottom: 18px; left: 18px; }
+        .hero-food-frame { opacity: .3; width: 170px; }
+        .hero-food-frame--top-left { left: -76px; top: 130px; }
+        .hero-food-frame--top-right { right: -76px; top: 145px; }
+        .hero-food-frame--bottom-left { bottom: -48px; left: -57px; }
+        .hero-food-frame--bottom-right { bottom: -50px; right: -59px; }
+        .burger-panel::before { height: 32px; justify-content: center; padding: 0; }
+    }
 </style>
 
 <header class="burger-front" id="home">
@@ -530,7 +695,7 @@
             <div class="burger-login">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('my_orders') }}">Track Order</a>
+                        <a class="track-order-link" href="{{ url('my_orders') }}">Track Order</a>
                         <a class="cart-badge-link" href="{{ url('my_cart') }}">Cart <span class="cart-badge">{{ $cartBadgeCount }}</span></a>
                         <details class="front-user-menu">
                             <summary aria-label="Open user menu">@if(Auth::user()->profile_photo_path)<img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">@else{{ $userInitial }}@endif</summary>
@@ -545,7 +710,8 @@
                                     <input id="customerProfilePhotoHome" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden onchange="if(this.files.length)this.form.submit()">
                                     @error('photo')<small class="customer-photo-error">{{ $message }}</small>@enderror
                                 </form>
-                                <form action="{{ route('logout') }}" method="POST">
+                                <a href="{{ route('profile.show') }}">Profile</a>
+                                <form action="{{ route('customer.logout') }}" method="POST">
                                     @csrf
                                     <button type="submit">Log Out</button>
                                 </form>
@@ -554,38 +720,53 @@
                     @else
                         <a href="{{ route('login') }}">Log In</a>
                         <a href="{{ Route::has('register') ? route('register') : url('/') }}">Register</a>
+                        <a class="mobile-app-button" href="{{ route('mobile-app.download') }}">Download App</a>
                     @endauth
                 @endif
             </div>
         </div>
 
         <div class="burger-copy">
-            <h1>Fresh <span class="headline-accent">Bites</span><br>Island <span class="headline-accent">Delights</span></h1>
-            <p>Your daily comfort food, made local and served with love.</p>
+            <h1>Comfort food for<br><span class="headline-accent">your table</span></h1>
+            <p>Discover Filipino comfort food, thoughtfully made and served with love at Mi Cusina.</p>
             <div class="burger-actions">
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
+                <a class="burger-secondary" href="{{ url('/?section=food') }}">Explore Menu</a>
             </div>
         </div>
 
+        <div class="hero-food-frame hero-food-frame--top-left" aria-hidden="true">
+            <img src="{{ asset('food_img/hero-hotdog-sandwich-transparent.png') }}" alt="">
+        </div>
+        <div class="hero-food-frame hero-food-frame--top-right" aria-hidden="true">
+            <img src="{{ asset('food_img/hero-chicken-teriyaki-transparent.png') }}" alt="">
+        </div>
+        <div class="hero-food-frame hero-food-frame--bottom-left" aria-hidden="true">
+            <img src="{{ asset('food_img/hero-adobo-bunwich-transparent.png') }}" alt="">
+        </div>
+        <div class="hero-food-frame hero-food-frame--bottom-right" aria-hidden="true">
+            <img src="{{ asset('food_img/hero-burger-spaghetti-transparent.png') }}" alt="">
+        </div>
+
         <div class="burger-art" aria-live="polite">
-            <img id="burgerMainImage" src="{{ asset('food_img/hero-chicken-teriyaki.png') }}" alt="Featured chicken burger">
+            <img id="burgerMainImage" src="{{ asset('food_img/hero-chicken-teriyaki-transparent.png') }}" alt="Featured chicken burger">
         </div>
 
         <div class="burger-thumbs" aria-label="Featured burgers">
-            <button class="burger-thumb active" type="button" data-image="{{ asset('food_img/hero-chicken-teriyaki.png') }}" aria-label="Show chicken burger">
-                <img src="{{ asset('food_img/hero-chicken-teriyaki.png') }}" alt="">
+            <button class="burger-thumb active" type="button" data-image="{{ asset('food_img/hero-chicken-teriyaki-transparent.png') }}" aria-label="Show chicken burger">
+                <img src="{{ asset('food_img/hero-chicken-teriyaki-transparent.png') }}" alt="">
             </button>
-            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-adobo-bunwich.png') }}" aria-label="Show adobo bunwich">
-                <img src="{{ asset('food_img/hero-adobo-bunwich.png') }}" alt="">
+            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-adobo-bunwich-transparent.png') }}" aria-label="Show adobo bunwich">
+                <img src="{{ asset('food_img/hero-adobo-bunwich-transparent.png') }}" alt="">
             </button>
-            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-burger-spaghetti.png') }}" aria-label="Show hotdog sandwich">
-                <img src="{{ asset('food_img/hero-burger-spaghetti.png') }}" alt="">
+            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-burger-spaghetti-transparent.png') }}" aria-label="Show hotdog sandwich">
+                <img src="{{ asset('food_img/hero-burger-spaghetti-transparent.png') }}" alt="">
             </button>
-            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-chicken-burger.png') }}" aria-label="Show teriyaki rice bowl">
-                <img src="{{ asset('food_img/hero-chicken-burger.png') }}" alt="">
+            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-chicken-burger-transparent.png') }}" aria-label="Show teriyaki rice bowl">
+                <img src="{{ asset('food_img/hero-chicken-burger-transparent.png') }}" alt="">
             </button>
-            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-hotdog-sandwich.png') }}" aria-label="Show burger spaghetti">
-                <img src="{{ asset('food_img/hero-hotdog-sandwich.png') }}" alt="">
+            <button class="burger-thumb" type="button" data-image="{{ asset('food_img/hero-hotdog-sandwich-transparent.png') }}" aria-label="Show burger spaghetti">
+                <img src="{{ asset('food_img/hero-hotdog-sandwich-transparent.png') }}" alt="">
             </button>
         </div>
     </div>
@@ -634,46 +815,67 @@
     }
 
     .inner-navbar {
-        background: #000 !important;
-        border: 0;
-        min-height: 96px;
-        padding: 0 30px;
+        background: #fff !important;
+        border-bottom: 1px solid #f1f0ec;
+        min-height: 91px;
+        padding: 0 clamp(22px, 9vw, 130px);
+        z-index: 1000;
     }
 
     .inner-navbar.affix {
-        background: #000 !important;
+        background: #fff !important;
         border: 0;
-        min-height: 96px;
+        min-height: 91px;
     }
 
     .inner-navbar .navbar-collapse {
         align-items: center;
-        display: flex !important;
-        justify-content: space-between;
+        display: grid !important;
+        grid-template-columns: 220px 1fr 220px;
     }
+
+    .inner-brand {
+        align-items: center;
+        color: #292b27 !important;
+        display: flex;
+        font-family: Georgia, serif;
+        font-size: 31px;
+        font-style: italic;
+        font-weight: 700;
+        gap: 9px;
+        text-decoration: none !important;
+        white-space: nowrap;
+    }
+
+    .inner-brand img { height: 46px; object-fit: contain; width: 54px; }
 
     .inner-navbar .navbar-nav {
         align-items: center;
         display: flex;
-        gap: 28px;
+        gap: clamp(17px, 2.6vw, 42px);
         margin: 0;
         width: auto !important;
     }
 
+    .inner-navbar .navbar-nav:first-of-type { justify-content: center; }
+    .inner-navbar .navbar-nav:last-of-type { gap: 16px; justify-content: flex-end; }
+
     .inner-navbar .nav-link {
         background: transparent;
         border: 0;
-        color: #fff !important;
+        color: #000 !important;
         cursor: pointer;
-        font-size: 17px;
-        font-weight: 800;
+        font-size: 14px;
+        font-weight: 600;
         padding: 0 !important;
     }
 
     .inner-navbar .nav-link:hover,
     .inner-navbar .nav-link.active {
-        color: #F88379 !important;
+        color: #000 !important;
     }
+
+    .inner-navbar .mobile-app-button { margin: 0 3px; }
 
     .inner-navbar .cart-badge-link {
         align-items: center;
@@ -685,7 +887,7 @@
         align-items: center;
         background: #F88379;
         border-radius: 999px;
-        color: #fff;
+        color: #000;
         display: inline-flex;
         font-size: 12px;
         font-weight: 900;
@@ -698,6 +900,7 @@
 
     .inner-navbar .front-user-menu {
         position: relative;
+        z-index: 1001;
     }
 
     .inner-navbar .front-user-menu summary {
@@ -706,7 +909,7 @@
         border: 3px solid #fff;
         border-radius: 999px;
         box-shadow: 0 0 0 2px #1d2330;
-        color: #F88379;
+        color: #000;
         cursor: pointer;
         display: inline-flex;
         font-size: 18px;
@@ -733,13 +936,14 @@
         border: 1px solid #2b2b2b;
         border-radius: 8px;
         box-shadow: 0 18px 38px rgba(0, 0, 0, .34);
-        color: #fff;
+        color: #000;
         min-width: 230px;
         padding: 10px;
         position: absolute;
         right: 0;
         top: calc(100% + 12px);
-        z-index: 30;
+        z-index: 1002;
+        pointer-events: auto;
     }
 
     .inner-navbar .front-user-info {
@@ -754,28 +958,31 @@
     }
 
     .inner-navbar .front-user-info strong {
-        color: #fff;
+        color: #000;
         font-size: 15px;
     }
 
     .inner-navbar .front-user-info span {
-        color: #aaa;
+        color: #000;
         font-size: 13px;
         margin-top: 4px;
     }
 
     .inner-navbar .front-user-dropdown form {
         margin: 0;
+        width: 100%;
     }
 
     .inner-navbar .front-user-dropdown button {
-        background: transparent;
-        border: 0;
+        background: transparent !important;
+        border: 0 !important;
         border-radius: 6px;
-        color: #fff;
+        box-sizing: border-box;
+        color: #000 !important;
         cursor: pointer;
         font-size: 14px;
         font-weight: 800;
+        margin: 0;
         padding: 10px;
         text-align: left;
         width: 100%;
@@ -783,7 +990,7 @@
 
     .inner-navbar .front-user-dropdown a {
         border-radius: 6px;
-        color: #fff;
+        color: #000;
         display: block;
         font-size: 14px;
         font-weight: 800;
@@ -794,12 +1001,12 @@
     .inner-navbar .front-user-dropdown a:hover,
     .inner-navbar .front-user-dropdown button:hover {
         background: #F88379;
-        color: #050505;
+        color: #000;
     }
 
     .inner-navbar .customer-photo-label {
         border-radius: 6px;
-        color: #fff;
+        color: #000;
         cursor: pointer;
         display: block;
         font-size: 14px;
@@ -808,8 +1015,8 @@
         padding: 10px;
     }
 
-    .inner-navbar .customer-photo-label:hover { background: #F88379; color: #050505; }
-    .inner-navbar .customer-photo-error { color: #FFA69E; display: block; font-size: 11px; padding: 4px 10px; }
+    .inner-navbar .customer-photo-label:hover { background: #F88379; color: #000; }
+    .inner-navbar .customer-photo-error { color: #000; display: block; font-size: 11px; padding: 4px 10px; }
 
     .inner-navbar .navbar-toggler {
         margin-left: auto;
@@ -823,6 +1030,7 @@
 
         .inner-navbar .navbar-collapse {
             align-items: flex-start;
+            display: flex !important;
             flex-direction: column;
             gap: 18px;
             margin-top: 16px;
@@ -833,6 +1041,8 @@
             flex-direction: column;
             gap: 14px;
         }
+
+        .inner-brand { display: none; }
     }
 </style>
 <nav class="custom-navbar inner-navbar navbar navbar-expand-lg navbar-dark fixed-top" data-spy="affix" data-offset-top="10">
@@ -840,6 +1050,10 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <a class="inner-brand" href="{{ url('/') }}" aria-label="Mi Cusina Home">
+            <img src="{{ asset('assets/imgs/mi-cusina-transparent.png') }}" alt="Mi Cusina">
+            <span>Mi Cusina</span>
+        </a>
         <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link {{ request('section') ? '' : 'active' }}" href="{{ url('/') }}">Home</a></li>
             <li class="nav-item"><a class="nav-link {{ request('section') === 'food' ? 'active' : '' }}" href="{{ url('/?section=food') }}">Menu</a></li>
@@ -848,7 +1062,7 @@
         </ul>
         <ul class="navbar-nav">
             @auth
-                <li class="nav-item"><a class="nav-link" href="{{ url('my_orders') }}">Track Order</a></li>
+                <li class="nav-item"><a class="nav-link track-order-link" href="{{ url('my_orders') }}">Track Order</a></li>
             @endauth
             <li class="nav-item"><a class="nav-link cart-badge-link" href="{{ url('my_cart') }}">Cart <span class="cart-badge">{{ $cartBadgeCount }}</span></a></li>
             @if (Route::has('login'))
@@ -867,8 +1081,8 @@
                                     <input id="customerProfilePhotoInner" type="file" name="photo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden onchange="if(this.files.length)this.form.submit()">
                                     @error('photo')<small class="customer-photo-error">{{ $message }}</small>@enderror
                                 </form>
-                                <a href="{{ url('/') }}">Home</a>
-                                <form action="{{ route('logout') }}" method="POST">
+                                <a href="{{ route('profile.show') }}">Profile</a>
+                                <form action="{{ route('customer.logout') }}" method="POST">
                                     @csrf
                                     <button type="submit">Log Out</button>
                                 </form>

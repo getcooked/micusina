@@ -150,7 +150,7 @@
         .cart-page {
             background: #000;
             min-height: calc(100vh - 96px);
-            padding: 34px 28px 80px;
+            padding: 130px 28px 80px;
         }
 
         .cart-title {
@@ -593,32 +593,165 @@
                 font-size: 34px;
             }
         }
+        /* Keep cart typography aligned with the customer homepage. */
+        .cart-topbar a,
+        .cart-topbar button,
+        .cart-shell,
+        .cart-shell input,
+        .cart-shell select,
+        .cart-shell textarea,
+        .cart-shell button,
+        .cart-shell label {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        .cart-topbar a,
+        .cart-topbar button {
+            font-size: 15px !important;
+        }
+
+        .cart-shell p,
+        .cart-shell li,
+        .cart-shell label,
+        .cart-shell input,
+        .cart-shell select,
+        .cart-shell textarea {
+            font-size: 17px !important;
+            line-height: 1.6;
+        }
+
+        .cart-shell button,
+        .cart-shell .btn,
+        .cart-shell a.button {
+            font-size: 14px !important;
+            font-weight: 700 !important;
+        }
+
+        .cart-shell .checkout-button {
+            background: #ed0da8 !important;
+            border-color: #ed0da8 !important;
+            color: #fff !important;
+            box-shadow: 0 12px 25px rgba(237, 13, 168, .25) !important;
+        }
+
+        .cart-shell .checkout-button:hover { background: #d90a99 !important; }
+
+        .gcash-open-button,
+        .bank-open-button {
+            align-items: center;
+            background: #0867e8 !important;
+            border: 2px solid #000 !important;
+            border-radius: 999px;
+            color: #fff !important;
+            display: none;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            justify-content: center;
+            margin: 0 0 18px;
+            min-height: 54px;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .gcash-open-button.is-visible,
+        .bank-open-button.is-visible { display: flex; }
+        .gcash-open-button:hover { background: #0057cc !important; color: #fff !important; }
+        .bank-open-button { background: #15803d !important; }
+        .bank-open-button:hover { background: #116b33 !important; color: #fff !important; }
+        .payment-qr-panel img { border: 2px solid #000 !important; }
+
+        .cart-shell .qty-stepper button {
+            background: #111 !important;
+            color: #fff !important;
+            box-shadow: none !important;
+        }
+
+        .cart-shell .qty-stepper button:hover { background: #000 !important; color: #fff !important; }
+        .cart-shell .qty-stepper button:disabled { background: #777 !important; color: #fff !important; }
+
+        .cart-title,
+        .cart-heading,
+        .order-summary h2,
+        .checkout-details h2,
+        .checkout-modal-head h2 {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-weight: 700 !important;
+        }
+
+        .cart-title {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-size: clamp(52px, 4.5vw, 82px) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0 !important;
+            text-transform: none !important;
+        }
+        .cart-heading { font-size: 32px !important; }
+        .order-summary h2,
+        .checkout-details h2,
+        .checkout-modal-head h2 { font-size: 30px !important; }
+
+        .cart-brand strong,
+        .cart-item-name,
+        .summary-line,
+        .summary-total,
+        .cart-count {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        /* Exact homepage type scale and weight. */
+        .cart-title {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-size: clamp(55px, 5vw, 88px) !important;
+            font-weight: 400 !important;
+            letter-spacing: -.055em !important;
+            line-height: .93 !important;
+        }
+
+        .cart-heading,
+        .order-summary h2,
+        .checkout-details h2,
+        .checkout-modal-head h2 {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-weight: 400 !important;
+            letter-spacing: -.025em !important;
+        }
+
+        .cart-shell,
+        .cart-shell * {
+            font-family: Arial, Helvetica, sans-serif !important;
+            font-weight: 400 !important;
+        }
+
+        .cart-shell p,
+        .cart-shell span,
+        .cart-shell td,
+        .cart-shell th,
+        .cart-shell label,
+        .cart-shell input,
+        .cart-shell select {
+            font-size: 17px !important;
+            line-height: 1.6 !important;
+        }
+
+        .cart-shell .cart-heading,
+        .cart-shell .order-summary h2,
+        .cart-shell .checkout-details h2,
+        .cart-shell .checkout-modal-head h2 {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-weight: 400 !important;
+        }
+
+        .cart-shell button,
+        .cart-shell .btn,
+        .cart-shell a.button {
+            font-size: 14px !important;
+            font-weight: 700 !important;
+        }
     </style>
 </head>
 
-<body>
-    <header class="cart-topbar">
-        <a href="{{ url('/') }}">Home</a>
-        @php
-            $userInitial = strtoupper(substr(Auth::user()->name ?? 'U', 0, 1));
-        @endphp
-        <div class="cart-top-actions">
-            <details class="cart-user-menu">
-                <summary aria-label="Open user menu">{{ $userInitial }}</summary>
-                <div class="cart-user-dropdown">
-                    <div class="cart-user-info">
-                        <strong>{{ Auth::user()->name }}</strong>
-                        <span>{{ Auth::user()->email }}</span>
-                    </div>
-                    <a href="{{ url('/') }}">Home</a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit">Log Out</button>
-                    </form>
-                </div>
-            </details>
-        </div>
-    </header>
+<body class="content-page">
+    @include('home.header', ['forceInnerNavbar' => true])
 
     <main class="cart-page">
         <h1 class="cart-title">Cart Page</h1>
@@ -823,21 +956,10 @@
 
                                 <div class="payment-qr-panel" id="paymentQrPanel">
                                     <h3 id="paymentQrTitle">Payment QR</h3>
+                                    <a class="gcash-open-button" id="openGcashButton" href="gcash://" aria-label="Open GCash app">Open in GCash</a>
+                                    <a class="bank-open-button" id="openBankButton" href="landbank://" aria-label="Open Landbank app">Open Bank App</a>
                                     <img id="paymentQrImage" src="" alt="Payment QR">
                                     <p id="paymentQrMissing" style="display:none;">QR image not found. Please ask staff for payment details.</p>
-                                    <p>After sending payment, type your reference number below.</p>
-                                </div>
-
-                                <div class="form-row" id="paymentReferenceRow" style="display:none;">
-                                    <label for="payment_reference">Reference #</label>
-                                    <input id="payment_reference" type="text" name="payment_reference" placeholder="Enter payment reference number">
-                                </div>
-
-                                <div class="payment-receipt" id="paymentReceipt">
-                                    <h3>Payment Receipt</h3>
-                                    <p>Method: <strong id="receiptMethod"></strong></p>
-                                    <p>Reference #: <strong id="receiptReference"></strong></p>
-                                    <p>Total Paid: <strong>&#8369;{{ number_format($total_price, 2) }}</strong></p>
                                 </div>
 
                                 <button class="checkout-button" type="submit">Confirm Order</button>
@@ -875,11 +997,8 @@
             var paymentQrTitle = document.getElementById('paymentQrTitle');
             var paymentQrImage = document.getElementById('paymentQrImage');
             var paymentQrMissing = document.getElementById('paymentQrMissing');
-            var paymentReferenceRow = document.getElementById('paymentReferenceRow');
-            var paymentReference = document.getElementById('payment_reference');
-            var paymentReceipt = document.getElementById('paymentReceipt');
-            var receiptMethod = document.getElementById('receiptMethod');
-            var receiptReference = document.getElementById('receiptReference');
+            var openGcashButton = document.getElementById('openGcashButton');
+            var openBankButton = document.getElementById('openBankButton');
             var checkoutModal = document.getElementById('checkoutModal');
             var openCheckout = document.getElementById('openCheckout');
             var closeCheckout = document.getElementById('closeCheckout');
@@ -931,32 +1050,18 @@
                 var needsReference = method === 'GCash' || method === 'Bank Transfer';
 
                 paymentQrPanel.classList.toggle('is-visible', needsReference);
-                paymentReferenceRow.style.display = needsReference ? 'block' : 'none';
-                paymentReference.required = needsReference;
+                openGcashButton.classList.toggle('is-visible', method === 'GCash');
+                openBankButton.classList.toggle('is-visible', method === 'Bank Transfer');
 
                 if (!needsReference) {
-                    paymentReference.value = '';
-                    paymentReceipt.classList.remove('is-visible');
                     paymentQrImage.style.display = 'none';
                     return;
                 }
 
                 paymentQrTitle.textContent = method + ' QR Payment';
-                paymentQrImage.src = method === 'GCash' ? '{{ asset('payment/gcash-qr.png') }}' : '{{ asset('payment/bank-qr.png') }}';
+                paymentQrImage.src = method === 'GCash' ? '{{ asset('payment/gcash-qr.jpg') }}' : '{{ asset('payment/bank-qr.jpg') }}';
                 paymentQrImage.style.display = 'block';
                 paymentQrMissing.style.display = 'none';
-                receiptMethod.textContent = method;
-                updateReceipt();
-            }
-
-            function updateReceipt() {
-                var method = paymentMethod.value;
-                var reference = paymentReference.value.trim();
-                var canShow = (method === 'GCash' || method === 'Bank Transfer') && reference.length > 0;
-
-                receiptMethod.textContent = method;
-                receiptReference.textContent = reference;
-                paymentReceipt.classList.toggle('is-visible', canShow);
             }
 
             paymentQrImage.addEventListener('error', function () {
@@ -965,7 +1070,6 @@
             });
 
             paymentMethod.addEventListener('change', updatePaymentFields);
-            paymentReference.addEventListener('input', updateReceipt);
             updatePaymentFields();
         });
     </script>

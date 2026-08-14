@@ -6,21 +6,6 @@
     display: none;
 }
 
-html,
-body,
-body [class],
-body [id] {
-    background-color: #fff !important;
-    background-image: none !important;
-    color: #000 !important;
-}
-
-body *,
-body *::before,
-body *::after {
-    color: #000 !important;
-}
-
 :root {
     --mi-primary: #f25f5c;
     --mi-primary-dark: #d94845;

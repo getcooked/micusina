@@ -1,0 +1,7 @@
+com.micusina.app-pngs-0 C:\Micusina_project\android-app\app\build\generated\res\pngs\release
+com.micusina.app-resValues-1 C:\Micusina_project\android-app\app\build\generated\res\resValues\release
+com.micusina.app-packageReleaseResources-2 C:\Micusina_project\android-app\app\build\intermediates\incremental\release\packageReleaseResources\merged.dir
+com.micusina.app-packageReleaseResources-3 C:\Micusina_project\android-app\app\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
+com.micusina.app-release-4 C:\Micusina_project\android-app\app\build\intermediates\merged_res\release\mergeReleaseResources
+com.micusina.app-main-5 C:\Micusina_project\android-app\app\src\main\res
+com.micusina.app-release-6 C:\Micusina_project\android-app\app\src\release\res

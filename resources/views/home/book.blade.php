@@ -393,6 +393,42 @@
             .booking-payment-dialog.is-gcash .booking-payment-summary,
             .booking-payment-dialog.is-gcash .booking-payment-actions { margin-left: 14px; margin-right: 14px; }
         }
+        /* Match the Mi Cusina homepage typography. */
+        .reserve-page,
+        .reserve-page input,
+        .reserve-page select,
+        .reserve-page textarea,
+        .reserve-page button {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        .reserve-logo {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-size: 31px !important;
+            font-style: italic;
+            font-weight: 700 !important;
+        }
+
+        .reserve-brand h2 {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-size: clamp(42px, 3.5vw, 62px) !important;
+            font-weight: 400 !important;
+            letter-spacing: -.035em !important;
+            line-height: 1.05 !important;
+            text-align: center;
+        }
+
+        .reserve-row label,
+        .reserve-field input,
+        .reserve-field select,
+        .reserve-field span,
+        .reserve-page p {
+            font-size: 17px !important;
+            font-weight: 400 !important;
+            line-height: 1.6 !important;
+        }
+
+        .reserve-page button { font-size: 14px !important; font-weight: 700 !important; }
     </style>
 
     <div class="reserve-card">

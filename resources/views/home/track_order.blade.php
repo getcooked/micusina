@@ -7,14 +7,14 @@
             background: #000;
             color: #111;
             margin: 0;
-            overflow: hidden;
+            overflow: auto;
         }
 
         .track-page {
-            align-items: center;
+            align-items: flex-start;
             background: #000;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             justify-content: center;
             padding: 28px;
             position: relative;
@@ -141,7 +141,7 @@
             display: grid;
             gap: 34px;
             grid-template-columns: minmax(0, 1fr) 360px;
-            max-height: calc(100vh - 56px);
+            max-height: none;
             max-width: 1180px;
             padding: 42px;
             width: min(1180px, calc(100vw - 56px));
@@ -213,6 +213,7 @@
 
         .track-steps {
             display: grid;
+            gap: 12px;
             grid-template-columns: repeat(3, 1fr);
             margin: 0 auto 20px;
             max-width: 540px;
@@ -220,24 +221,22 @@
 
         .track-step {
             align-items: center;
+            background: #fff;
+            border: 1px solid #dedede;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
             gap: 9px;
+            min-height: 108px;
+            padding: 12px 8px;
             position: relative;
         }
 
-        .track-step:not(:last-child):after {
-            background: #dedede;
-            content: "";
-            height: 4px;
-            left: calc(50% + 25px);
-            position: absolute;
-            right: calc(-50% + 25px);
-            top: 23px;
-        }
-
-        .track-step.is-complete:not(:last-child):after {
-            background: #F88379;
+        .track-step.is-active,
+        .track-step.is-complete {
+            background: #fff5f8;
+            border-color: #ed0da8;
+            box-shadow: 0 8px 20px rgba(237, 13, 168, .12);
         }
 
         .track-step-icon {
@@ -263,6 +262,7 @@
             color: #777;
             font-size: 13px;
             font-weight: 900;
+            text-align: center;
         }
 
         .track-step.is-active .track-step-title,
@@ -350,6 +350,7 @@
             border-radius: 14px;
             margin-top: 18px;
             padding: 16px;
+            position: relative;
         }
 
         .track-note strong {
@@ -361,32 +362,138 @@
             display: block;
         }
 
+        .rider-message-card-button {
+            align-items: center;
+            background: #ed0da8 !important;
+            border: 2px solid #111 !important;
+            border-radius: 50%;
+            color: #111;
+            cursor: pointer;
+            display: inline-flex;
+            font-size: 21px;
+            height: 42px;
+            justify-content: center;
+            margin-top: 12px;
+            position: relative;
+            right: auto;
+            width: 42px;
+        }
+
+        .rider-message-card-button svg {
+            display: block;
+            height: 24px;
+            width: 24px;
+        }
+
+        .track-map-card {
+            background: #fff;
+            border: 1px solid #d8d8d8;
+            border-radius: 14px;
+            margin-top: 18px;
+            overflow: hidden;
+        }
+
+        .track-map-head {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 16px;
+        }
+
+        .track-map-head strong {
+            color: #111;
+            font-size: 16px;
+        }
+
+        .track-map-head span {
+            color: #555;
+            font-size: 13px;
+        }
+
+        .track-map {
+            border: 0;
+            display: block;
+            height: 300px;
+            position: relative;
+            width: 100%;
+        }
+
+        .track-map iframe {
+            border: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .map-location-label {
+            align-items: center;
+            background: #fff;
+            border: 2px solid #111;
+            border-radius: 999px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .18);
+            color: #111;
+            display: flex;
+            font-size: 18px;
+            height: 38px;
+            justify-content: center;
+            position: absolute;
+            width: 38px;
+            z-index: 2;
+        }
+
+        .map-location-label.shop { left: 22%; top: 57%; }
+        .map-location-label.rider { left: 47%; top: 44%; }
+        .map-location-label.customer { right: 15%; top: 26%; }
+
+        .delivery-marker {
+            align-items: center;
+            border: 3px solid #fff;
+            border-radius: 999px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, .3);
+            color: #fff;
+            display: flex;
+            font-size: 18px;
+            height: 38px;
+            justify-content: center;
+            width: 38px;
+        }
+
+        .delivery-marker-shop { background: #111; }
+        .delivery-marker-customer { background: #ed0da8; }
+        .delivery-marker-rider { background: #1677ff; transform: rotate(45deg); }
+
+        .delivery-marker-rider span { transform: rotate(-45deg); }
+
         .rider-message-button {
             align-items: center;
-            background: #F88379;
-            border: 0;
+            background: #ed0da8;
+            border: 2px solid #111;
             border-radius: 50%;
+            bottom: 24px;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, .22);
             color: #fff;
             cursor: pointer;
             display: inline-flex;
             font-weight: 900;
-            margin-top: 12px;
-            height: 54px;
+            height: 64px;
             justify-content: center;
+            margin: 0;
+            position: fixed;
+            right: 24px;
             text-decoration: none;
-            width: 54px;
+            width: 64px;
+            z-index: 100;
         }
 
         .rider-message-button:hover {
-            background: #ed0031;
+            background: #c90089;
             color: #fff;
             text-decoration: none;
         }
 
         .rider-message-icon {
             display: block;
-            height: 36px;
-            width: 36px;
+            height: 42px;
+            width: 42px;
         }
 
         .rider-message-button.is-disabled {
@@ -398,10 +505,14 @@
             background: #fff;
             border: 1px solid #e0def0;
             border-radius: 8px;
+            bottom: 100px;
             box-shadow: 0 14px 34px rgba(29, 24, 72, .12);
             display: none;
-            margin-top: 14px;
             overflow: hidden;
+            position: fixed;
+            right: 24px;
+            width: min(360px, calc(100vw - 32px));
+            z-index: 101;
         }
 
         .rider-chat-panel.is-open {
@@ -679,6 +790,18 @@
                 <a class="track-back" href="{{ url('/home') }}"><i class="ti-arrow-left"></i></a>
                 <h1 class="track-title">Track Order</h1>
 
+                @if($isOnWay)
+                    <section class="track-map-card" aria-label="Bantayan Island live delivery map">
+                        <div class="track-map" aria-label="Bantayan Island delivery map showing the shop, rider, and customer">
+                            <iframe
+                                title="Bantayan Island map"
+                                src="https://www.google.com/maps?q=Bantayan%20Island%2C%20Cebu%2C%20Philippines&amp;z=13&amp;output=embed"
+                                loading="lazy"
+                                referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        </div>
+                    </section>
+                @endif
+
                 <div class="track-status-card">
                     <p>{{ $isDelivered ? 'Delivery completed' : 'Estimated delivery time updated' }}</p>
                     <h2>{{ $eta }}</h2>
@@ -709,29 +832,12 @@
                         @endphp
                         <strong>Your rider: {{ $rider->name }}</strong>
                         <span>Phone: {{ $riderPhone ?: 'No phone listed' }}</span>
-                        <button class="rider-message-button" type="button" aria-label="Message your rider" title="Message your rider" data-rider-chat-toggle>
-                            <svg class="rider-message-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-                                <path fill="#fff" d="M31.8 12C19.4 12 9.4 20.6 9.4 31.2c0 5.9 3.1 11.1 8 14.6l-1.5 8.7 9.5-4.6c2 .4 4.1.7 6.4.7 12.4 0 22.4-8.6 22.4-19.2S44.2 12 31.8 12Z"/>
-                                <circle cx="23.4" cy="31.4" r="3.6" fill="#F88379"/>
-                                <circle cx="32" cy="31.4" r="3.6" fill="#F88379"/>
-                                <circle cx="40.6" cy="31.4" r="3.6" fill="#F88379"/>
+                        <button class="rider-message-card-button" type="button" aria-label="Message your rider" title="Message your rider" style="background:#ed0da8 !important; border-color:#ed0da8 !important;">
+                            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                                <path d="M12 13h40v29H29L17 52V42h-5z" fill="none" stroke="#111" stroke-linejoin="round" stroke-width="5"/>
+                                <path d="M22 23h20M22 30h20M22 37h13" fill="none" stroke="#111" stroke-linecap="round" stroke-width="4"/>
                             </svg>
                         </button>
-                        <div class="rider-chat-panel" data-rider-chat-panel>
-                            <div class="rider-chat-head">
-                                <strong>{{ $rider->name }}</strong>
-                                <button class="rider-chat-close" type="button" aria-label="Close rider message" data-rider-chat-close>&times;</button>
-                            </div>
-                            <div class="rider-chat-messages" data-rider-chat-messages>
-                                <div class="rider-chat-message rider-chat-message-rider">
-                                    Hi, you can type your message for your rider here.
-                                </div>
-                            </div>
-                            <form class="rider-chat-form" data-rider-chat-form>
-                                <input type="text" name="message" autocomplete="off" maxlength="300" placeholder="Type message..." required>
-                                <button type="submit">Send</button>
-                            </form>
-                        </div>
                     @else
                         <strong>Waiting for rider assignment</strong>
                         <span>Admin or cashier will confirm your delivery and assign an available rider.</span>

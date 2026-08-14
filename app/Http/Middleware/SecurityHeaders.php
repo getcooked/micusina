@@ -19,6 +19,7 @@ class SecurityHeaders
         $response->headers->set(
             'Content-Security-Policy',
             "default-src 'self'; base-uri 'self'; frame-ancestors 'self'; form-action 'self'; ".
+            "frame-src 'self' https://www.openstreetmap.org https://www.google.com https://maps.google.com; ".
             "img-src 'self' data: https:; font-src 'self' data: https:; ".
             "style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:;"
         );

@@ -13,9 +13,9 @@
         .orders-page {
             align-items: center;
             display: flex;
-            height: 100vh;
+            min-height: 100vh;
             justify-content: center;
-            padding: 28px;
+            padding: 130px 28px 28px;
         }
 
         .orders-shell {
@@ -28,7 +28,7 @@
 
         .orders-top {
             align-items: center;
-            display: flex;
+            display: none;
             justify-content: space-between;
             margin-bottom: 32px;
         }
@@ -127,6 +127,39 @@
             font-size: 18px;
         }
 
+        /* Match the customer homepage typography. */
+        .orders-page,
+        .orders-page button,
+        .orders-page input,
+        .orders-page select,
+        .orders-page textarea {
+            font-family: Arial, Helvetica, sans-serif !important;
+        }
+
+        .orders-page p,
+        .orders-page li,
+        .orders-page span,
+        .orders-page a,
+        .orders-page button {
+            font-size: 17px !important;
+            line-height: 1.6;
+        }
+
+        .orders-page h1,
+        .orders-page h2,
+        .orders-page h3 {
+            font-family: Georgia, 'Times New Roman', serif !important;
+            font-weight: 400 !important;
+            letter-spacing: -.025em !important;
+        }
+
+        .orders-page h1 {
+            font-size: clamp(55px, 5vw, 88px) !important;
+            letter-spacing: -.055em !important;
+            line-height: .93 !important;
+        }
+        .orders-page h2 { font-size: 32px !important; }
+
         .orders-modal {
             align-items: center;
             background: rgba(0, 0, 0, .72);
@@ -200,7 +233,8 @@
         }
     </style>
 </head>
-<body>
+<body class="content-page">
+    @include('home.header', ['forceInnerNavbar' => true])
     <main class="orders-page">
         <section class="orders-shell">
             <div class="orders-top">
