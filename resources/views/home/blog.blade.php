@@ -768,6 +768,31 @@
     .mic-solid-btn { background:#83bd47 !important; border-radius:9px !important; }
     .mic-outline-btn { border-color:#83bd47 !important; border-radius:9px !important; color:#5c9032 !important; }
     .mic-product-close { background:#fff; border-radius:50%; box-shadow:0 5px 15px rgba(15,23,42,.12); color:#526245; height:40px; right:20px; top:20px; width:40px; z-index:2; }
+    /* Dark restaurant menu workspace. */
+    .mic-marketplace { background:#f6e5af; padding:64px 0; }
+    .mic-marketplace-inner { background:radial-gradient(circle at 20% 10%, rgba(255,255,255,.08), transparent 25%), #111312; border-radius:34px; box-shadow:0 28px 58px rgba(70,49,10,.22); max-width:1360px; padding:42px; }
+    .mic-menu-hero, .mic-menu-heading { display:none; }
+    .mic-sortbar { background:transparent; border:0; border-bottom:1px solid rgba(255,255,255,.18); border-radius:0; box-shadow:none; margin-bottom:30px; padding:0 0 20px; }
+    .mic-sortbar > span { color:#f5f5f4; font-size:25px; font-weight:900; margin-right:auto; }
+    .mic-category-filter summary, .mic-sort-btn, .mic-price-sort { background:transparent; border-color:rgba(255,255,255,.45); color:#fff; }
+    .mic-sort-btn:hover, .mic-sort-btn.is-active, .mic-category-filter[open] summary { background:#f6c63f; border-color:#f6c63f; color:#1d1d1b; }
+    .mic-page-count { color:#f6c63f; }
+    .mic-product-grid { column-gap:42px; grid-template-columns:repeat(2, minmax(0, 1fr)); row-gap:8px; }
+    .mic-product-card { align-items:center; background:transparent; border:0; border-radius:0; box-shadow:none; display:grid; grid-template-columns:112px 1fr; min-height:132px; padding:12px 0; text-align:left; }
+    .mic-product-card:hover { background:rgba(255,255,255,.04); box-shadow:none; transform:none; }
+    .mic-product-open { align-items:center; display:contents; }
+    .mic-product-image-wrap { align-items:center; background:transparent; display:flex; grid-row:1 / span 2; height:104px; justify-content:center; padding:0; }
+    .mic-product-image-wrap img { border:0; border-radius:15px; height:104px; object-fit:cover; width:104px; }
+    .mic-product-body { align-items:start; display:flex; flex-direction:column; padding:0 12px; }
+    .mic-product-title { color:#fff; font-size:17px; min-height:0; }
+    .mic-product-price { color:#f6c63f; font-size:16px; margin-top:6px; }
+    .mic-stock { background:transparent; color:#d1d5db !important; font-size:12px; margin-top:5px; padding:0; }
+    .mic-product-meta { color:#f6c63f; font-size:11px; margin-top:7px; }
+    .mic-product-meta span:last-child { color:#cbd5e1; }
+    .mic-card-cart { grid-column:2; justify-content:flex-start; padding:4px 12px 0; }
+    .mic-card-cart input { background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.25); color:#fff; height:34px; width:52px; }
+    .mic-card-cart button { background:#f6c63f; border-radius:7px; box-shadow:none; color:#1d1d1b; height:34px; padding:0 14px; }
+    .mic-card-cart button:hover { background:#ffdc6c; }
     @media (max-width:640px) { .mic-marketplace { padding-top:24px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-hero { background:linear-gradient(160deg, #fff 0 55%, #83bd47 55%); grid-template-columns:1fr; min-height:520px; padding:32px 26px; } .mic-menu-hero h2 { font-size:40px; } .mic-menu-hero-dish::before { height:220px; width:220px; } .mic-menu-hero-dish img { height:200px; width:200px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-image-wrap img { border-width:5px; height:118px; width:118px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } .mic-product-detail { display:block; max-height:92vh; overflow:auto; } .mic-detail-media { min-height:300px; padding:28px; } .mic-detail-media > img { height:220px; width:220px; } .mic-detail-info { padding:30px 24px; } .mic-detail-info h3 { font-size:30px; } }
 </style>
 
