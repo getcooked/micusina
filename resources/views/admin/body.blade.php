@@ -695,19 +695,19 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  @if($out_of_stock > 0)
-    <div class="modal fade stock-alert-modal" id="outOfStockAlert" tabindex="-1" role="dialog" aria-labelledby="outOfStockAlertTitle" aria-hidden="true">
+  @if($low_stock > 0)
+    <div class="modal fade stock-alert-modal" id="lowStockAlert" tabindex="-1" role="dialog" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title" id="outOfStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> No-stock alert</h3>
+            <h3 class="modal-title" id="lowStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Low-stock alert</h3>
             <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
-            {{ $out_of_stock }} item{{ $out_of_stock === 1 ? ' is' : 's are' }} currently out of stock.
+            {{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).
             <ul>
-              @foreach($inventory_alerts->where('stock', '<=', 0) as $food)
-                <li>{{ $food->title }}</li>
+              @foreach($inventory_alerts->where('stock', '>', 0) as $food)
+                <li>{{ $food->title }}: {{ $food->stock }} left</li>
               @endforeach
             </ul>
           </div>
@@ -727,7 +727,7 @@
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        $('#outOfStockAlert').modal('show');
+        $('#lowStockAlert').modal('show');
       });
     </script>
   @endif
