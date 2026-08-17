@@ -40,4 +40,21 @@ class SalesReportTest extends TestCase
 
         $this->actingAs($user)->get('/sales-report')->assertForbidden();
     }
+
+    public function test_admin_can_view_transaction_history(): void
+    {
+        $admin = User::factory()->create(['usertype' => 'admin']);
+
+        Order::create([
+            'name' => 'History customer', 'title' => 'Burger Meal', 'quantity' => 1,
+            'price' => 120, 'delivery_status' => 'In Progress', 'payment_status' => 'Pending Verification',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/transaction-history')
+            ->assertOk()
+            ->assertSee('Transaction History')
+            ->assertSee('History customer')
+            ->assertSee('Burger Meal x 1');
+    }
 }

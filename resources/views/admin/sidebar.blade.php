@@ -40,6 +40,9 @@
                 <li class="{{ request()->is('sales-report') ? 'active' : '' }}">
                   <a href="{{ route('admin.sales-report') }}"> <i class="icon-stats-up"></i>Sales Report</a>
                 </li>
+                <li class="{{ request()->is('transaction-history') ? 'active' : '' }}">
+                  <a href="{{ route('admin.transaction-history') }}"> <i class="icon-list"></i>Transaction History</a>
+                </li>
                 @endif
 
                 <li class="{{ request()->is('riders') ? 'active' : '' }}">

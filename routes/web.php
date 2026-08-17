@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/orders', [AdminController::class, 'orders']);
     Route::get('/sales-report', [AdminController::class, 'sales_report'])->name('admin.sales-report');
+    Route::get('/transaction-history', [AdminController::class, 'transaction_history'])->name('admin.transaction-history');
     Route::get('/users', [AdminController::class, 'users']);
     Route::get('/riders', [AdminController::class, 'riders']);
     Route::post('/assign_rider/{id}', [AdminController::class, 'assign_rider']);

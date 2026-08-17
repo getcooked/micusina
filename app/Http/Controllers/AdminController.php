@@ -274,6 +274,49 @@ class AdminController extends Controller
         ]);
     }
 
+    public function transaction_history(Request $request)
+    {
+        $this->requireAdmin();
+
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        $from = $request->filled('from') ? Carbon::parse($request->from)->startOfDay() : now()->subDays(29)->startOfDay();
+        $to = $request->filled('to') ? Carbon::parse($request->to)->endOfDay() : now()->endOfDay();
+
+        $orderTransactions = Order::whereBetween('created_at', [$from, $to])->get()->map(function ($order) {
+            return (object) [
+                'date' => $order->created_at,
+                'type' => 'Food order',
+                'customer' => $order->name ?: $order->email,
+                'description' => $order->title . ' x ' . $order->quantity,
+                'amount' => (float) $order->price,
+                'method' => $order->payment_method ?: 'Cash on Delivery',
+                'status' => $order->delivery_status === 'Canceled' ? 'Canceled' : ($order->payment_status ?: 'Unpaid'),
+                'reference' => $order->payment_reference,
+            ];
+        });
+
+        $reservationTransactions = Book::whereBetween('created_at', [$from, $to])->get()->map(function ($book) {
+            return (object) [
+                'date' => $book->created_at,
+                'type' => 'Table reservation',
+                'customer' => $book->name ?: trim(($book->first_name ?? '') . ' ' . ($book->last_name ?? '')),
+                'description' => $book->guest . ' guest(s) · ' . $book->date . ' ' . $book->time,
+                'amount' => (float) $book->deposit_amount,
+                'method' => $book->payment_method,
+                'status' => $book->status === 'Approved' ? 'Approved' : ($book->payment_status ?: $book->status),
+                'reference' => $book->gcash_reference ?: $book->paymongo_payment_id,
+            ];
+        });
+
+        $transactions = $orderTransactions->concat($reservationTransactions)->sortByDesc('date')->values();
+
+        return view('admin.transaction_history', compact('transactions', 'from', 'to'));
+    }
+
     public function assign_rider(Request $request, $id)
     {
         $this->requireAdminOrCashier();
