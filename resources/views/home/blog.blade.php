@@ -119,6 +119,7 @@
                         <span class="mic-product-body">
                             <span class="mic-product-title">{{ $food->title }}</span>
                             <span class="mic-product-price">&#8369;{{ number_format($price, 2) }}</span>
+                            <span class="mic-product-description">{{ \Illuminate\Support\Str::limit($food->detail, 96) }}</span>
                             <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : ($food->stock <= 5 ? 'is-low' : 'is-available') }}" style="color: {{ $food->stock <= 5 ? '#dc2626' : '#15803d' }} !important;">
                                 {{ $food->stock > 0 ? $food->stock . ' available' : 'Out of stock' }}
                             </span>
@@ -838,6 +839,32 @@
     .mic-stock { font-size:15px; }
     .mic-product-meta { font-size:14px; }
     .mic-card-cart button { height:42px; padding:0 24px; }
+    /* Light dashboard surface and larger two-column food cards. */
+    .mic-marketplace { background:#f6f8fb; }
+    .mic-marketplace-inner { background:#fff; border:1px solid #e5e7eb; box-shadow:0 18px 45px rgba(15,23,42,.08); max-width:1500px; }
+    .mic-product-card { grid-template-columns:230px minmax(0, 1fr); min-height:270px; }
+    .mic-product-image-wrap { height:220px; }
+    .mic-product-image-wrap img { height:220px; width:220px; }
+    .mic-product-title { color:#172033; font-size:25px; }
+    .mic-product-price { color:#ef5d5d; font-size:22px; }
+    .mic-product-description { color:#64748b; display:block; font-size:14px; line-height:1.45; margin-top:8px; }
+    .mic-product-meta span:last-child, .mic-product-meta { color:#64748b; }
+    .mic-card-cart input { background:#fff; border-color:#dbe2ea; color:#172033; }
+    .mic-card-cart button { background:#f56060; color:#fff; }
+    .mic-product-modal-backdrop { background:rgba(15,23,42,.42); }
+    @media (max-width:700px) {
+        .mic-marketplace-inner { border-radius:20px; padding:20px 16px; }
+        .mic-product-grid { grid-template-columns:1fr; }
+        .mic-product-card { grid-template-columns:145px minmax(0, 1fr); min-height:180px; }
+        .mic-product-image-wrap, .mic-product-image-wrap img { height:132px; width:132px; }
+        .mic-product-title { font-size:19px; }
+        .mic-product-description { -webkit-box-orient:vertical; -webkit-line-clamp:2; display:-webkit-box; overflow:hidden; }
+        .mic-product-modal.is-open { padding:16px; }
+        .mic-product-detail { display:block; max-height:calc(100vh - 32px); width:calc(100vw - 32px); }
+        .mic-detail-media { padding:16px; }
+        .mic-detail-media > img { height:auto; max-height:34vh; width:100%; }
+        .mic-detail-info { max-height:calc(66vh - 32px); overflow-y:auto; padding:22px; }
+    }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
