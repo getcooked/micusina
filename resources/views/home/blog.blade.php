@@ -875,6 +875,14 @@
         .mic-product-detail { max-width:calc(100vw - 32px) !important; }
         .mic-detail-media > img { height:auto; max-height:36vh; width:100%; }
     }
+    /* Show the complete food artwork, including its printed product name and price. */
+    .mic-product-card { grid-template-columns:265px minmax(0, 1fr); min-height:300px; }
+    .mic-product-image-wrap { height:250px; }
+    .mic-product-image-wrap img { background:#fff; height:250px; object-fit:contain; width:250px; }
+    @media (max-width:700px) {
+        .mic-product-card { grid-template-columns:165px minmax(0, 1fr); min-height:200px; }
+        .mic-product-image-wrap, .mic-product-image-wrap img { height:150px; width:150px; }
+    }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
