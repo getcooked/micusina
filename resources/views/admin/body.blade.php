@@ -736,7 +736,7 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  @if($low_stock > 0)
+  @if(false)
     <div class="stock-alert-modal is-visible" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="false" style="display:flex !important;">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -1050,6 +1050,44 @@
 
   </div>
 </div>
+
+@if($low_stock > 0)
+  <div class="low-stock-overlay" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle">
+    <section class="low-stock-dialog">
+      <header class="low-stock-header">
+        <h2 id="lowStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Low-stock alert</h2>
+        <button type="button" onclick="document.getElementById('lowStockAlert').remove()" aria-label="Close">&times;</button>
+      </header>
+      <div class="low-stock-content">
+        <p>{{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).</p>
+        <ul>
+          @foreach($inventory_alerts->where('stock', '>', 0) as $food)
+            <li>
+              <img src="{{ asset('food_img/' . $food->image) }}" alt="{{ $food->title }}" onerror="this.style.display='none'">
+              <span><strong>{{ $food->title }}</strong>: {{ $food->stock }} left</span>
+            </li>
+          @endforeach
+        </ul>
+      </div>
+      <footer class="low-stock-footer"><button type="button" onclick="document.getElementById('lowStockAlert').remove()">Dismiss</button></footer>
+    </section>
+  </div>
+  <style>
+    .low-stock-overlay { align-items:center; background:rgba(71,85,105,.42); backdrop-filter:blur(3px); display:flex; inset:0; justify-content:center; padding:24px; position:fixed; z-index:9999; }
+    .low-stock-dialog { background:#fff; border-radius:20px; box-shadow:0 20px 46px rgba(15,23,42,.22); color:#1f2937; max-width:570px; overflow:hidden; width:100%; }
+    .low-stock-header { align-items:center; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; padding:26px 28px; }
+    .low-stock-header h2 { align-items:center; display:flex; font-size:25px; font-weight:800; margin:0; }
+    .low-stock-header h2 i { color:#fbbf24; font-size:36px; margin-right:12px; }
+    .low-stock-header button { background:none; border:0; color:#64748b; cursor:pointer; font-size:29px; font-weight:300; line-height:1; }
+    .low-stock-content { font-size:17px; padding:24px 28px 26px; }
+    .low-stock-content p { margin:0; }
+    .low-stock-content ul { display:grid; gap:16px; list-style:none; margin:20px 0 0; padding:0; }
+    .low-stock-content li { align-items:center; display:flex; font-size:18px; gap:16px; }
+    .low-stock-content img { border-radius:50%; box-shadow:0 5px 12px rgba(15,23,42,.16); height:52px; object-fit:cover; width:52px; }
+    .low-stock-footer { border-top:1px solid #e5e7eb; display:flex; justify-content:flex-end; padding:18px 20px; }
+    .low-stock-footer button { background:#f87171; border:0; border-radius:10px; color:#fff; cursor:pointer; font-size:16px; font-weight:700; padding:10px 24px; }
+  </style>
+@endif
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
