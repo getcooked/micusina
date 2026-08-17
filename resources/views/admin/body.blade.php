@@ -784,6 +784,23 @@
       .stock-alert-modal .low-stock-list strong { color:#172033; }
       .stock-alert-modal .modal-footer { background:#f8fafc; border-color:#e2e8f0; padding:14px 22px; }
       .stock-alert-modal .btn-secondary { background:linear-gradient(135deg, #fb7185, #f88379); border:0; border-radius:10px; box-shadow:0 8px 16px rgba(248, 131, 121, .3); font-weight:800; padding:10px 22px; }
+      /* Match the low-stock alert reference design. */
+      .stock-alert-modal { background:rgba(71, 85, 105, .42) !important; backdrop-filter:blur(3px); }
+      .stock-alert-modal .modal-dialog { max-width:570px; }
+      .stock-alert-modal .modal-content { background:#fff; border:0; border-radius:20px; box-shadow:0 20px 46px rgba(15, 23, 42, .22); color:#1f2937; }
+      .stock-alert-modal .modal-header { background:#fff; border-bottom:1px solid #e5e7eb; padding:26px 28px; }
+      .stock-alert-modal .modal-title { align-items:center; color:#1f2937; display:flex; font-size:25px; font-weight:800; letter-spacing:-.02em; }
+      .stock-alert-modal .stock-alert-symbol { background:transparent; border-radius:0; display:inline; height:auto; margin-right:10px; width:auto; }
+      .stock-alert-modal .modal-title .stock-alert-symbol .fa { color:#fbbf24; font-size:36px; vertical-align:middle; }
+      .stock-alert-modal .close { color:#64748b; font-size:29px; font-weight:300; opacity:1; text-shadow:none; }
+      .stock-alert-modal .modal-body { color:#1f2937; font-size:17px; padding:24px 28px 26px; }
+      .stock-alert-modal .low-stock-list { gap:16px; margin-top:20px; }
+      .stock-alert-modal .low-stock-list li { color:#1e293b; font-size:18px; gap:16px; }
+      .stock-alert-modal .low-stock-list img { border:0; border-radius:50%; box-shadow:0 5px 12px rgba(15, 23, 42, .16); height:52px; width:52px; }
+      .stock-alert-modal .low-stock-list strong { color:#1e293b; }
+      .stock-alert-modal .modal-footer { background:#fff; border-top:1px solid #e5e7eb; padding:18px 20px; }
+      .stock-alert-modal .btn-secondary { background:#f87171; border:0; border-radius:10px; box-shadow:none; color:#fff; font-size:16px; font-weight:700; padding:10px 24px; }
+      .stock-alert-modal .btn-secondary:hover { background:#ef4444; }
     </style>
     <script>
       (function () {
