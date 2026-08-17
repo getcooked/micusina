@@ -738,7 +738,8 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  @if($inventory_alerts->isNotEmpty())
+  {{-- The dashboard uses the no-stock modal below instead of a permanent inventory banner. --}}
+  @if(false)
     <section class="inventory-alert" aria-labelledby="inventory-alert-title" role="alert">
       <i class="fa fa-exclamation-triangle inventory-alert-icon" aria-hidden="true"></i>
       <div class="inventory-alert-content">
@@ -757,6 +758,44 @@
       </div>
       <a class="btn btn-warning" href="{{ url('inventory') }}">Review Inventory</a>
     </section>
+  @endif
+
+  @if($out_of_stock > 0)
+    <div class="modal fade stock-alert-modal" id="outOfStockAlert" tabindex="-1" role="dialog" aria-labelledby="outOfStockAlertTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="outOfStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> No-stock alert</h3>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            {{ $out_of_stock }} item{{ $out_of_stock === 1 ? ' is' : 's are' }} currently out of stock.
+            <ul>
+              @foreach($inventory_alerts->where('stock', '<=', 0) as $food)
+                <li>{{ $food->title }}</li>
+              @endforeach
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <a class="btn btn-warning" href="{{ url('inventory') }}">Review Inventory</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+      .stock-alert-modal .modal-content { background:#15171c; border:1px solid rgba(248, 131, 121, .7); border-radius:10px; color:#fff; }
+      .stock-alert-modal .modal-header, .stock-alert-modal .modal-footer { border-color:#2b2f38; }
+      .stock-alert-modal .modal-title { font-weight:800; }
+      .stock-alert-modal .modal-title .fa { color:#fca5a5; }
+      .stock-alert-modal .modal-body { color:#d1d5db; }
+      .stock-alert-modal .modal-body li { color:#fff; margin-bottom:6px; }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        $('#outOfStockAlert').modal('show');
+      });
+    </script>
   @endif
 
   <div class="row dashboard-gap">

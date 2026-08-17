@@ -5,6 +5,8 @@
   <style>
     .sales-report { background:var(--mc-shell); border:1px solid var(--mc-border); border-radius:8px; margin:0; min-height:calc(100vh - 120px); padding:26px; }
     .sales-report h2 { font-size:25px; font-weight:800; margin:0; }
+    .sales-report-heading { align-items:center; display:flex; gap:12px; }
+    .sales-report-logo { height:46px; object-fit:contain; width:46px; }
     .sales-report .subtitle { color:var(--mc-muted); margin:5px 0 0; }
     .sales-filter, .sales-card, .sales-panel { background:var(--mc-panel); border:1px solid var(--mc-border); border-radius:8px; }
     .sales-filter { align-items:end; display:flex; flex-wrap:wrap; gap:14px; margin:22px 0; padding:16px; }
@@ -23,7 +25,10 @@
   @include('admin.header')
   @include('admin.sidebar')
   <div class="page-content"><div class="page-header"><div class="container-fluid"><main class="sales-report">
-    <h2>Sales Report</h2><p class="subtitle">Paid sales from {{ $from->format('M d, Y') }} to {{ $to->format('M d, Y') }}</p>
+    <div class="sales-report-heading">
+      <img class="sales-report-logo" src="{{ asset('assets/imgs/mi-cusina-transparent.png') }}" alt="Mi Cusina logo">
+      <div><h2>Sales Report</h2><p class="subtitle">Paid sales from {{ $from->format('M d, Y') }} to {{ $to->format('M d, Y') }}</p></div>
+    </div>
     <form class="sales-filter" method="GET" action="{{ route('admin.sales-report') }}">
       <label>From <input type="date" name="from" value="{{ $from->toDateString() }}"></label>
       <label>To <input type="date" name="to" value="{{ $to->toDateString() }}"></label>
