@@ -750,7 +750,25 @@
     .mic-card-cart { justify-content:center; }
     .mic-card-cart button { background:#83bd47; box-shadow:none; }
     .mic-card-cart button:hover { background:#679b34; }
-    @media (max-width:640px) { .mic-marketplace { padding-top:24px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-hero { background:linear-gradient(160deg, #fff 0 55%, #83bd47 55%); grid-template-columns:1fr; min-height:520px; padding:32px 26px; } .mic-menu-hero h2 { font-size:40px; } .mic-menu-hero-dish::before { height:220px; width:220px; } .mic-menu-hero-dish img { height:200px; width:200px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-image-wrap img { border-width:5px; height:118px; width:118px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } }
+    /* Spacious menu item detail view inspired by modern healthy-food stores. */
+    .mic-product-modal-backdrop { background:rgba(29,43,20,.42); backdrop-filter:blur(4px); }
+    .mic-product-detail { border-radius:24px; box-shadow:0 28px 70px rgba(21,34,13,.25); display:grid; grid-template-columns:1fr 1fr; max-width:1040px; overflow:hidden; }
+    .mic-detail-media { align-items:center; background:linear-gradient(145deg, #f2f7ec, #fff); display:flex; justify-content:center; min-height:560px; padding:50px; position:relative; }
+    .mic-detail-media > img { background:#fff; border:10px solid #83bd47; border-radius:50%; box-shadow:0 20px 40px rgba(59,88,31,.18); height:360px; object-fit:cover; width:360px; }
+    .mic-detail-thumbs, .mic-share-row { display:none; }
+    .mic-detail-info { align-self:center; padding:52px; }
+    .mic-detail-info h3 { color:#1b2515; font-size:38px; font-weight:900; letter-spacing:-.05em; line-height:1.05; }
+    .mic-detail-rating span { color:#83bd47; }
+    .mic-detail-price { color:#5c9032; font-size:30px; font-weight:900; }
+    .mic-detail-stock { color:#5c9032; font-weight:800; }
+    .mic-detail-row { border-color:#e5ebdf; }
+    .mic-detail-info p { color:#64705f; line-height:1.7; }
+    .mic-detail-cart label { color:#526245; font-weight:800; }
+    .mic-detail-cart input { border-color:#d7e5ca; border-radius:9px; }
+    .mic-solid-btn { background:#83bd47 !important; border-radius:9px !important; }
+    .mic-outline-btn { border-color:#83bd47 !important; border-radius:9px !important; color:#5c9032 !important; }
+    .mic-product-close { background:#fff; border-radius:50%; box-shadow:0 5px 15px rgba(15,23,42,.12); color:#526245; height:40px; right:20px; top:20px; width:40px; z-index:2; }
+    @media (max-width:640px) { .mic-marketplace { padding-top:24px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-hero { background:linear-gradient(160deg, #fff 0 55%, #83bd47 55%); grid-template-columns:1fr; min-height:520px; padding:32px 26px; } .mic-menu-hero h2 { font-size:40px; } .mic-menu-hero-dish::before { height:220px; width:220px; } .mic-menu-hero-dish img { height:200px; width:200px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-image-wrap img { border-width:5px; height:118px; width:118px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } .mic-product-detail { display:block; max-height:92vh; overflow:auto; } .mic-detail-media { min-height:300px; padding:28px; } .mic-detail-media > img { height:220px; width:220px; } .mic-detail-info { padding:30px 24px; } .mic-detail-info h3 { font-size:30px; } }
 </style>
 
 <script>
