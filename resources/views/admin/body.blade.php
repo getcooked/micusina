@@ -736,7 +736,7 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  @if(session('show_low_stock_alert') && $low_stock > 0)
+  @if($low_stock > 0)
     <div class="stock-alert-modal" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
