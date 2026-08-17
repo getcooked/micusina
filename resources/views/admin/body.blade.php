@@ -741,14 +741,17 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title" id="lowStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Low-stock alert</h3>
+            <h3 class="modal-title" id="lowStockAlertTitle"><span class="stock-alert-symbol"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span> Low-stock alert</h3>
             <button type="button" class="close text-white" data-stock-alert-close aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
             {{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).
-            <ul>
+            <ul class="low-stock-list">
               @foreach($inventory_alerts->where('stock', '>', 0) as $food)
-                <li>{{ $food->title }}: {{ $food->stock }} left</li>
+                <li>
+                  <img src="{{ asset('food_img/' . $food->image) }}" alt="{{ $food->title }}" onerror="this.style.display='none'">
+                  <span><strong>{{ $food->title }}</strong>: {{ $food->stock }} left</span>
+                </li>
               @endforeach
             </ul>
           </div>
@@ -768,6 +771,19 @@
       .stock-alert-modal .modal-title .fa { color:#fca5a5; }
       .stock-alert-modal .modal-body { color:#d1d5db; }
       .stock-alert-modal .modal-body li { color:#fff; margin-bottom:6px; }
+      .stock-alert-modal { background:rgba(15, 23, 42, .44) !important; backdrop-filter:blur(4px); }
+      .stock-alert-modal .modal-content { background:#fff; border:1px solid #fed7aa; border-radius:18px; box-shadow:0 24px 60px rgba(15, 23, 42, .24); color:#172033; overflow:hidden; }
+      .stock-alert-modal .modal-header { align-items:center; background:#fff7ed; border-color:#fed7aa; padding:18px 22px; }
+      .stock-alert-modal .modal-title { color:#9a3412; font-size:19px; }
+      .stock-alert-modal .stock-alert-symbol { align-items:center; background:#fff1bf; border-radius:12px; display:inline-flex; height:42px; justify-content:center; margin-right:8px; width:42px; }
+      .stock-alert-modal .modal-title .stock-alert-symbol .fa { color:#f59e0b; font-size:23px; }
+      .stock-alert-modal .modal-body { color:#334155; padding:20px 22px; }
+      .stock-alert-modal .low-stock-list { display:grid; gap:13px; list-style:none; margin:18px 0 0; padding:0; }
+      .stock-alert-modal .low-stock-list li { align-items:center; color:#172033; display:flex; gap:13px; margin:0; }
+      .stock-alert-modal .low-stock-list img { background:#fff7ed; border:2px solid #fff; border-radius:50%; box-shadow:0 4px 12px rgba(15, 23, 42, .12); height:48px; object-fit:cover; width:48px; }
+      .stock-alert-modal .low-stock-list strong { color:#172033; }
+      .stock-alert-modal .modal-footer { background:#f8fafc; border-color:#e2e8f0; padding:14px 22px; }
+      .stock-alert-modal .btn-secondary { background:linear-gradient(135deg, #fb7185, #f88379); border:0; border-radius:10px; box-shadow:0 8px 16px rgba(248, 131, 121, .3); font-weight:800; padding:10px 22px; }
     </style>
     <script>
       (function () {
