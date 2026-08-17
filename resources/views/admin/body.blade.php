@@ -696,12 +696,12 @@
   <h2>Dashboard Overview</h2>
 
   @if($low_stock > 0)
-    <div class="modal fade stock-alert-modal" id="lowStockAlert" tabindex="-1" role="dialog" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
+    <div class="stock-alert-modal" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title" id="lowStockAlertTitle"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Low-stock alert</h3>
-            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close text-white" data-stock-alert-close aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
             {{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).
@@ -712,12 +712,15 @@
             </ul>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
+            <button type="button" class="btn btn-secondary" data-stock-alert-close>Dismiss</button>
           </div>
         </div>
       </div>
     </div>
     <style>
+      .stock-alert-modal { align-items:center; background:rgba(0, 0, 0, .65); display:none; inset:0; justify-content:center; padding:16px; position:fixed; z-index:2000; }
+      .stock-alert-modal.is-visible { display:flex; }
+      .stock-alert-modal .modal-dialog { margin:0; max-width:520px; width:100%; }
       .stock-alert-modal .modal-content { background:#15171c; border:1px solid rgba(248, 131, 121, .7); border-radius:10px; color:#fff; }
       .stock-alert-modal .modal-header, .stock-alert-modal .modal-footer { border-color:#2b2f38; }
       .stock-alert-modal .modal-title { font-weight:800; }
@@ -727,7 +730,25 @@
     </style>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        $('#lowStockAlert').modal('show');
+        var lowStockAlert = document.getElementById('lowStockAlert');
+        if (!lowStockAlert) return;
+
+        function closeLowStockAlert() {
+          lowStockAlert.classList.remove('is-visible');
+          lowStockAlert.setAttribute('aria-hidden', 'true');
+        }
+
+        lowStockAlert.classList.add('is-visible');
+        lowStockAlert.setAttribute('aria-hidden', 'false');
+        lowStockAlert.querySelectorAll('[data-stock-alert-close]').forEach(function (button) {
+          button.addEventListener('click', closeLowStockAlert);
+        });
+        lowStockAlert.addEventListener('click', function (event) {
+          if (event.target === lowStockAlert) closeLowStockAlert();
+        });
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') closeLowStockAlert();
+        });
       });
     </script>
   @endif
