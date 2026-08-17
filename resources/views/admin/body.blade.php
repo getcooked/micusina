@@ -1074,7 +1074,7 @@
   </div>
   <style>
     .low-stock-overlay { align-items:center; background:transparent !important; display:flex; inset:0; justify-content:center; padding:24px; position:fixed; z-index:9999; }
-    .low-stock-overlay::before { background:rgba(71,85,105,.34); backdrop-filter:blur(3px); content:''; inset:0; position:absolute; }
+    .low-stock-overlay::before { display:none; }
     .low-stock-dialog { background:#fff; border-radius:20px; box-shadow:0 20px 46px rgba(15,23,42,.22); color:#1f2937; max-width:570px; overflow:hidden; position:relative; width:100%; z-index:1; }
     .low-stock-header { align-items:center; border-bottom:1px solid #e5e7eb; display:flex; justify-content:space-between; padding:26px 28px; }
     .low-stock-header h2 { align-items:center; display:flex; font-size:25px; font-weight:800; margin:0; }
