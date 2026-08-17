@@ -719,6 +719,16 @@
   .best-seller-track { background: #f1f5f9; }
   .best-seller-bar { background: linear-gradient(90deg, #f88379, #fb7185); }
   .data-fallback, .fallback-value, .fallback-label { color: #64748b; }
+  .stock-alert-modal { background: rgba(15, 23, 42, .44) !important; backdrop-filter: blur(4px); }
+  .stock-alert-modal .modal-content { background: #fff; border: 1px solid #fed7aa; border-radius: 18px; box-shadow: 0 24px 60px rgba(15, 23, 42, .24); color: #172033; overflow: hidden; }
+  .stock-alert-modal .modal-header { align-items: center; background: #fff7ed; border-color: #fed7aa; padding: 18px 22px; }
+  .stock-alert-modal .modal-title { color: #9a3412; font-size: 19px; }
+  .stock-alert-modal .modal-title .fa { color: #f97316; }
+  .stock-alert-modal .modal-body { color: #334155; padding: 20px 22px; }
+  .stock-alert-modal .modal-body ul { margin: 14px 0 0; padding-left: 20px; }
+  .stock-alert-modal .modal-body li { color: #172033; margin-bottom: 8px; }
+  .stock-alert-modal .modal-footer { background: #f8fafc; border-color: #e2e8f0; padding: 14px 22px; }
+  .stock-alert-modal .btn-secondary { background: #172033; border-color: #172033; border-radius: 8px; font-weight: 700; padding: 8px 18px; }
   @media (max-width: 1199px) { .analytics-grid .best-selling-panel { grid-column: span 6; } }
   @media (max-width: 767px) { .analytics-grid .best-selling-panel { grid-column: span 1; } .admin-dashboard h2 { font-size: 22px; } }
 </style>
@@ -846,7 +856,7 @@
     </div>
 
     <div class="mini-card-col">
-      <div class="mini-card">
+      <div class="mini-card low-stock-card">
         <div class="mini-icon bg-orange"><i class="fa fa-warning"></i></div>
         <div>
           <div class="mini-label">Low Stock</div>
