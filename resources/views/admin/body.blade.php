@@ -1052,6 +1052,14 @@
 </div>
 
 @if($low_stock > 0)
+  @php
+    $lowStockImages = [
+      'ham-bowl' => 'ham-bowl.png',
+      'chicken-adobo-flakes' => 'chicken-adobo-flakes.png',
+      'chicken-teriyaki' => 'chicken-tereyaki.png',
+      'chicken-tereyaki' => 'chicken-tereyaki.png',
+    ];
+  @endphp
   <div class="low-stock-overlay" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" style="background:transparent !important;">
     <section class="low-stock-dialog">
       <header class="low-stock-header">
@@ -1062,8 +1070,12 @@
         <p>{{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).</p>
         <ul>
           @foreach($inventory_alerts->where('stock', '>', 0) as $food)
+            @php
+              $mappedImage = $lowStockImages[\Illuminate\Support\Str::slug($food->title)] ?? null;
+              $foodImage = $mappedImage ? asset('assets/imgs/' . $mappedImage) : asset('food_img/' . $food->image);
+            @endphp
             <li>
-              <img src="{{ asset('food_img/' . $food->image) }}" alt="{{ $food->title }}" onerror="this.style.display='none'">
+              <img src="{{ $foodImage }}" alt="{{ $food->title }}" onerror="this.style.display='none'">
               <span><strong>{{ $food->title }}</strong>: {{ $food->stock }} left</span>
             </li>
           @endforeach
