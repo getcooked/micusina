@@ -791,6 +791,10 @@
         var lowStockAlert = document.getElementById('lowStockAlert');
         if (!lowStockAlert) return;
 
+        // Move the overlay to the page root so it always covers the entire
+        // admin dashboard (including the sidebar and header).
+        document.body.appendChild(lowStockAlert);
+
         function closeLowStockAlert() {
           lowStockAlert.classList.remove('is-visible');
           lowStockAlert.setAttribute('aria-hidden', 'true');
