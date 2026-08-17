@@ -692,6 +692,37 @@
   }
 </style>
 
+<style>
+  /* Light, information-first dashboard layout. */
+  body, .page-content, .page-header { background: #f8fafc; }
+  .admin-dashboard { background: transparent; color: #172033; padding: 8px 0 28px; }
+  .admin-dashboard h2 { color: #172033; font-size: 26px; letter-spacing: -.02em; margin: 0 0 20px; }
+  .admin-dashboard > .row.dashboard-gap { gap: 16px; margin-bottom: 16px; }
+  .admin-dashboard > .row.dashboard-gap:first-of-type { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; gap: 14px; padding: 14px; }
+  .sales-card, .mini-card, .chart-panel, .best-selling-panel { background: #fff !important; border: 1px solid #e2e8f0; box-shadow: 0 8px 24px rgba(15, 23, 42, .05); color: #172033; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .sales-card:hover, .mini-card:hover, .chart-panel:hover { border-color: #cbd5e1; box-shadow: 0 14px 30px rgba(15, 23, 42, .09); transform: translateY(-2px); }
+  .sales-card { border-radius: 13px; min-height: 122px; padding: 16px; }
+  .sales-card .label, .mini-label { color: #64748b; font-size: 12px; font-weight: 700; }
+  .sales-card .value, .mini-value { color: #0f172a; font-size: 22px; font-weight: 800; }
+  .mini-card { border-radius: 13px; min-height: 74px; padding: 13px 16px; }
+  .mini-value { font-size: 20px; }
+  .chart-panel { border-radius: 16px; padding: 18px; }
+  .chart-panel h3, .chart-panel.best-selling-panel h3 { color: #172033; font-size: 16px; }
+  .chart-tabs { border-color: #e2e8f0; }
+  .chart-tabs span, .chart-tabs span.active { color: #64748b; }
+  .chart-tabs span.active { border-bottom-color: #f88379; color: #ea580c; }
+  .analytics-grid { gap: 16px; margin-top: 18px; }
+  .analytics-grid .chart-panel { min-height: 300px; }
+  .analytics-grid .best-selling-panel { grid-column: span 3; }
+  .best-selling-panel, .best-selling-row, .best-seller-sold, .chart-panel.best-selling-panel h3 { color: #172033; }
+  .best-seller-meta { border-color: #e2e8f0; }
+  .best-seller-track { background: #f1f5f9; }
+  .best-seller-bar { background: linear-gradient(90deg, #f88379, #fb7185); }
+  .data-fallback, .fallback-value, .fallback-label { color: #64748b; }
+  @media (max-width: 1199px) { .analytics-grid .best-selling-panel { grid-column: span 6; } }
+  @media (max-width: 767px) { .analytics-grid .best-selling-panel { grid-column: span 1; } .admin-dashboard h2 { font-size: 22px; } }
+</style>
+
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
@@ -810,6 +841,16 @@
         <div>
           <div class="mini-label">Available Stock</div>
           <div class="mini-value">{{ $total_stock }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-card-col">
+      <div class="mini-card">
+        <div class="mini-icon bg-orange"><i class="fa fa-warning"></i></div>
+        <div>
+          <div class="mini-label">Low Stock</div>
+          <div class="mini-value">{{ $low_stock }}</div>
         </div>
       </div>
     </div>
