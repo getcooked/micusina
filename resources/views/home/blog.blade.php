@@ -883,6 +883,10 @@
         .mic-product-card { grid-template-columns:165px minmax(0, 1fr); min-height:200px; }
         .mic-product-image-wrap, .mic-product-image-wrap img { height:150px; width:150px; }
     }
+    /* Explicit layers: the modal never replaces the menu page behind it. */
+    .mic-product-modal { background:rgba(15,23,42,.42); }
+    .mic-product-modal-backdrop { background:transparent !important; inset:0; z-index:0; }
+    .mic-product-detail { background:rgba(255,255,255,.97); position:relative; z-index:1; }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
