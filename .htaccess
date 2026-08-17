@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    Options -Indexes
+    RewriteEngine On
+
+    # This project is deployed with its repository directory as the web root.
+    # Serve requests through Laravel's public directory without exposing files
+    # outside that directory.
+    RewriteRule ^public/ - [L]
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
