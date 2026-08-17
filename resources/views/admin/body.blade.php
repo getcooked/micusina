@@ -26,49 +26,6 @@
     text-shadow: none;
   }
 
-  .inventory-alert {
-    align-items: flex-start;
-    background: rgba(185, 28, 28, 0.16);
-    border: 1px solid rgba(248, 131, 121, 0.65);
-    border-left: 5px solid #f88379;
-    border-radius: 8px;
-    display: flex;
-    gap: 14px;
-    margin: 0 0 22px;
-    padding: 16px 18px;
-  }
-
-  .inventory-alert-icon {
-    color: #fca5a5;
-    font-size: 22px;
-    line-height: 1.25;
-  }
-
-  .inventory-alert-content { flex: 1; }
-
-  .inventory-alert-title {
-    color: #fff;
-    font-size: 16px;
-    font-weight: 800;
-    margin: 0 0 4px;
-  }
-
-  .inventory-alert-copy { color: #fecaca; margin: 0; }
-
-  .inventory-alert-items {
-    color: #fff;
-    font-weight: 700;
-    line-height: 1.6;
-    margin: 8px 0 0;
-  }
-
-  .inventory-alert .btn { flex: 0 0 auto; white-space: nowrap; }
-
-  @media (max-width: 575px) {
-    .inventory-alert { flex-wrap: wrap; }
-    .inventory-alert .btn { margin-left: 36px; }
-  }
-
   .sales-card,
   .mini-card,
   .chart-panel {
@@ -738,28 +695,6 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  {{-- The dashboard uses the no-stock modal below instead of a permanent inventory banner. --}}
-  @if(false)
-    <section class="inventory-alert" aria-labelledby="inventory-alert-title" role="alert">
-      <i class="fa fa-exclamation-triangle inventory-alert-icon" aria-hidden="true"></i>
-      <div class="inventory-alert-content">
-        <h3 class="inventory-alert-title" id="inventory-alert-title">Inventory needs attention</h3>
-        <p class="inventory-alert-copy">
-          {{ $out_of_stock }} out of stock and {{ $low_stock }} low-stock item{{ ($out_of_stock + $low_stock) === 1 ? '' : 's' }} ({{ $lowStockThreshold }} or fewer remaining).
-        </p>
-        <p class="inventory-alert-items">
-          @foreach($inventory_alerts->take(5) as $food)
-            <span>{{ $food->title }}: {{ $food->stock <= 0 ? 'Out of stock' : $food->stock . ' left' }}</span>{{ $loop->last ? '' : ' · ' }}
-          @endforeach
-          @if($inventory_alerts->count() > 5)
-            <span> · +{{ $inventory_alerts->count() - 5 }} more</span>
-          @endif
-        </p>
-      </div>
-      <a class="btn btn-warning" href="{{ url('inventory') }}">Review Inventory</a>
-    </section>
-  @endif
-
   @if($out_of_stock > 0)
     <div class="modal fade stock-alert-modal" id="outOfStockAlert" tabindex="-1" role="dialog" aria-labelledby="outOfStockAlertTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -777,8 +712,7 @@
             </ul>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <a class="btn btn-warning" href="{{ url('inventory') }}">Review Inventory</a>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Dismiss</button>
           </div>
         </div>
       </div>
