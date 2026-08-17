@@ -966,12 +966,14 @@
             addCartButton.disabled = stock <= 0;
             buyNowButton.disabled = stock <= 0;
             modal.classList.add('is-open');
+            modal.style.display = 'flex';
             modal.setAttribute('aria-hidden', 'false');
         });
 
         modal.addEventListener('click', function (event) {
             if (!event.target.closest('[data-close-product]')) return;
             modal.classList.remove('is-open');
+            modal.style.display = '';
             modal.setAttribute('aria-hidden', 'true');
         });
     });
