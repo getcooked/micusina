@@ -823,6 +823,15 @@
     .mic-card-cart input { background:rgba(255,255,255,.06); color:#fff; height:34px; width:52px; }
     .mic-card-cart button { background:#f6c63f; color:#1d1d1b; height:34px; }
     .mic-product-open { cursor:pointer; pointer-events:auto; }
+    /* Restored product detail popup, sized to the viewport without horizontal scrolling. */
+    .mic-product-modal.is-open { display:flex !important; }
+    .mic-product-detail { height:auto; max-height:calc(100vh - 48px); max-width:1120px; overflow-x:hidden; overflow-y:auto; width:calc(100vw - 48px); }
+    .mic-detail-media { min-height:0; padding:32px; }
+    .mic-detail-media > img { height:auto; max-height:calc(100vh - 130px); object-fit:contain; width:100%; }
+    .mic-detail-info { padding:34px; }
+    .mic-detail-info p { -webkit-box-orient:vertical; -webkit-line-clamp:4; display:-webkit-box; overflow:hidden; }
+    .mic-detail-actions { flex-wrap:wrap; }
+    .mic-detail-actions button { min-width:0; }
     @media (max-width:640px) { .mic-product-grid { grid-template-columns:1fr; } .mic-product-card { display:grid; } .mic-product-image-wrap { display:flex; height:104px; } .mic-product-image-wrap img { height:104px; width:104px; } .mic-product-body, .mic-card-cart { display:flex; } }
     @media (max-width:640px) { .mic-marketplace { padding-top:24px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-hero { background:linear-gradient(160deg, #fff 0 55%, #83bd47 55%); grid-template-columns:1fr; min-height:520px; padding:32px 26px; } .mic-menu-hero h2 { font-size:40px; } .mic-menu-hero-dish::before { height:220px; width:220px; } .mic-menu-hero-dish img { height:200px; width:200px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-image-wrap img { border-width:5px; height:118px; width:118px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } .mic-product-detail { display:block; max-height:92vh; overflow:auto; } .mic-detail-media { min-height:300px; padding:28px; } .mic-detail-media > img { height:220px; width:220px; } .mic-detail-info { padding:30px 24px; } .mic-detail-info h3 { font-size:30px; } }
     /* Image-first mobile menu and a clean white product preview. */
