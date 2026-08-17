@@ -130,7 +130,7 @@
                         <span class="mic-product-body">
                             <span class="mic-product-title">{{ $food->title }}</span>
                             <span class="mic-product-price">&#8369;{{ number_format($price, 2) }}</span>
-                            <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : '' }}">
+                            <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : ($food->stock <= 5 ? 'is-low' : 'is-available') }}">
                                 {{ $food->stock > 0 ? $food->stock . ' available' : 'Out of stock' }}
                             </span>
                             <span class="mic-product-meta">
@@ -428,14 +428,10 @@
         color: #000;
     }
 
-    .mic-stock {
-        color: #000;
-        font-weight: 700;
-    }
-
-    .mic-stock.is-out {
-        color: #000;
-    }
+    .mic-stock { font-weight: 700; }
+    .mic-stock.is-low,
+    .mic-stock.is-out { color: #dc2626; }
+    .mic-stock.is-available { color: #15803d; }
 
     .mic-card-cart {
         display: flex;
