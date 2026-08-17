@@ -38,7 +38,7 @@
 
                 @if(Auth::check() && Auth::user()->usertype == 'admin')
                 <li class="{{ request()->is('sales-report') ? 'active' : '' }}">
-                  <a href="{{ route('admin.sales-report') }}"> <i class="icon-stats-up"></i>Sales Report</a>
+                  <a href="{{ route('admin.sales-report') }}"><img src="{{ asset('assets/imgs/mi-cusina-transparent.png') }}" alt="" style="height:20px; margin-right:10px; object-fit:contain; vertical-align:middle; width:20px;">Sales Report</a>
                 </li>
                 <li class="{{ request()->is('transaction-history') ? 'active' : '' }}">
                   <a href="{{ route('admin.transaction-history') }}"> <i class="icon-list"></i>Transaction History</a>
