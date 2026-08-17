@@ -844,6 +844,14 @@
     /* Image-first mobile menu and a clean white product preview. */
     .mic-detail-media { background:#fff; }
     .mic-detail-media > img { border:0; border-radius:18px; box-shadow:none; height:min(430px, 38vw); object-fit:contain; width:min(430px, 38vw); }
+    /* Product preview sits over the existing menu; only the dialog itself may scroll. */
+    .mic-product-modal,
+    .mic-product-modal.is-open { align-items:center; display:none; inset:0; justify-content:center; position:fixed; z-index:4000; }
+    .mic-product-modal.is-open { display:flex !important; }
+    .mic-product-modal-backdrop { background:rgba(14, 20, 16, .46); backdrop-filter:blur(5px); position:fixed; }
+    .mic-product-detail { box-sizing:border-box; margin:0; max-height:calc(100vh - 48px); overflow:hidden; width:min(1120px, calc(100vw - 48px)); }
+    .mic-detail-info { max-height:calc(100vh - 48px); overflow-y:auto; scrollbar-width:none; }
+    .mic-detail-info::-webkit-scrollbar { display:none; }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
