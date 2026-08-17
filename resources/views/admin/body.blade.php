@@ -737,12 +737,12 @@
   <h2>Dashboard Overview</h2>
 
   @if($low_stock > 0)
-    <div class="stock-alert-modal" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
+    <div class="stock-alert-modal is-visible" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="false">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h3 class="modal-title" id="lowStockAlertTitle"><span class="stock-alert-symbol"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></span> Low-stock alert</h3>
-            <button type="button" class="close text-white" data-stock-alert-close aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <button type="button" class="close text-white" data-stock-alert-close onclick="document.getElementById('lowStockAlert').classList.remove('is-visible')" aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body">
             {{ $low_stock }} food item{{ $low_stock === 1 ? ' is' : 's are' }} running low ({{ $lowStockThreshold }} or fewer remaining).
@@ -756,7 +756,7 @@
             </ul>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-stock-alert-close>Dismiss</button>
+            <button type="button" class="btn btn-secondary" data-stock-alert-close onclick="document.getElementById('lowStockAlert').classList.remove('is-visible')">Dismiss</button>
           </div>
         </div>
       </div>
