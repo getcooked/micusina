@@ -144,6 +144,7 @@
 </div>
 
 <div class="mic-product-modal" id="micProductModal" aria-hidden="true">
+    <div class="mic-menu-modal-background" aria-hidden="true"></div>
     <div class="mic-product-modal-backdrop" data-close-product></div>
     <section class="mic-product-detail" role="dialog" aria-modal="true" aria-labelledby="micProductTitle">
         <button class="mic-product-close" type="button" data-close-product aria-label="Close product">&times;</button>
@@ -887,6 +888,8 @@
     .mic-product-modal { background:transparent !important; }
     .mic-product-modal-backdrop { background:transparent !important; display:none; inset:0; z-index:0; }
     .mic-product-detail { background:rgba(255,255,255,.97); position:relative; z-index:1; }
+    .mic-menu-modal-background { background:#f6f8fb; inset:0; overflow:hidden; pointer-events:none; position:absolute; z-index:0; }
+    .mic-menu-modal-background > * { filter:blur(2px); opacity:.52; transform:scale(.96); transform-origin:center top; }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
@@ -905,6 +908,9 @@
         const grid = document.getElementById('micProductGrid');
         const modal = document.getElementById('micProductModal');
         if (!grid || !modal) return;
+
+        const menuPreview = modal.querySelector('.mic-menu-modal-background');
+        const menuSurface = document.querySelector('.mic-marketplace-inner');
 
         const cards = Array.from(grid.querySelectorAll('.mic-product-card'));
         const sortButtons = document.querySelectorAll('.mic-sort-btn');
@@ -1015,6 +1021,9 @@
             modalQty.disabled = stock <= 0;
             addCartButton.disabled = stock <= 0;
             buyNowButton.disabled = stock <= 0;
+            if (menuPreview && menuSurface && !menuPreview.hasChildNodes()) {
+                menuPreview.appendChild(menuSurface.cloneNode(true));
+            }
             modal.classList.add('is-open');
             modal.style.display = 'flex';
             document.body.classList.add('mic-modal-open');
