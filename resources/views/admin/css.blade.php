@@ -680,7 +680,10 @@
         }
 
         .admin-brand img {
-            display: none;
+            display: block;
+            height: 38px;
+            object-fit: contain;
+            width: 38px;
         }
 
         .admin-user-trigger {
