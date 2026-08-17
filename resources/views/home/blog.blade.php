@@ -92,30 +92,6 @@
         <div class="mic-menu-heading">
             <div><span class="mic-eyebrow">OUR MENU</span><h2>Choose your favorite</h2></div>
         </div>
-        <div class="mic-sortbar">
-            <span>Sort by</span>
-            <details class="mic-category-filter">
-                <summary>
-                    <span>Category</span>
-                    <strong id="micCategoryLabel">All</strong>
-                </summary>
-                <div class="mic-category-menu" aria-label="Menu categories">
-                    <button class="is-active" type="button" data-category="all">All Categories</button>
-                    @foreach($menuCategories as $category)
-                        <button type="button" data-category="{{ e($category) }}">{{ $category }}</button>
-                    @endforeach
-                </div>
-            </details>
-            <button class="mic-sort-btn" type="button" data-sort="latest">Latest</button>
-            <button class="mic-sort-btn" type="button" data-sort="sales">Top Sales</button>
-            <select class="mic-price-sort" aria-label="Sort by price">
-                <option value="">Price</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-            </select>
-            <div class="mic-page-count"><span>1</span>/1</div>
-        </div>
-
         <div class="mic-product-grid" id="micProductGrid">
             @foreach($data as $food)
                 @php
@@ -852,6 +828,16 @@
     .mic-product-detail { box-sizing:border-box; margin:0; max-height:calc(100vh - 48px); overflow:hidden; width:min(1120px, calc(100vw - 48px)); }
     .mic-detail-info { max-height:calc(100vh - 48px); overflow-y:auto; scrollbar-width:none; }
     .mic-detail-info::-webkit-scrollbar { display:none; }
+    /* A larger, simple two-item menu without sorting dropdowns. */
+    .mic-product-grid { column-gap:64px; grid-template-columns:repeat(2, minmax(0, 1fr)); row-gap:24px; }
+    .mic-product-card { grid-template-columns:180px minmax(0, 1fr); min-height:210px; padding:18px 0; }
+    .mic-product-image-wrap { height:170px; }
+    .mic-product-image-wrap img { height:170px; width:170px; }
+    .mic-product-title { font-size:22px; }
+    .mic-product-price { font-size:20px; }
+    .mic-stock { font-size:15px; }
+    .mic-product-meta { font-size:14px; }
+    .mic-card-cart button { height:42px; padding:0 24px; }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
