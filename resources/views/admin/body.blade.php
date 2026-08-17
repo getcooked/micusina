@@ -695,7 +695,7 @@
 <div class="admin-dashboard">
   <h2>Dashboard Overview</h2>
 
-  @if($low_stock > 0)
+  @if(session('show_low_stock_alert') && $low_stock > 0)
     <div class="stock-alert-modal" id="lowStockAlert" role="dialog" aria-modal="true" aria-labelledby="lowStockAlertTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -729,7 +729,8 @@
       .stock-alert-modal .modal-body li { color:#fff; margin-bottom:6px; }
     </style>
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
+      (function () {
+        function showLowStockAlert() {
         var lowStockAlert = document.getElementById('lowStockAlert');
         if (!lowStockAlert) return;
 
@@ -749,7 +750,14 @@
         document.addEventListener('keydown', function (event) {
           if (event.key === 'Escape') closeLowStockAlert();
         });
-      });
+        }
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', showLowStockAlert);
+        } else {
+          showLowStockAlert();
+        }
+      })();
     </script>
   @endif
 
@@ -802,16 +810,6 @@
         <div>
           <div class="mini-label">Available Stock</div>
           <div class="mini-value">{{ $total_stock }}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="mini-card-col">
-      <div class="mini-card">
-        <div class="mini-icon bg-orange"><i class="fa fa-warning"></i></div>
-        <div>
-          <div class="mini-label">Low Stock</div>
-          <div class="mini-value">{{ $low_stock }}</div>
         </div>
       </div>
     </div>
