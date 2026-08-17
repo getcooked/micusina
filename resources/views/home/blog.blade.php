@@ -79,6 +79,10 @@
 
 <div id="blog" class="mic-marketplace">
     <div class="mic-marketplace-inner">
+        <div class="mic-menu-heading">
+            <div><span class="mic-eyebrow">MI CUSINA KITCHEN</span><h2>Find your next favorite meal</h2><p>Freshly prepared comfort food, ready when you are.</p></div>
+            <span class="mic-menu-count">{{ count($data) }} menu items</span>
+        </div>
         <div class="mic-sortbar">
             <span>Sort by</span>
             <details class="mic-category-filter">
@@ -679,6 +683,35 @@
             width: 100%;
         }
     }
+    /* Modern customer menu experience. */
+    .mic-marketplace { background:linear-gradient(180deg, #fff7f5 0, #ffffff 330px); padding:48px 0 64px; }
+    .mic-marketplace-inner { max-width:1320px; padding:0 24px; }
+    .mic-menu-heading { align-items:end; display:flex; justify-content:space-between; margin:0 0 28px; }
+    .mic-eyebrow { color:#e85c55; font-size:12px; font-weight:800; letter-spacing:.12em; }
+    .mic-menu-heading h2 { color:#1f2937; font-size:36px; font-weight:800; letter-spacing:-.04em; margin:6px 0 8px; }
+    .mic-menu-heading p { color:#64748b; margin:0; }
+    .mic-menu-count { background:#fff; border:1px solid #fecaca; border-radius:999px; color:#b91c1c; font-size:13px; font-weight:800; padding:9px 14px; }
+    .mic-sortbar { background:rgba(255,255,255,.92); border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 10px 24px rgba(15,23,42,.06); gap:10px; margin-bottom:28px; padding:12px; }
+    .mic-sortbar > span { color:#475569; font-size:13px; font-weight:800; margin:0 4px; }
+    .mic-category-filter summary, .mic-sort-btn, .mic-price-sort { background:#fff; border:1px solid #dbe3ee; border-radius:10px; color:#334155; font-weight:700; min-height:42px; }
+    .mic-sort-btn:hover, .mic-sort-btn.is-active, .mic-category-filter[open] summary { background:#fff1f0; border-color:#f88379; color:#c2413a; }
+    .mic-product-grid { gap:22px; grid-template-columns:repeat(auto-fill, minmax(245px, 1fr)); }
+    .mic-product-card { background:#fff; border:1px solid #e2e8f0; border-radius:18px; box-shadow:0 8px 22px rgba(15,23,42,.06); overflow:hidden; transition:transform .2s ease, box-shadow .2s ease; }
+    .mic-product-card:hover { box-shadow:0 18px 36px rgba(15,23,42,.12); transform:translateY(-4px); }
+    .mic-product-image-wrap { background:#fff7f5; height:205px; }
+    .mic-product-image-wrap img { height:100%; object-fit:cover; width:100%; }
+    .mic-product-ribbon { background:rgba(31,41,55,.82); border-radius:999px; left:12px; padding:5px 9px; top:12px; }
+    .mic-product-body { padding:16px 16px 8px; }
+    .mic-product-title { color:#1f2937; font-size:18px; font-weight:800; min-height:48px; }
+    .mic-product-price { color:#e85c55; font-size:21px; font-weight:800; margin-top:10px; }
+    .mic-stock { background:#f8fafc; border-radius:8px; padding:6px 8px; width:max-content; }
+    .mic-product-meta { color:#64748b; margin-top:12px; }
+    .mic-location { color:#64748b; font-size:12px; }
+    .mic-card-cart { gap:10px; padding:12px 16px 16px; }
+    .mic-card-cart input { border:1px solid #dbe3ee; border-radius:9px; height:44px; width:62px; }
+    .mic-card-cart button { background:linear-gradient(135deg, #f88379, #ef5f62); border-radius:9px; box-shadow:0 8px 16px rgba(239,95,98,.18); font-weight:800; height:44px; }
+    .mic-card-cart button:hover { filter:brightness(.96); }
+    @media (max-width:640px) { .mic-marketplace { padding-top:32px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } }
 </style>
 
 <script>
