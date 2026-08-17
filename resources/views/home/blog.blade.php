@@ -842,16 +842,18 @@
     /* Light dashboard surface and larger two-column food cards. */
     .mic-marketplace { background:#f6f8fb; }
     .mic-marketplace-inner { background:#fff; border:1px solid #e5e7eb; box-shadow:0 18px 45px rgba(15,23,42,.08); max-width:1500px; }
-    .mic-product-card { grid-template-columns:230px minmax(0, 1fr); min-height:270px; }
-    .mic-product-image-wrap { height:220px; }
-    .mic-product-image-wrap img { height:220px; width:220px; }
+    .mic-product-card { grid-template-columns:245px minmax(0, 1fr); min-height:280px; }
+    .mic-product-image-wrap { height:235px; }
+    .mic-product-image-wrap img { height:235px; width:235px; }
     .mic-product-title { color:#172033; font-size:25px; }
     .mic-product-price { color:#ef5d5d; font-size:22px; }
     .mic-product-description { color:#64748b; display:block; font-size:14px; line-height:1.45; margin-top:8px; }
     .mic-product-meta span:last-child, .mic-product-meta { color:#64748b; }
     .mic-card-cart input { background:#fff; border-color:#dbe2ea; color:#172033; }
     .mic-card-cart button { background:#f56060; color:#fff; }
-    .mic-product-modal-backdrop { background:rgba(15,23,42,.42); }
+    body.mic-modal-open { overflow:hidden; }
+    .mic-product-modal-backdrop { background:rgba(15,23,42,.20); backdrop-filter:none; }
+    .mic-product-detail { max-width:1040px; }
     @media (max-width:700px) {
         .mic-marketplace-inner { border-radius:20px; padding:20px 16px; }
         .mic-product-grid { grid-template-columns:1fr; }
@@ -995,6 +997,7 @@
             buyNowButton.disabled = stock <= 0;
             modal.classList.add('is-open');
             modal.style.display = 'flex';
+            document.body.classList.add('mic-modal-open');
             modal.setAttribute('aria-hidden', 'false');
         });
 
@@ -1002,6 +1005,7 @@
             if (!event.target.closest('[data-close-product]')) return;
             modal.classList.remove('is-open');
             modal.style.display = '';
+            document.body.classList.remove('mic-modal-open');
             modal.setAttribute('aria-hidden', 'true');
         });
     });
