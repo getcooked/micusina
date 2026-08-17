@@ -36,6 +36,12 @@
                   <a href="{{ url('orders') }}"> <i class="icon-logout"></i>Orders</a>
                 </li>
 
+                @if(Auth::check() && Auth::user()->usertype == 'admin')
+                <li class="{{ request()->is('sales-report') ? 'active' : '' }}">
+                  <a href="{{ route('admin.sales-report') }}"> <i class="icon-stats-up"></i>Sales Report</a>
+                </li>
+                @endif
+
                 <li class="{{ request()->is('riders') ? 'active' : '' }}">
                   <a href="{{ url('riders') }}"> <i class="fa fa-motorcycle"></i>Riders</a>
                 </li>

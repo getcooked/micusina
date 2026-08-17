@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -207,6 +208,70 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.order', compact('data', 'availableRiders'));
+    }
+
+    public function sales_report(Request $request)
+    {
+        $this->requireAdmin();
+
+        $request->validate([
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
+
+        $from = $request->filled('from') ? Carbon::parse($request->from)->startOfDay() : now()->subDays(29)->startOfDay();
+        $to = $request->filled('to') ? Carbon::parse($request->to)->endOfDay() : now()->endOfDay();
+
+        $salesOrders = Order::query()
+            ->where('payment_status', 'Paid')
+            ->where('delivery_status', '!=', 'Canceled')
+            ->whereBetween('created_at', [$from, $to]);
+
+        $orderSales = (clone $salesOrders)->sum('price');
+        $paidOrders = (clone $salesOrders)->count();
+        $reservationSales = Book::where('status', 'Approved')
+            ->whereBetween('approved_at', [$from, $to])
+            ->sum('deposit_amount');
+        $approvedReservations = Book::where('status', 'Approved')
+            ->whereBetween('approved_at', [$from, $to])
+            ->count();
+
+        $topItems = (clone $salesOrders)
+            ->selectRaw('title, SUM(quantity) as quantity_sold, SUM(price) as sales_total')
+            ->whereNotNull('title')
+            ->groupBy('title')
+            ->orderByDesc('sales_total')
+            ->limit(8)
+            ->get();
+
+        $recentSales = (clone $salesOrders)->latest()->limit(12)->get();
+
+        $salesByDay = [];
+        for ($date = $from->copy()->startOfDay(); $date->lte($to); $date->addDay()) {
+            $salesByDay[] = [
+                'label' => $date->format('M d'),
+                'total' => Order::where('payment_status', 'Paid')
+                    ->where('delivery_status', '!=', 'Canceled')
+                    ->whereDate('created_at', $date->toDateString())
+                    ->sum('price')
+                    + Book::where('status', 'Approved')
+                        ->whereDate('approved_at', $date->toDateString())
+                        ->sum('deposit_amount'),
+            ];
+        }
+
+        return view('admin.sales_report', [
+            'from' => $from,
+            'to' => $to,
+            'orderSales' => $orderSales,
+            'reservationSales' => $reservationSales,
+            'totalSales' => $orderSales + $reservationSales,
+            'paidOrders' => $paidOrders,
+            'approvedReservations' => $approvedReservations,
+            'topItems' => $topItems,
+            'recentSales' => $recentSales,
+            'salesByDay' => $salesByDay,
+        ]);
     }
 
     public function assign_rider(Request $request, $id)

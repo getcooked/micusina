@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/confirm_order', [HomeController::class, 'confirm_order']);
 
     Route::get('/orders', [AdminController::class, 'orders']);
+    Route::get('/sales-report', [AdminController::class, 'sales_report'])->name('admin.sales-report');
     Route::get('/users', [AdminController::class, 'users']);
     Route::get('/riders', [AdminController::class, 'riders']);
     Route::post('/assign_rider/{id}', [AdminController::class, 'assign_rider']);

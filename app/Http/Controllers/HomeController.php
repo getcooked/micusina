@@ -84,9 +84,17 @@ class HomeController extends Controller
 
               $total_stock = Food::sum('stock');
 
-              $low_stock = Food::where('stock','>',0)->where('stock','<=',5)->count();
+              $lowStockThreshold = (int) config('services.low_stock.threshold', 5);
 
-              $out_of_stock = Food::where('stock','<=',0)->count();
+              $low_stock = Food::where('stock', '>', 0)->where('stock', '<=', $lowStockThreshold)->count();
+
+              $out_of_stock = Food::where('stock', '<=', 0)->count();
+
+              $inventory_alerts = Food::where('stock', '<=', $lowStockThreshold)
+                  ->orderByRaw('CASE WHEN stock <= 0 THEN 0 ELSE 1 END')
+                  ->orderBy('stock')
+                  ->orderBy('title')
+                  ->get();
 
               $total_order = Order::count();
 
@@ -220,7 +228,7 @@ class HomeController extends Controller
               $available_riders = $riders->where('rider_available', true)->count();
               $busy_riders = $riders->count() - $available_riders;
 
-                return view('admin.index',compact('total_user','total_food','total_stock','low_stock','out_of_stock','total_order','total_delivered','today_orders','yesterday_sales','pending_orders','processing_orders','daily_sales','weekly_sales','total_sales','monthly_sales','last_month_sales','ordered_foods','daily_sales_labels','daily_sales_values','daily_sales_max','weekly_sales_labels','weekly_sales_values','weekly_sales_max','monthly_sales_labels','monthly_sales_values','monthly_sales_max','best_selling_labels','best_selling_values','best_selling_items','best_selling_max','popular_foods','recent_orders','reservation_sales_labels','reservation_sales_values','riders','available_riders','busy_riders'));
+                return view('admin.index',compact('total_user','total_food','total_stock','low_stock','out_of_stock','lowStockThreshold','inventory_alerts','total_order','total_delivered','today_orders','yesterday_sales','pending_orders','processing_orders','daily_sales','weekly_sales','total_sales','monthly_sales','last_month_sales','ordered_foods','daily_sales_labels','daily_sales_values','daily_sales_max','weekly_sales_labels','weekly_sales_values','weekly_sales_max','monthly_sales_labels','monthly_sales_values','monthly_sales_max','best_selling_labels','best_selling_values','best_selling_items','best_selling_max','popular_foods','recent_orders','reservation_sales_labels','reservation_sales_values','riders','available_riders','busy_riders'));
             }
             else
             if($usertype=='staff')
