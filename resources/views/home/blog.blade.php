@@ -867,6 +867,14 @@
         .mic-detail-media > img { height:auto; max-height:34vh; width:100%; }
         .mic-detail-info { max-height:calc(66vh - 32px); overflow-y:auto; padding:22px; }
     }
+    /* Keep the actual menu visible behind a focused product preview. */
+    .mic-product-modal-backdrop { background:rgba(15,23,42,.38) !important; backdrop-filter:blur(3px) !important; }
+    .mic-product-detail { max-width:min(960px, calc(100vw - 64px)) !important; }
+    .mic-detail-media > img { height:min(470px, 42vw); max-height:calc(100vh - 120px); width:min(470px, 42vw); }
+    @media (max-width:700px) {
+        .mic-product-detail { max-width:calc(100vw - 32px) !important; }
+        .mic-detail-media > img { height:auto; max-height:36vh; width:100%; }
+    }
     @media (max-width:640px) {
         .mic-marketplace-inner { background:#111312; border-radius:20px; padding:20px 14px; }
         .mic-sortbar { display:none; }
