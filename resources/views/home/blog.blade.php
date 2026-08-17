@@ -79,9 +79,18 @@
 
 <div id="blog" class="mic-marketplace">
     <div class="mic-marketplace-inner">
-        <div class="mic-menu-heading">
-            <div><span class="mic-eyebrow">MI CUSINA KITCHEN</span><h2>Find your next favorite meal</h2><p>Freshly prepared comfort food, ready when you are.</p></div>
+        <section class="mic-menu-hero">
+            <div class="mic-menu-hero-copy">
+                <span class="mic-eyebrow">FRESHLY PREPARED DAILY</span>
+                <h2>Good food,<br>made for you.</h2>
+                <p>Explore Mi Cusina favorites—from filling rice bowls to comforting pasta and snacks.</p>
+                <a href="#micProductGrid" class="mic-hero-cta">Explore menu <i class="fa fa-arrow-right"></i></a>
+            </div>
+            <div class="mic-menu-hero-dish"><img src="{{ asset('assets/imgs/chicken-adobo-flakes.png') }}" alt="Mi Cusina featured meal"></div>
             <span class="mic-menu-count">{{ count($data) }} menu items</span>
+        </section>
+        <div class="mic-menu-heading">
+            <div><span class="mic-eyebrow">OUR MENU</span><h2>Choose your favorite</h2></div>
         </div>
         <div class="mic-sortbar">
             <span>Sort by</span>
@@ -711,7 +720,37 @@
     .mic-card-cart input { border:1px solid #dbe3ee; border-radius:9px; height:44px; width:62px; }
     .mic-card-cart button { background:linear-gradient(135deg, #f88379, #ef5f62); border-radius:9px; box-shadow:0 8px 16px rgba(239,95,98,.18); font-weight:800; height:44px; }
     .mic-card-cart button:hover { filter:brightness(.96); }
-    @media (max-width:640px) { .mic-marketplace { padding-top:32px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } }
+    .mic-marketplace { background:#f8faf5; }
+    .mic-menu-hero { align-items:center; background:linear-gradient(120deg, #fff 0 50%, #83bd47 50%); border-radius:28px; display:grid; gap:24px; grid-template-columns:1.05fr .95fr; margin-bottom:42px; min-height:350px; overflow:hidden; padding:42px 54px; position:relative; }
+    .mic-menu-hero-copy { max-width:430px; position:relative; z-index:1; }
+    .mic-eyebrow { color:#72a83d; }
+    .mic-menu-hero h2 { color:#182014; font-size:48px; font-weight:900; letter-spacing:-.055em; line-height:.98; margin:12px 0 16px; }
+    .mic-menu-hero p { color:#64705f; line-height:1.7; margin:0 0 24px; max-width:360px; }
+    .mic-hero-cta { background:#7fb545; border-radius:999px; color:#fff; display:inline-flex; font-size:14px; font-weight:800; gap:10px; padding:13px 20px; text-decoration:none; }
+    .mic-hero-cta:hover { background:#679b34; color:#fff; text-decoration:none; }
+    .mic-menu-hero-dish { align-items:center; display:flex; justify-content:center; position:relative; }
+    .mic-menu-hero-dish::before { background:#fff; border:10px solid rgba(255,255,255,.6); border-radius:50%; content:''; height:270px; position:absolute; width:270px; }
+    .mic-menu-hero-dish img { border-radius:50%; height:250px; object-fit:cover; position:relative; width:250px; }
+    .mic-menu-hero .mic-menu-count { background:rgba(255,255,255,.9); border:0; bottom:22px; color:#507b28; position:absolute; right:22px; }
+    .mic-menu-heading { margin-bottom:18px; }
+    .mic-menu-heading h2 { color:#1b2515; font-size:30px; font-weight:900; letter-spacing:-.04em; margin:5px 0 0; }
+    .mic-sortbar { border-radius:14px; box-shadow:none; }
+    .mic-category-filter summary, .mic-sort-btn, .mic-price-sort { border-radius:999px; }
+    .mic-sort-btn:hover, .mic-sort-btn.is-active, .mic-category-filter[open] summary { background:#eef7e5; border-color:#83bd47; color:#507b28; }
+    .mic-product-card { border:0; border-radius:18px; box-shadow:0 8px 22px rgba(47,68,28,.1); text-align:center; }
+    .mic-product-image-wrap { align-items:center; background:transparent; display:flex; height:190px; justify-content:center; padding:20px 20px 0; }
+    .mic-product-image-wrap img { border:7px solid #83bd47; border-radius:50%; height:156px; object-fit:cover; width:156px; }
+    .mic-product-ribbon { display:none; }
+    .mic-product-body { align-items:center; display:flex; flex-direction:column; padding-top:10px; }
+    .mic-product-title { min-height:auto; }
+    .mic-product-price { color:#5c9032; font-size:17px; }
+    .mic-stock { margin-top:8px; }
+    .mic-product-meta { width:100%; }
+    .mic-location { display:none; }
+    .mic-card-cart { justify-content:center; }
+    .mic-card-cart button { background:#83bd47; box-shadow:none; }
+    .mic-card-cart button:hover { background:#679b34; }
+    @media (max-width:640px) { .mic-marketplace { padding-top:24px; } .mic-marketplace-inner { padding:0 16px; } .mic-menu-hero { background:linear-gradient(160deg, #fff 0 55%, #83bd47 55%); grid-template-columns:1fr; min-height:520px; padding:32px 26px; } .mic-menu-hero h2 { font-size:40px; } .mic-menu-hero-dish::before { height:220px; width:220px; } .mic-menu-hero-dish img { height:200px; width:200px; } .mic-menu-heading { align-items:start; flex-direction:column; gap:14px; } .mic-menu-heading h2 { font-size:28px; } .mic-sortbar { align-items:stretch; flex-wrap:wrap; } .mic-page-count { display:none; } .mic-product-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; } .mic-product-image-wrap { height:145px; } .mic-product-image-wrap img { border-width:5px; height:118px; width:118px; } .mic-product-body { padding:12px 12px 4px; } .mic-product-title { font-size:15px; min-height:42px; } .mic-card-cart { padding:10px 12px 12px; } .mic-card-cart input { width:46px; } }
 </style>
 
 <script>
