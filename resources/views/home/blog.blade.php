@@ -952,6 +952,19 @@
         z-index: 1;
     }
 
+    .mic-product-image-wrap::after {
+        background: #101010 url('{{ asset('assets/imgs/mi-cusina-transparent.png') }}') center / contain no-repeat;
+        border-radius:50%;
+        bottom:5%;
+        content:'';
+        height:20%;
+        left:5%;
+        pointer-events:none;
+        position:absolute;
+        width:20%;
+        z-index:2;
+    }
+
 
 
     @media (max-width:640px) {
