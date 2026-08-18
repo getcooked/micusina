@@ -120,7 +120,7 @@
                             <span class="mic-product-title">{{ $food->title }}</span>
                             <span class="mic-product-price">&#8369;{{ number_format($price, 2) }}</span>
                             <span class="mic-product-description">{{ \Illuminate\Support\Str::limit($food->detail, 96) }}</span>
-                            <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : ($food->stock <= 5 ? 'is-low' : 'is-available') }}" style="color: {{ $food->stock <= 5 ? '#dc2626' : '#15803d' }} !important;">
+                            <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : ($food->stock < 5 ? 'is-low' : 'is-available') }}" style="color: {{ $food->stock < 5 ? '#dc2626' : '#15803d' }} !important;">
                                 {{ $food->stock > 0 ? $food->stock . ' available' : 'Out of stock' }}
                             </span>
                             <span class="mic-product-meta">
@@ -169,14 +169,6 @@
             </div>
             <div class="mic-detail-price" id="micProductPrice"></div>
             <div class="mic-detail-stock" id="micProductStock"></div>
-            <div class="mic-detail-row">
-                <span>Shipping</span>
-                <strong>Available for Mi Cusina orders</strong>
-            </div>
-            <div class="mic-detail-row">
-                <span>Guarantee</span>
-                <strong>Freshly prepared food from this system</strong>
-            </div>
             <p id="micProductDetail"></p>
             <form id="micProductForm" action="" method="post" class="mic-detail-cart">
                 @csrf
@@ -574,6 +566,10 @@
 
     .mic-detail-stock.is-out {
         color: #b91c1c;
+    }
+
+    .mic-detail-stock.is-low {
+        color: #dc2626;
     }
 
     .mic-detail-row {
@@ -1014,6 +1010,7 @@
             modalPrice.textContent = '\u20b1' + price;
             modalStock.textContent = stock > 0 ? stock + ' available stock' : 'Out of stock';
             modalStock.classList.toggle('is-out', stock <= 0);
+            modalStock.classList.toggle('is-low', stock > 0 && stock < 5);
             modalDetail.textContent = card.dataset.detail || 'No extra details saved in the system.';
             modalForm.action = card.dataset.action;
             modalQty.value = 1;
