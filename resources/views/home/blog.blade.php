@@ -960,13 +960,13 @@
     .mic-product-card[data-menu-slug="creamy-carbonara"] .mic-product-image-wrap::after,
     .mic-product-card[data-menu-slug="egg-bunwich"] .mic-product-image-wrap::after {
         background: url('{{ asset('assets/imgs/menu-drink-overlay-v1.png') }}') center / contain no-repeat;
-        bottom: 18%;
+        top: 25%;
         content: '';
-        height: 34%;
+        height: 31%;
         pointer-events: none;
         position: absolute;
-        right: 5%;
-        width: 27%;
+        right: 7%;
+        width: 25%;
         z-index: 2;
     }
 
