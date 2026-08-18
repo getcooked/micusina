@@ -933,10 +933,11 @@
 
     .mic-product-image-wrap {
         aspect-ratio: 3 / 5;
-        background: transparent;
+        background: #080808;
         border: 0;
         box-sizing: border-box;
         height: auto;
+        overflow: hidden;
         padding: 0;
     }
 
@@ -948,6 +949,8 @@
         height: 100% !important;
         object-fit: cover !important;
         position: relative;
+        transform: scale(1.035);
+        transform-origin: center;
         width: 100% !important;
         z-index: 1;
     }
