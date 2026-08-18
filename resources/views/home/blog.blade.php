@@ -99,7 +99,6 @@
                     $price = (float) $food->price;
                     $menuImage = $menuImages[$normalizeMenuSlug($food->title)] ?? null;
                     $foodImage = $menuImage ? asset('assets/imgs/' . $menuImage) : asset('food_img/' . $food->image);
-                    $fallbackFoodImage = asset('food_img/' . $food->image);
                 @endphp
 
                 <article class="mic-product-card"
@@ -115,7 +114,7 @@
                     data-action="{{ url('/add_cart', $food->id) }}">
                     <button class="mic-product-open" type="button" aria-label="View {{ $food->title }}">
                         <span class="mic-product-image-wrap">
-                            <img src="{{ $foodImage }}" data-fallback-image="{{ $fallbackFoodImage }}" alt="{{ $food->title }}" onerror="if (this.src !== this.dataset.fallbackImage) { this.src = this.dataset.fallbackImage; }">
+                            <img src="{{ $foodImage }}" alt="{{ $food->title }}">
                             <span class="mic-product-ribbon">Mi Cusina</span>
                         </span>
                         <span class="mic-product-body">
