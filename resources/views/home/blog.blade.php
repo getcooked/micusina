@@ -959,7 +959,7 @@
     .mic-product-card[data-menu-slug="2-pc-chicken-meal"] .mic-product-image-wrap::after,
     .mic-product-card[data-menu-slug="creamy-carbonara"] .mic-product-image-wrap::after,
     .mic-product-card[data-menu-slug="egg-bunwich"] .mic-product-image-wrap::after {
-        background: url('{{ asset('assets/imgs/menu-drink-overlay-v1.png') }}') center / contain no-repeat;
+        background: url('{{ asset('assets/imgs/menu-cola-glass-overlay-v2.png') }}') center / contain no-repeat;
         top: 25%;
         content: '';
         height: 31%;
