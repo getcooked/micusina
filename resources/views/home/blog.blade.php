@@ -1,11 +1,11 @@
 @php
     $soldCounts = $soldCounts ?? collect();
     $menuImages = [
-        'chicken-burger' => 'chicken-burger-home-logo-v7.png',
-        'egg-bunwich' => 'egg-bunwich-home-logo-v7.png',
-        'cheesy-chicken' => 'cheesy-chicken-home-logo-v7.png',
-        'cheesy-chicken-hotdog-sandwich' => 'cheesy-chicken-home-logo-v7.png',
-        'cheesy-chicken-hotdog' => 'cheesy-chicken-home-logo-v7.png',
+        'chicken-burger' => 'chicken-burger-pink-v8.png',
+        'egg-bunwich' => 'egg-bunwich-pink-v8.png',
+        'cheesy-chicken' => 'cheesy-chicken-pink-v8.png',
+        'cheesy-chicken-hotdog-sandwich' => 'cheesy-chicken-pink-v8.png',
+        'cheesy-chicken-hotdog' => 'cheesy-chicken-pink-v8.png',
         'fries' => 'fries-pink-v8.png',
         'classic-fries' => 'fries-pink-v8.png',
         'ice-cream' => 'ice-cream-pink-v8.png',
@@ -932,7 +932,7 @@
     }
 
     .mic-product-image-wrap {
-        aspect-ratio: 2 / 3;
+        aspect-ratio: 3 / 5;
         background: transparent;
         border: 0;
         box-sizing: border-box;
@@ -950,6 +950,31 @@
         position: relative;
         width: 100% !important;
         z-index: 1;
+    }
+
+    /* The supplied numbered collection cards have a small sequence badge in
+       the upper-left corner. Hide that badge without changing the food art. */
+    .mic-product-image-wrap:is(
+        :has(img[src*="2-pcs-chicken-meal-pink-v8.png"]),
+        :has(img[src*="chicken-fillet-pink-v8.png"]),
+        :has(img[src*="chicken-adobo-flakes-pink-v8.png"]),
+        :has(img[src*="chicken-teriyaki-pink-v8.png"]),
+        :has(img[src*="chicken-nugget-pink-v8.png"]),
+        :has(img[src*="ham-bowl-pink-v8.png"]),
+        :has(img[src*="siomai-egg-pink-v8.png"]),
+        :has(img[src*="siomai-pink-v8.png"]),
+        :has(img[src*="fries-pink-v8.png"]),
+        :has(img[src*="ice-cream-pink-v8.png"])
+    )::after {
+        background:#080808;
+        border-radius:50%;
+        content:"";
+        height:12%;
+        left:2.5%;
+        position:absolute;
+        top:2.5%;
+        width:12%;
+        z-index:2;
     }
 
 
