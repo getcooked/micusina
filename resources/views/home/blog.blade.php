@@ -897,6 +897,47 @@
         .mic-detail-media { background:#fff; min-height:0; padding:20px; }
         .mic-detail-media > img { border:0; border-radius:16px; height:auto; max-height:58vh; object-fit:contain; width:100%; }
     }
+
+    /* Final menu card and stock-status rules. */
+    .mic-stock.is-low,
+    .mic-stock.is-out,
+    .mic-detail-stock.is-low,
+    .mic-detail-stock.is-out {
+        color: #dc2626 !important;
+    }
+
+    .mic-stock.is-available,
+    .mic-detail-stock:not(.is-low):not(.is-out) {
+        color: #15803d !important;
+    }
+
+    .mic-product-grid {
+        gap: 24px;
+    }
+
+    .mic-product-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
+        overflow: hidden;
+        padding: 18px;
+    }
+
+    .mic-product-card:hover {
+        box-shadow: 0 16px 32px rgba(15, 23, 42, .14);
+        transform: translateY(-3px);
+    }
+
+    @media (max-width:640px) {
+        .mic-product-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, .10);
+            padding: 14px;
+        }
+    }
 </style>
 
 <script>
