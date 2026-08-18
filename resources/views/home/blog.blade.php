@@ -15,8 +15,8 @@
         'chicken-nugget' => 'chicken-nugget-no-drink-v5.png',
         'chicken-nuggets' => 'chicken-nugget-no-drink-v5.png',
         'chicken-nuggets-rice-bowl' => 'chicken-nugget-no-drink-v5.png',
-        '2-pcs-chicken-meal' => '2-pcs-chicken-meal-no-drink-v5.png',
-        '2-pc-chicken-meal' => '2-pcs-chicken-meal-no-drink-v5.png',
+        '2-pcs-chicken-meal' => '2-pcs-chicken-meal-gravy-v6.png',
+        '2-pc-chicken-meal' => '2-pcs-chicken-meal-gravy-v6.png',
         '1-pc-chicken-meal' => '1-pc-chicken-meal-brown-wood-v4.png',
         'chicken-spaghetti' => 'chicken-spaghetti-no-drink-v5.png',
         'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
@@ -124,17 +124,18 @@
                             <span class="mic-stock {{ $food->stock <= 0 ? 'is-out' : ($food->stock < 5 ? 'is-low' : 'is-available') }}" style="color: {{ $food->stock < 5 ? '#dc2626' : '#15803d' }} !important;">
                                 {{ $food->stock > 0 ? $food->stock . ' available' : 'Out of stock' }}
                             </span>
-                            <span class="mic-product-meta">
-                                <span class="mic-stars">&#9733; 5.0</span>
-                                <span>{{ $sold }} sold</span>
-                            </span>
+                            <span class="mic-product-meta"><span>{{ $sold }} sold</span></span>
                             <span class="mic-location">Mi Cusina Kitchen</span>
                         </span>
                     </button>
 
                     <form action="{{ url('/add_cart', $food->id) }}" method="post" class="mic-card-cart">
                         @csrf
-                        <input value="1" type="number" min="1" max="{{ max(1, $food->stock) }}" name="qty" required aria-label="Quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>
+                        <div class="mic-quantity-control">
+                            <button type="button" class="mic-qty-change" data-qty-change="-1" aria-label="Decrease quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>&minus;</button>
+                            <input value="1" type="number" min="1" max="{{ max(1, $food->stock) }}" name="qty" required aria-label="Quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>
+                            <button type="button" class="mic-qty-change" data-qty-change="1" aria-label="Increase quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>+</button>
+                        </div>
                         <button type="submit" {{ $food->stock <= 0 ? 'disabled' : '' }}>{{ $food->stock > 0 ? 'Add to Cart' : 'Out of Stock' }}</button>
                     </form>
                 </article>
@@ -962,6 +963,18 @@
             padding: 14px 0;
         }
     }
+
+    .mic-product-title { font-size:28px; font-weight:900; letter-spacing:-.035em; line-height:1.08; }
+    .mic-product-price { font-size:24px; font-weight:900; }
+    .mic-product-description { font-size:16px; font-weight:600; line-height:1.45; }
+    .mic-stock { font-size:16px; }
+    .mic-product-meta { justify-content:flex-end; font-size:15px; font-weight:700; }
+    .mic-card-cart { align-items:center; gap:14px; }
+    .mic-quantity-control { align-items:center; border:1px solid #dbe2ea; border-radius:11px; display:flex; height:46px; overflow:hidden; }
+    .mic-quantity-control .mic-qty-change { background:#fff; border:0; box-shadow:none; color:#172033; font-size:23px; font-weight:700; height:100%; min-width:38px; padding:0; }
+    .mic-quantity-control input { border:0; border-left:1px solid #dbe2ea; border-radius:0; border-right:1px solid #dbe2ea; height:100%; min-width:42px; padding:0; text-align:center; width:42px; }
+    .mic-card-cart > button { border-radius:10px; flex:1; font-size:16px; font-weight:800; height:46px; }
+    @media (max-width:700px) { .mic-product-title { font-size:22px; } .mic-product-description { font-size:14px; } }
 </style>
 
 <script>
@@ -1057,6 +1070,15 @@
         updateVisibleCards();
 
         grid.addEventListener('click', function (event) {
+            const quantityButton = event.target.closest('.mic-qty-change');
+            if (quantityButton) {
+                const quantityInput = quantityButton.closest('.mic-quantity-control').querySelector('input[name="qty"]');
+                const max = Number(quantityInput.max) || 1;
+                const nextValue = Math.min(max, Math.max(1, Number(quantityInput.value || 1) + Number(quantityButton.dataset.qtyChange)));
+                quantityInput.value = nextValue;
+                return;
+            }
+
             const opener = event.target.closest('.mic-product-open');
             if (!opener) return;
 
