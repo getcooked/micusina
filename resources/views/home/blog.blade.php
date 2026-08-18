@@ -917,17 +917,17 @@
     }
 
     .mic-product-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 18px;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
-        overflow: hidden;
-        padding: 18px;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+        padding: 18px 0;
     }
 
     .mic-product-card:hover {
-        box-shadow: 0 16px 32px rgba(15, 23, 42, .14);
-        transform: translateY(-3px);
+        box-shadow: none;
+        transform: none;
     }
 
     .mic-product-image-wrap {
@@ -949,14 +949,35 @@
         z-index: 1;
     }
 
+    .mic-product-card[data-menu-slug="ham-bowl"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="chicken-teriyaki"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="chicken-adobo-flakes"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="chicken-burger-spaghetti"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="chicken-spaghetti"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="2-pcs-chicken-meal"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="2-pc-chicken-meal"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="creamy-carbonara"] .mic-product-image-wrap::after,
+    .mic-product-card[data-menu-slug="egg-bunwich"] .mic-product-image-wrap::after {
+        background: url('{{ asset('assets/imgs/menu-drink-overlay-v1.png') }}') center / contain no-repeat;
+        bottom: 18%;
+        content: '';
+        height: 34%;
+        pointer-events: none;
+        position: absolute;
+        right: 5%;
+        width: 27%;
+        z-index: 2;
+    }
+
 
     @media (max-width:640px) {
         .mic-product-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, .10);
-            padding: 14px;
+            background: transparent;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 14px 0;
         }
     }
 </style>
