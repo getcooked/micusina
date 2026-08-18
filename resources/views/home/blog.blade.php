@@ -931,10 +931,12 @@
     }
 
     .mic-product-image-wrap {
-        background: #2b1b10 url('{{ asset('assets/imgs/menu-poster-wood-background-v2.png') }}') center / cover no-repeat;
-        border: 5px solid #3a2414;
+        aspect-ratio: 2 / 3;
+        background: transparent;
+        border: 0;
         box-sizing: border-box;
-        padding: 10px;
+        height: auto;
+        padding: 0;
     }
 
     .mic-product-image-wrap img {
@@ -943,7 +945,7 @@
         display: block;
         filter: sepia(.16) saturate(.92) contrast(1.03);
         height: 100% !important;
-        object-fit: contain !important;
+        object-fit: cover !important;
         position: relative;
         width: 100% !important;
         z-index: 1;
