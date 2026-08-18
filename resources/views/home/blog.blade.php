@@ -951,26 +951,6 @@
         z-index: 1;
     }
 
-    .mic-product-card[data-menu-slug="ham-bowl"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="chicken-teriyaki"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="chicken-adobo-flakes"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="chicken-burger-spaghetti"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="chicken-spaghetti"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="2-pcs-chicken-meal"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="2-pc-chicken-meal"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="creamy-carbonara"] .mic-product-image-wrap::after,
-    .mic-product-card[data-menu-slug="egg-bunwich"] .mic-product-image-wrap::after {
-        background: url('{{ asset('assets/imgs/menu-cola-glass-overlay-v2.png') }}') center / contain no-repeat;
-        top: 27%;
-        content: '';
-        height: 27%;
-        pointer-events: none;
-        position: absolute;
-        right: 9%;
-        width: 23%;
-        z-index: 2;
-    }
 
 
     @media (max-width:640px) {
