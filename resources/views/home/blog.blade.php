@@ -964,11 +964,12 @@
         }
     }
 
-    .mic-product-title { font-size:28px; font-weight:900; letter-spacing:-.035em; line-height:1.08; }
-    .mic-product-price { font-size:24px; font-weight:900; }
-    .mic-product-description { font-size:16px; font-weight:600; line-height:1.45; }
-    .mic-stock { font-size:16px; }
-    .mic-product-meta { justify-content:flex-end; font-size:15px; font-weight:700; }
+    .mic-product-body { font-family:Arial, Helvetica, sans-serif; }
+    .mic-product-title { font-family:Arial, Helvetica, sans-serif; font-size:28px; font-weight:900; letter-spacing:-.035em; line-height:1.08; }
+    .mic-product-price { font-family:Arial, Helvetica, sans-serif; font-size:24px; font-weight:900; }
+    .mic-product-description { font-family:Arial, Helvetica, sans-serif; font-size:16px; font-weight:600; line-height:1.45; }
+    .mic-stock { font-family:Arial, Helvetica, sans-serif; font-size:16px; }
+    .mic-product-meta { font-family:Arial, Helvetica, sans-serif; font-size:15px; font-weight:700; justify-content:flex-start; margin-top:4px; }
     .mic-card-cart { align-items:center; gap:14px; }
     .mic-quantity-control { align-items:center; border:1px solid #dbe2ea; border-radius:11px; display:flex; height:46px; overflow:hidden; }
     .mic-quantity-control .mic-qty-change { background:#fff; border:0; box-shadow:none; color:#172033; font-size:23px; font-weight:700; height:100%; min-width:38px; padding:0; }
