@@ -929,6 +929,17 @@
         transform: translateY(-3px);
     }
 
+    .mic-product-image-wrap {
+        background: #1a1019 url('{{ asset('assets/imgs/food-poster-background-v1.png') }}') center / cover no-repeat;
+        padding: 10px;
+    }
+
+    .mic-product-image-wrap img {
+        background: transparent;
+        position: relative;
+        z-index: 1;
+    }
+
     @media (max-width:640px) {
         .mic-product-card {
             background: #fff;

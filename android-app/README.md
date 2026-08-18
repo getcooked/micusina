@@ -1,14 +1,13 @@
 # Mi Cusina Android app
 
-This native Android project opens the Mi Cusina customer website in a mobile WebView.
+This native Android project opens Mi Cusina in a mobile WebView. On launch, users
+choose either Customer (menu and ordering) or Staff (staff dashboard). Website
+permissions continue to be enforced by the Mi Cusina account they sign in with.
 
 ## Configure the live website
 
-In `app/build.gradle`, replace:
-
-`https://your-mi-cusina-domain.com`
-
-with your deployed HTTPS website address, for example `https://micusina.com`.
+The app is configured to use `https://micusina-pos.com`. Update `WEBSITE_URL` in
+`app/build.gradle` if the production address changes.
 
 ## Build the APK
 

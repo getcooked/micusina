@@ -10,5 +10,5 @@ public final class BuildConfig {
   public static final int VERSION_CODE = 1;
   public static final String VERSION_NAME = "1.0.0";
   // Field from default config.
-  public static final String WEBSITE_URL = "http://192.168.1.86:8000";
+  public static final String WEBSITE_URL = "https://micusina-pos.com";
 }
