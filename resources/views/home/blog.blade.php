@@ -956,37 +956,20 @@
         z-index: 1;
     }
 
-    /* Full-image menu view: keep the artwork large and never crop it. */
-    .mic-marketplace,
-    .mic-marketplace-inner {
-        background: #000;
-    }
-
-    .mic-marketplace-inner {
-        border: 0;
-        box-shadow: none;
-    }
-
-    .mic-product-card {
-        grid-template-columns: 1fr;
-        min-height: 0;
-    }
-
-    .mic-product-image-wrap {
-        aspect-ratio: auto;
-        background: #000;
-        height: min(88vh, 860px);
-    }
-
-    .mic-product-image-wrap img {
-        filter: none;
-        object-fit: contain !important;
-        transform: none;
-    }
-
     /* The supplied numbered collection cards have a small sequence badge in
        the upper-left corner. Hide that badge without changing the food art. */
-    .mic-product-image-wrap::after {
+    .mic-product-image-wrap:is(
+        :has(img[src*="2-pcs-chicken-meal-pink-v8.png"]),
+        :has(img[src*="chicken-fillet-pink-v8.png"]),
+        :has(img[src*="chicken-adobo-flakes-pink-v8.png"]),
+        :has(img[src*="chicken-teriyaki-pink-v8.png"]),
+        :has(img[src*="chicken-nugget-pink-v8.png"]),
+        :has(img[src*="ham-bowl-pink-v8.png"]),
+        :has(img[src*="siomai-egg-pink-v8.png"]),
+        :has(img[src*="siomai-pink-v8.png"]),
+        :has(img[src*="fries-pink-v8.png"]),
+        :has(img[src*="ice-cream-pink-v8.png"])
+    )::after {
         background:#080808;
         border-radius:50%;
         content:"";
@@ -1010,9 +993,6 @@
             padding: 14px 0;
         }
 
-        .mic-product-image-wrap {
-            height: 86vh;
-        }
     }
 
     .mic-product-body { font-family:Arial, Helvetica, sans-serif; }
