@@ -1008,6 +1008,57 @@
     .mic-card-cart > button { border-radius:10px; flex:1; font-size:16px; font-weight:800; height:46px; }
     @media (max-width:700px) { .mic-product-title { font-size:22px; } .mic-product-description { font-size:14px; } }
 
+    /* Full-image black menu: preserve each food poster without cropping. */
+    .mic-marketplace,
+    .mic-marketplace-inner,
+    .mic-product-card,
+    .mic-product-body,
+    .mic-card-cart {
+        background: #000;
+    }
+
+    .mic-marketplace-inner {
+        border: 0;
+        box-shadow: none;
+    }
+
+    .mic-product-grid { grid-template-columns: 1fr; }
+    .mic-product-card { border: 0; display: block; padding: 0 0 36px; }
+    .mic-product-open { display: block; }
+
+    .mic-product-image-wrap {
+        aspect-ratio: auto;
+        background: #000;
+        height: min(86vh, 920px);
+    }
+
+    .mic-product-image-wrap img {
+        filter: none;
+        height: 100% !important;
+        object-fit: contain !important;
+        transform: none;
+        width: 100% !important;
+    }
+
+    .mic-product-ribbon { display: none; }
+    .mic-product-body { padding: 18px 24px; }
+    .mic-product-title, .mic-product-price, .mic-product-description, .mic-product-meta, .mic-location { color: #fff; }
+    .mic-card-cart { padding: 0 24px 24px; }
+    .mic-quantity-control, .mic-quantity-control .mic-qty-change, .mic-quantity-control input { background: #000; border-color: #444; color: #fff; }
+
+    /* Hide the printed sequence badge (for example, 4. or 5.) seamlessly. */
+    .mic-product-image-wrap::after {
+        background: #000;
+        border-radius: 0;
+        height: 17%;
+        left: 0;
+        top: 0;
+        width: 18%;
+    }
+
+    @media (max-width: 700px) {
+        .mic-product-image-wrap { height: 82vh; }
+    }
 </style>
 
 <script>
