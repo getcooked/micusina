@@ -17,7 +17,7 @@
         'chicken-nuggets-rice-bowl' => 'chicken-nugget.png',
         '2-pcs-chicken-meal' => '2-pcs chicken meal.png',
         '2-pc-chicken-meal' => '2-pcs chicken meal.png',
-        '1-pc-chicken-meal' => '1-pc-chicken meal.png',
+        '1-pc-chicken-meal' => '1-pc-chicken-meal-magenta-v2.png',
         'chicken-spaghetti' => 'chicken-spaghetti.png',
         'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
         'chicken-fillet' => 'chicken-fillet.png',
@@ -931,12 +931,16 @@
 
     .mic-product-image-wrap {
         background: #1a1019 url('{{ asset('assets/imgs/food-poster-background-v1.png') }}') center / cover no-repeat;
-        padding: 10px;
+        border: 6px solid #d328bc;
+        padding: 0;
     }
 
     .mic-product-image-wrap img {
         background: transparent;
+        height: 100%;
+        object-fit: cover;
         position: relative;
+        width: 100%;
         z-index: 1;
     }
 
