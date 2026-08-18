@@ -17,7 +17,7 @@
         'chicken-nuggets-rice-bowl' => 'chicken-nugget.png',
         '2-pcs-chicken-meal' => '2-pcs chicken meal.png',
         '2-pc-chicken-meal' => '2-pcs chicken meal.png',
-        '1-pc-chicken-meal' => '1-pc-chicken-meal-magenta-frame-v3.png',
+        '1-pc-chicken-meal' => '1-pc-chicken meal.png',
         'chicken-spaghetti' => 'chicken-spaghetti.png',
         'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
         'chicken-fillet' => 'chicken-fillet.png',
