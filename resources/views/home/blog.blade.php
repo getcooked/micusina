@@ -103,6 +103,7 @@
 
                 <article class="mic-product-card"
                     data-title="{{ e($food->title) }}"
+                    data-menu-slug="{{ $normalizeMenuSlug($food->title) }}"
                     data-detail="{{ e($food->detail) }}"
                     data-price="{{ $price }}"
                     data-sold="{{ $sold }}"
@@ -938,6 +939,18 @@
         background: transparent;
         position: relative;
         z-index: 1;
+    }
+
+    /* Give the 1-piece chicken artwork the same magenta surround as the other posters. */
+    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap {
+        box-sizing: border-box;
+        padding: 14px;
+    }
+
+    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap img {
+        height: 100%;
+        object-fit: contain;
+        width: 100%;
     }
 
     @media (max-width:640px) {
