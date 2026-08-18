@@ -931,8 +931,8 @@
     }
 
     .mic-product-image-wrap {
-        background: #1a1019 url('{{ asset('assets/imgs/food-poster-background-v1.png') }}') center / cover no-repeat;
-        border: 5px solid #d328bc;
+        background: #2b1b10 url('{{ asset('assets/imgs/menu-poster-wood-background-v2.png') }}') center / cover no-repeat;
+        border: 5px solid #3a2414;
         box-sizing: border-box;
         padding: 10px;
     }
