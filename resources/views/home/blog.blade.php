@@ -941,6 +941,7 @@
         background: transparent !important;
         box-sizing: border-box;
         display: block;
+        filter: sepia(.16) saturate(.92) contrast(1.03);
         height: 100% !important;
         object-fit: contain !important;
         position: relative;
