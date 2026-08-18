@@ -962,13 +962,13 @@
     .mic-product-card[data-menu-slug="creamy-carbonara"] .mic-product-image-wrap::after,
     .mic-product-card[data-menu-slug="egg-bunwich"] .mic-product-image-wrap::after {
         background: url('{{ asset('assets/imgs/menu-cola-glass-overlay-v2.png') }}') center / contain no-repeat;
-        top: 25%;
+        top: 27%;
         content: '';
-        height: 31%;
+        height: 27%;
         pointer-events: none;
         position: absolute;
-        right: 7%;
-        width: 25%;
+        right: 9%;
+        width: 23%;
         z-index: 2;
     }
 
