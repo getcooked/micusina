@@ -955,13 +955,13 @@
     .mic-product-image-wrap::after {
         background: #101010 url('{{ asset('assets/imgs/mi-cusina-transparent.png') }}') center / contain no-repeat;
         border-radius:50%;
-        bottom:5%;
+        bottom:3%;
         content:'';
-        height:20%;
-        left:5%;
+        height:26%;
+        left:3%;
         pointer-events:none;
         position:absolute;
-        width:20%;
+        width:26%;
         z-index:2;
     }
 
