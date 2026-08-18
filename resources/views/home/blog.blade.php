@@ -1,32 +1,32 @@
 @php
     $soldCounts = $soldCounts ?? collect();
     $menuImages = [
-        'chicken-burger' => 'chicken-burger-no-drink-v5.png',
-        'egg-bunwich' => 'egg-bunwich-no-drink-v5.png',
-        'cheesy-chicken' => 'cheesy-chicken-no-drink-v5.png',
-        'cheesy-chicken-hotdog-sandwich' => 'cheesy-chicken-no-drink-v5.png',
-        'cheesy-chicken-hotdog' => 'cheesy-chicken-no-drink-v5.png',
-        'fries' => 'fries.png',
-        'classic-fries' => 'fries.png',
-        'ice-cream' => 'ice-cream.png',
-        'mi-cusina-ice-cream' => 'ice-cream.png',
-        'creamy-carbonara' => 'creamy-carbonara-no-drink-v5.png',
-        'classic-spaghetti' => 'classic-spaghetti.png',
-        'chicken-nugget' => 'chicken-nugget-no-drink-v5.png',
-        'chicken-nuggets' => 'chicken-nugget-no-drink-v5.png',
-        'chicken-nuggets-rice-bowl' => 'chicken-nugget-no-drink-v5.png',
-        '2-pcs-chicken-meal' => '2-pcs-chicken-meal-gravy-v6.png',
-        '2-pc-chicken-meal' => '2-pcs-chicken-meal-gravy-v6.png',
-        '1-pc-chicken-meal' => '1-pc-chicken-meal-brown-wood-v4.png',
-        'chicken-spaghetti' => 'chicken-spaghetti-no-drink-v5.png',
-        'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
-        'chicken-fillet' => 'chicken-fillet.png',
-        'chicken-burger-spaghetti' => 'chicken-burger-spaghetti-no-drink-v5.png',
-        'chicken-adobo-flakes' => 'chicken-adobo-flakes-no-drink-v5.png',
-        'chicken-teriyaki' => 'chicken-teriyaki-no-drink-v5.png',
-        'ham-bowl' => 'ham-bowl-no-drink-v5.png',
-        'siomai' => 'siomai-no-drink-v5.png',
-        'siomai-egg-rice-bowl' => 'siomai-no-drink-v5.png',
+        'chicken-burger' => 'chicken-burger-home-logo-v7.png',
+        'egg-bunwich' => 'egg-bunwich-home-logo-v7.png',
+        'cheesy-chicken' => 'cheesy-chicken-home-logo-v7.png',
+        'cheesy-chicken-hotdog-sandwich' => 'cheesy-chicken-home-logo-v7.png',
+        'cheesy-chicken-hotdog' => 'cheesy-chicken-home-logo-v7.png',
+        'fries' => 'fries-pink-v8.png',
+        'classic-fries' => 'fries-pink-v8.png',
+        'ice-cream' => 'ice-cream-pink-v8.png',
+        'mi-cusina-ice-cream' => 'ice-cream-pink-v8.png',
+        'creamy-carbonara' => 'creamy-carbonara-pink-v8.png',
+        'classic-spaghetti' => 'classic-spaghetti-pink-v8.png',
+        'chicken-nugget' => 'chicken-nugget-pink-v8.png',
+        'chicken-nuggets' => 'chicken-nugget-pink-v8.png',
+        'chicken-nuggets-rice-bowl' => 'chicken-nugget-pink-v8.png',
+        '2-pcs-chicken-meal' => '2-pcs-chicken-meal-pink-v8.png',
+        '2-pc-chicken-meal' => '2-pcs-chicken-meal-pink-v8.png',
+        '1-pc-chicken-meal' => '1-pc-chicken-meal-pink-v8.png',
+        'chicken-spaghetti' => 'chicken-spaghetti-pink-v8.png',
+        'chicken-adobo-bunwich' => 'chicken-adobo-bunwich-pink-v8.png',
+        'chicken-fillet' => 'chicken-fillet-pink-v8.png',
+        'chicken-burger-spaghetti' => 'chicken-burger-spaghetti-pink-v8.png',
+        'chicken-adobo-flakes' => 'chicken-adobo-flakes-pink-v8.png',
+        'chicken-teriyaki' => 'chicken-teriyaki-pink-v8.png',
+        'ham-bowl' => 'ham-bowl-pink-v8.png',
+        'siomai' => 'siomai-pink-v8.png',
+        'siomai-egg-rice-bowl' => 'siomai-egg-pink-v8.png',
     ];
 
     $normalizeMenuSlug = function ($title) {
@@ -952,18 +952,6 @@
         z-index: 1;
     }
 
-    .mic-product-image-wrap::after {
-        background: #101010 url('{{ asset('assets/imgs/mi-cusina-transparent.png') }}') center / contain no-repeat;
-        border-radius:50%;
-        bottom:3%;
-        content:'';
-        height:26%;
-        left:3%;
-        pointer-events:none;
-        position:absolute;
-        width:26%;
-        z-index:2;
-    }
 
 
 
