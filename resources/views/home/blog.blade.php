@@ -17,7 +17,7 @@
         'chicken-nuggets-rice-bowl' => 'chicken-nugget.png',
         '2-pcs-chicken-meal' => '2-pcs chicken meal.png',
         '2-pc-chicken-meal' => '2-pcs chicken meal.png',
-        '1-pc-chicken-meal' => '1-pc-chicken meal.png',
+        '1-pc-chicken-meal' => '1-pc-chicken-meal-magenta-frame-v3.png',
         'chicken-spaghetti' => 'chicken-spaghetti.png',
         'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
         'chicken-fillet' => 'chicken-fillet.png',
@@ -941,17 +941,6 @@
         z-index: 1;
     }
 
-    /* Give the 1-piece chicken artwork the same magenta surround as the other posters. */
-    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap {
-        box-sizing: border-box;
-        padding: 14px;
-    }
-
-    .mic-product-card[data-menu-slug="1-pc-chicken-meal"] .mic-product-image-wrap img {
-        height: 100%;
-        object-fit: contain;
-        width: 100%;
-    }
 
     @media (max-width:640px) {
         .mic-product-card {
