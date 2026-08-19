@@ -1106,10 +1106,10 @@
 </a>
 
 <style>
-    .floating-cart-button {
+    html body .floating-cart-button {
         align-items: center;
-        background: #22619b;
-        border: 3px solid #fff;
+        background: #24639c !important;
+        border: 3px solid #fff !important;
         border-radius: 50%;
         bottom: 24px;
         box-shadow: 0 10px 24px rgba(15, 23, 42, .24);
@@ -1118,30 +1118,30 @@
         justify-content: center;
         position: fixed;
         right: 24px;
-        text-decoration: none;
+        text-decoration: none !important;
         transition: transform .2s ease, background .2s ease;
         width: 64px;
         z-index: 1300;
     }
 
-    .floating-cart-button:hover {
-        background: #174d7e;
+    html body .floating-cart-button:hover {
+        background: #174d7e !important;
         transform: translateY(-3px);
     }
 
-    .floating-cart-button svg {
-        fill: none;
+    html body .floating-cart-button svg {
+        fill: none !important;
         height: 31px;
-        stroke: #fff;
+        stroke: #fff !important;
         stroke-linecap: round;
         stroke-linejoin: round;
         stroke-width: 2.25;
         width: 31px;
     }
 
-    .floating-cart-count {
+    html body .floating-cart-count {
         align-items: center;
-        background: #ef55cf;
+        background: #ef55cf !important;
         border: 2px solid #fff;
         border-radius: 999px;
         color: #fff;
