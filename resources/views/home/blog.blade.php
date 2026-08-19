@@ -911,19 +911,19 @@
 
     .mic-product-card {
         align-items: start;
-        background: transparent;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
+        background: #fff;
+        border: 1px solid #e4e7ec;
+        border-radius: 18px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
         grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
         min-height: 0;
-        overflow: visible;
-        padding: 18px 0;
+        overflow: hidden;
+        padding: 18px;
     }
 
     .mic-product-card:hover {
-        box-shadow: none;
-        transform: none;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, .13);
+        transform: translateY(-2px);
     }
 
     .mic-product-image-wrap {
@@ -958,12 +958,12 @@
 
     @media (max-width:640px) {
         .mic-product-card {
-            background: transparent;
-            border: 0;
-            border-radius: 0;
-            box-shadow: none;
+            background: #fff;
+            border: 1px solid #e4e7ec;
+            border-radius: 14px;
+            box-shadow: 0 8px 22px rgba(15, 23, 42, .08);
             grid-template-columns: 130px minmax(0, 1fr);
-            padding: 14px 0;
+            padding: 14px;
         }
 
         .mic-product-image-wrap {

@@ -1,3 +1,4 @@
+@php($embeddedCart = request()->boolean('embed'))
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -605,6 +606,20 @@
             font-family: Arial, Helvetica, sans-serif !important;
         }
 
+        body.cart-embed {
+            background: #fff;
+            padding: 0;
+        }
+
+        .cart-embed .cart-page {
+            min-height: 100vh;
+            padding-top: 24px;
+        }
+
+        .cart-embed .cart-title {
+            display: none;
+        }
+
         .cart-topbar a,
         .cart-topbar button {
             font-size: 15px !important;
@@ -750,8 +765,10 @@
     </style>
 </head>
 
-<body class="content-page">
-    @include('home.header', ['forceInnerNavbar' => true])
+<body class="{{ $embeddedCart ? 'cart-embed' : 'content-page' }}">
+    @if(!$embeddedCart)
+        @include('home.header', ['forceInnerNavbar' => true])
+    @endif
 
     <main class="cart-page">
         <h1 class="cart-title">Cart Page</h1>

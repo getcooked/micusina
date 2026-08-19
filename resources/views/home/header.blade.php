@@ -1096,19 +1096,27 @@
 </nav>
 @endif
 
-<a class="floating-cart-button" href="{{ url('my_cart') }}" aria-label="Open cart">
+<button class="floating-cart-button" type="button" data-cart-popup data-cart-url="{{ url('my_cart') }}?embed=1" aria-label="Open cart">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L20 9H7"></path>
         <circle cx="10" cy="20" r="1.35"></circle>
         <circle cx="17" cy="20" r="1.35"></circle>
     </svg>
     <span class="floating-cart-count">{{ $cartBadgeCount }}</span>
-</a>
+</button>
+
+<div class="cart-popup" id="cartPopup" aria-hidden="true">
+    <div class="cart-popup-backdrop" data-close-cart-popup></div>
+    <section class="cart-popup-panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
+        <button class="cart-popup-close" type="button" data-close-cart-popup aria-label="Close cart">&times;</button>
+        <iframe class="cart-popup-frame" title="Shopping cart"></iframe>
+    </section>
+</div>
 
 <style>
     html body .floating-cart-button {
         align-items: center;
-        background: #24639c !important;
+        background: #9b6b92 !important;
         border: 3px solid #fff !important;
         border-radius: 50%;
         bottom: 24px;
@@ -1125,7 +1133,7 @@
     }
 
     html body .floating-cart-button:hover {
-        background: #174d7e !important;
+        background: #7f526f !important;
         transform: translateY(-3px);
     }
 
@@ -1157,6 +1165,22 @@
         top: -5px;
     }
 
+    .cart-popup {
+        align-items: center;
+        display: none;
+        inset: 0;
+        justify-content: center;
+        padding: 28px;
+        position: fixed;
+        z-index: 1400;
+    }
+
+    .cart-popup.is-open { display: flex; }
+    .cart-popup-backdrop { background: rgba(15, 23, 42, .52); inset: 0; position: absolute; }
+    .cart-popup-panel { background: #fff; border-radius: 20px; box-shadow: 0 28px 70px rgba(15, 23, 42, .35); height: min(820px, calc(100vh - 56px)); max-width: 1240px; overflow: hidden; position: relative; width: min(1240px, calc(100vw - 56px)); z-index: 1; }
+    .cart-popup-frame { border: 0; height: 100%; width: 100%; }
+    .cart-popup-close { align-items: center; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 4px 14px rgba(15, 23, 42, .18); color: #1f2937; cursor: pointer; display: flex; font-size: 28px; height: 42px; justify-content: center; line-height: 1; position: absolute; right: 16px; top: 16px; width: 42px; z-index: 2; }
+
     @media (max-width:640px) {
         .floating-cart-button {
             bottom: 16px;
@@ -1166,6 +1190,30 @@
         }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var button = document.querySelector('[data-cart-popup]');
+        var popup = document.getElementById('cartPopup');
+        var frame = popup ? popup.querySelector('.cart-popup-frame') : null;
+
+        if (!button || !popup || !frame) return;
+
+        button.addEventListener('click', function () {
+            if (!frame.src) frame.src = button.dataset.cartUrl;
+            popup.classList.add('is-open');
+            popup.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        });
+
+        popup.addEventListener('click', function (event) {
+            if (!event.target.closest('[data-close-cart-popup]')) return;
+            popup.classList.remove('is-open');
+            popup.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        });
+    });
+</script>
 
 @if(session()->has('message'))
     <div class="site-flash" id="siteFlash">{{ session()->get('message') }}</div>
