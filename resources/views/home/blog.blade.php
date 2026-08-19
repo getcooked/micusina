@@ -953,16 +953,6 @@
         width: 260px;
     }
 
-    .mic-product-image-wrap::after {
-        border: 5px solid #ef55cf;
-        box-sizing: border-box;
-        content: "";
-        inset: 0;
-        pointer-events: none;
-        position: absolute;
-        z-index: 2;
-    }
-
     .mic-product-image-wrap img {
         background: transparent !important;
         box-sizing: border-box;
