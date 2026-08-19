@@ -851,7 +851,7 @@
                                     $unitPrice = $lineTotal / $quantity;
                                     $decreaseQty = max(1, $quantity - 1);
                                     $increaseQty = $quantity + 1;
-                                    $cartImage = $resolveFoodImage($cart->title, $cart->image);
+                                    $cartImage = asset('food_img/' . $cart->image);
                                 @endphp
                                 <div class="cart-item">
                                     <div class="cart-product">
