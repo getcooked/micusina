@@ -819,8 +819,8 @@
             @foreach ($data as $cart)
                 @php
                     $lineTotal = (float) $cart->price;
-                    $total_price += $lineTotal;
-                    $total_items += (int) $cart->quantity;
+                    $total_price = ($total_price ?? 0) + $lineTotal;
+                    $total_items = ($total_items ?? 0) + (int) $cart->quantity;
                 @endphp
             @endforeach
 

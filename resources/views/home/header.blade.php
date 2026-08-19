@@ -689,8 +689,8 @@
             <nav class="burger-nav" aria-label="Primary">
                 <a class="active" href="{{ url('/') }}">Home</a>
                 <a href="{{ url('/?section=food') }}">Menu</a>
-                <a href="{{ url('/?section=about') }}">About</a>
                 <a href="{{ url('/?section=book') }}">Book Table</a>
+                <a href="{{ route('mobile-app.download') }}">Download App</a>
             </nav>
             <div class="burger-login">
                 @if (Route::has('login'))
@@ -719,7 +719,6 @@
                     @else
                         <a href="{{ route('login') }}">Log In</a>
                         <a href="{{ Route::has('register') ? route('register') : url('/') }}">Register</a>
-                        <a class="mobile-app-button" href="{{ route('mobile-app.download') }}">Download App</a>
                     @endauth
                 @endif
             </div>
@@ -730,7 +729,7 @@
             <p>Discover Filipino comfort food, thoughtfully made and served with love at Mi Cusina.</p>
             <div class="burger-actions">
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
-                <a class="burger-secondary" href="{{ url('/?section=food') }}">Explore Menu</a>
+                <a class="burger-secondary" href="{{ url('/?section=about') }}">About Us</a>
             </div>
         </div>
 
