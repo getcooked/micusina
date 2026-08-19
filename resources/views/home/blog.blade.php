@@ -948,9 +948,9 @@
         display: block;
         filter: sepia(.16) saturate(.92) contrast(1.03);
         height: 100% !important;
-        object-fit: cover !important;
+        object-fit: contain !important;
         position: relative;
-        transform: scale(1.035);
+        transform: none;
         transform-origin: center;
         width: 100% !important;
         z-index: 1;
