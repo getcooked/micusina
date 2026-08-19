@@ -649,10 +649,10 @@
         color: #fff !important;
         min-width: auto;
     }
-    html body.front-only .burger-secondary { background: #9b6b92; border: 1px solid #9b6b92; color: #fff !important; }
-    html body.front-only .burger-secondary:hover { background: #7f526f; border-color: #7f526f; color: #fff !important; }
+    html body.front-only .burger-secondary { background: linear-gradient(135deg, #b678aa 0%, #8f5f87 100%); border: 0; color: #fff !important; }
+    html body.front-only .burger-secondary:hover { background: linear-gradient(135deg, #9f668f 0%, #74496d 100%); border-color: transparent; color: #fff !important; }
     html body.front-only .burger-login .guest-auth-link { background: #fff; border: 1px solid #9b6b92; color: #9b6b92 !important; }
-    html body.front-only .burger-login .guest-register-link { background: #9b6b92; color: #fff !important; }
+    html body.front-only .burger-login .guest-register-link { background: #fff; color: #9b6b92 !important; }
     html body .burger-art { display: none; }
     html body .burger-art img { filter: drop-shadow(0 20px 15px rgba(0,0,0,.14)); height: 100%; object-fit: contain; object-position: right center; width: 100%; }
     html body .burger-thumbs { display: none; }
