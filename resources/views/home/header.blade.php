@@ -696,7 +696,6 @@
                 @if (Route::has('login'))
                     @auth
                         <a class="track-order-link" href="{{ url('my_orders') }}">Track Order</a>
-                        <a class="cart-badge-link" href="{{ url('my_cart') }}">Cart <span class="cart-badge">{{ $cartBadgeCount }}</span></a>
                         <details class="front-user-menu">
                             <summary aria-label="Open user menu">@if(Auth::user()->profile_photo_path)<img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">@else{{ $userInitial }}@endif</summary>
                             <div class="front-user-dropdown">
@@ -1064,7 +1063,6 @@
             @auth
                 <li class="nav-item"><a class="nav-link track-order-link" href="{{ url('my_orders') }}">Track Order</a></li>
             @endauth
-            <li class="nav-item"><a class="nav-link cart-badge-link" href="{{ url('my_cart') }}">Cart <span class="cart-badge">{{ $cartBadgeCount }}</span></a></li>
             @if (Route::has('login'))
                 @auth
                     <li class="nav-item">
@@ -1097,6 +1095,77 @@
     </div>
 </nav>
 @endif
+
+<a class="floating-cart-button" href="{{ url('my_cart') }}" aria-label="Open cart">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L20 9H7"></path>
+        <circle cx="10" cy="20" r="1.35"></circle>
+        <circle cx="17" cy="20" r="1.35"></circle>
+    </svg>
+    <span class="floating-cart-count">{{ $cartBadgeCount }}</span>
+</a>
+
+<style>
+    .floating-cart-button {
+        align-items: center;
+        background: #22619b;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        bottom: 24px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .24);
+        display: flex;
+        height: 64px;
+        justify-content: center;
+        position: fixed;
+        right: 24px;
+        text-decoration: none;
+        transition: transform .2s ease, background .2s ease;
+        width: 64px;
+        z-index: 1300;
+    }
+
+    .floating-cart-button:hover {
+        background: #174d7e;
+        transform: translateY(-3px);
+    }
+
+    .floating-cart-button svg {
+        fill: none;
+        height: 31px;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2.25;
+        width: 31px;
+    }
+
+    .floating-cart-count {
+        align-items: center;
+        background: #ef55cf;
+        border: 2px solid #fff;
+        border-radius: 999px;
+        color: #fff;
+        display: flex;
+        font-size: 12px;
+        font-weight: 800;
+        height: 23px;
+        justify-content: center;
+        min-width: 23px;
+        padding: 0 5px;
+        position: absolute;
+        right: -5px;
+        top: -5px;
+    }
+
+    @media (max-width:640px) {
+        .floating-cart-button {
+            bottom: 16px;
+            height: 56px;
+            right: 16px;
+            width: 56px;
+        }
+    }
+</style>
 
 @if(session()->has('message'))
     <div class="site-flash" id="siteFlash">{{ session()->get('message') }}</div>
