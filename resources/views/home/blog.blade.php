@@ -926,7 +926,7 @@
         border: 0;
         border-radius: 0;
         box-shadow: none;
-        grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
         min-height: 0;
         overflow: visible;
         padding: 18px 0;
@@ -940,17 +940,17 @@
     .mic-product-image-wrap {
         align-items: center;
         aspect-ratio: 3 / 5;
-        background: #080808;
+        background: #fff;
         border: 0;
         box-sizing: border-box;
         display: flex;
-        flex: 0 0 330px;
-        height: 550px;
+        flex: 0 0 260px;
+        height: 433px;
         overflow: hidden;
         padding: 0;
         position: relative;
         justify-content: center;
-        width: 330px;
+        width: 260px;
     }
 
     .mic-product-image-wrap::after {
@@ -983,14 +983,14 @@
             border: 0;
             border-radius: 0;
             box-shadow: none;
-            grid-template-columns: 150px minmax(0, 1fr);
+            grid-template-columns: 130px minmax(0, 1fr);
             padding: 14px 0;
         }
 
         .mic-product-image-wrap {
-            flex-basis: 150px;
-            height: 250px;
-            width: 150px;
+            flex-basis: 130px;
+            height: 217px;
+            width: 130px;
         }
 
     }
