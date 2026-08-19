@@ -649,7 +649,10 @@
         color: #fff !important;
         min-width: auto;
     }
-    html body .burger-secondary { border: 1px solid #292b27; color: #292b27 !important; }
+    html body.front-only .burger-secondary { background: #9b6b92; border: 1px solid #9b6b92; color: #fff !important; }
+    html body.front-only .burger-secondary:hover { background: #7f526f; border-color: #7f526f; color: #fff !important; }
+    html body.front-only .burger-login .guest-auth-link { background: #fff; border: 1px solid #9b6b92; color: #9b6b92 !important; }
+    html body.front-only .burger-login .guest-register-link { background: #9b6b92; color: #fff !important; }
     html body .burger-art { display: none; }
     html body .burger-art img { filter: drop-shadow(0 20px 15px rgba(0,0,0,.14)); height: 100%; object-fit: contain; object-position: right center; width: 100%; }
     html body .burger-thumbs { display: none; }
@@ -705,7 +708,6 @@
             <nav class="burger-nav" aria-label="Primary">
                 <a class="active" href="{{ url('/') }}">Home</a>
                 <a href="{{ url('/?section=food') }}">Menu</a>
-                <a href="{{ url('/?section=about') }}">About Us</a>
                 <a href="{{ url('/?section=book') }}">Book Table</a>
                 <a href="{{ route('mobile-app.download') }}">Download App</a>
             </nav>
