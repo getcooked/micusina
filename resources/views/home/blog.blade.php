@@ -919,10 +919,13 @@
     }
 
     .mic-product-card {
+        align-items: start;
         background: transparent;
         border: 0;
         border-radius: 0;
         box-shadow: none;
+        grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
+        min-height: 0;
         overflow: visible;
         padding: 18px 0;
     }
@@ -933,13 +936,17 @@
     }
 
     .mic-product-image-wrap {
+        align-items: center;
         aspect-ratio: 3 / 5;
         background: #080808;
         border: 0;
         box-sizing: border-box;
+        display: flex;
         height: auto;
         overflow: hidden;
         padding: 0;
+        justify-content: center;
+        width: 100%;
     }
 
     .mic-product-image-wrap img {
@@ -962,6 +969,7 @@
             border: 0;
             border-radius: 0;
             box-shadow: none;
+            grid-template-columns: 150px minmax(0, 1fr);
             padding: 14px 0;
         }
 
