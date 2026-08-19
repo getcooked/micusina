@@ -134,12 +134,9 @@
 
                     <form action="{{ url('/add_cart', $food->id) }}" method="post" class="mic-card-cart">
                         @csrf
-                        <div class="mic-quantity-control">
-                            <button type="button" class="mic-qty-change" data-qty-change="-1" aria-label="Decrease quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>&minus;</button>
-                            <input value="1" type="number" min="1" max="{{ max(1, $food->stock) }}" name="qty" required aria-label="Quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>
-                            <button type="button" class="mic-qty-change" data-qty-change="1" aria-label="Increase quantity" {{ $food->stock <= 0 ? 'disabled' : '' }}>+</button>
-                        </div>
+                        <input type="hidden" name="qty" value="1">
                         <button type="submit" {{ $food->stock <= 0 ? 'disabled' : '' }}>{{ $food->stock > 0 ? 'Add to Cart' : 'Out of Stock' }}</button>
+                        <button type="submit" name="buy_now" value="1" {{ $food->stock <= 0 ? 'disabled' : '' }}>{{ $food->stock > 0 ? 'Buy Now' : 'Out of Stock' }}</button>
                     </form>
                 </article>
             @endforeach
@@ -167,23 +164,15 @@
         </div>
         <div class="mic-detail-info">
             <h3 id="micProductTitle"></h3>
-            <div class="mic-detail-rating">
-                <strong>5.0</strong>
-                <span>&#9733;&#9733;&#9733;&#9733;&#9733;</span>
-                <span id="micProductSold"></span>
-            </div>
             <div class="mic-detail-price" id="micProductPrice"></div>
             <div class="mic-detail-stock" id="micProductStock"></div>
             <p id="micProductDetail"></p>
             <form id="micProductForm" action="" method="post" class="mic-detail-cart">
                 @csrf
-                <label>
-                    Quantity
-                    <input value="1" type="number" min="1" name="qty" required>
-                </label>
+                <input type="hidden" name="qty" value="1">
                 <div class="mic-detail-actions">
                     <button type="submit" class="mic-outline-btn" id="micAddCartButton">Add To Cart</button>
-                    <button type="submit" class="mic-solid-btn" id="micBuyNowButton">Buy Now</button>
+                    <button type="submit" name="buy_now" value="1" class="mic-solid-btn" id="micBuyNowButton">Buy Now</button>
                 </div>
             </form>
         </div>
@@ -992,10 +981,6 @@
     .mic-stock { font-family:Arial, Helvetica, sans-serif; font-size:16px; }
     .mic-product-meta { font-family:Arial, Helvetica, sans-serif; font-size:15px; font-weight:700; justify-content:flex-start; margin-top:4px; }
     .mic-card-cart { align-items:center; gap:14px; }
-    .mic-quantity-control { align-items:center; border:1px solid #dbe2ea; border-radius:11px; display:flex; height:46px; overflow:hidden; }
-
-    .mic-quantity-control .mic-qty-change { background:#fff; border:0; box-shadow:none; color:#172033; font-size:23px; font-weight:700; height:100%; min-width:38px; padding:0; }
-    .mic-quantity-control input { border:0; border-left:1px solid #dbe2ea; border-radius:0; border-right:1px solid #dbe2ea; height:100%; min-width:42px; padding:0; text-align:center; width:42px; }
     .mic-card-cart > button { border-radius:10px; flex:1; font-size:16px; font-weight:800; height:46px; }
     @media (max-width:700px) { .mic-product-title { font-size:22px; } .mic-product-description { font-size:14px; } }
 
@@ -1020,12 +1005,10 @@
         const modalImage = document.getElementById('micProductImage');
         const modalThumb = document.getElementById('micProductThumb');
         const modalTitle = document.getElementById('micProductTitle');
-        const modalSold = document.getElementById('micProductSold');
         const modalPrice = document.getElementById('micProductPrice');
         const modalStock = document.getElementById('micProductStock');
         const modalDetail = document.getElementById('micProductDetail');
         const modalForm = document.getElementById('micProductForm');
-        const modalQty = modalForm.querySelector('input[name="qty"]');
         const addCartButton = document.getElementById('micAddCartButton');
         const buyNowButton = document.getElementById('micBuyNowButton');
         let activeCategory = 'all';
@@ -1094,15 +1077,6 @@
         updateVisibleCards();
 
         grid.addEventListener('click', function (event) {
-            const quantityButton = event.target.closest('.mic-qty-change');
-            if (quantityButton) {
-                const quantityInput = quantityButton.closest('.mic-quantity-control').querySelector('input[name="qty"]');
-                const max = Number(quantityInput.max) || 1;
-                const nextValue = Math.min(max, Math.max(1, Number(quantityInput.value || 1) + Number(quantityButton.dataset.qtyChange)));
-                quantityInput.value = nextValue;
-                return;
-            }
-
             const opener = event.target.closest('.mic-product-open');
             if (!opener) return;
 
@@ -1117,16 +1091,12 @@
             modalThumb.src = card.dataset.image;
             modalImage.alt = card.dataset.title;
             modalTitle.textContent = card.dataset.title;
-            modalSold.textContent = card.dataset.sold + ' sold';
             modalPrice.textContent = '\u20b1' + price;
             modalStock.textContent = stock > 0 ? stock + ' available stock' : 'Out of stock';
             modalStock.classList.toggle('is-out', stock <= 0);
             modalStock.classList.toggle('is-low', stock > 0 && stock < 5);
             modalDetail.textContent = card.dataset.detail || 'No extra details saved in the system.';
             modalForm.action = card.dataset.action;
-            modalQty.value = 1;
-            modalQty.max = Math.max(1, stock);
-            modalQty.disabled = stock <= 0;
             addCartButton.disabled = stock <= 0;
             buyNowButton.disabled = stock <= 0;
             if (menuPreview && menuSurface && !menuPreview.hasChildNodes()) {

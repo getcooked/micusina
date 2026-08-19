@@ -290,6 +290,7 @@ class HomeController extends Controller
           ]);
 
           $food = Food::findOrFail($id);
+          $redirectToCart = $request->boolean('buy_now');
 
           if($food->stock <= 0)
           {
@@ -322,7 +323,8 @@ class HomeController extends Controller
               $existingCart->price = $unitPrice * $existingCart->quantity;
               $existingCart->save();
 
-              return redirect()->back()->with('message', 'Added ' . $requestedQty . ' ' . Str::plural('item', $requestedQty) . ' to your cart.');
+              return ($redirectToCart ? redirect('my_cart') : redirect()->back())
+                  ->with('message', 'Added ' . $requestedQty . ' ' . Str::plural('item', $requestedQty) . ' to your cart.');
           }
 
           $data = new Cart;
@@ -343,7 +345,8 @@ class HomeController extends Controller
 
            $data->save();
 
-           return redirect()->back()->with('message', 'Added ' . $requestedQty . ' ' . Str::plural('item', $requestedQty) . ' to your cart.');
+           return ($redirectToCart ? redirect('my_cart') : redirect()->back())
+               ->with('message', 'Added ' . $requestedQty . ' ' . Str::plural('item', $requestedQty) . ' to your cart.');
 
 
 
