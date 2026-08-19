@@ -106,6 +106,22 @@
         color: #F88379;
     }
 
+    .burger-login .guest-auth-link {
+        border-radius: 999px;
+        color: #9b6b92;
+        padding: 9px 15px;
+    }
+
+    .burger-login .guest-register-link {
+        background: #9b6b92;
+        color: #fff;
+    }
+
+    .burger-login .guest-auth-link:hover {
+        background: #7f526f;
+        color: #fff;
+    }
+
     .cart-badge-link {
         align-items: center;
         display: inline-flex;
@@ -689,6 +705,7 @@
             <nav class="burger-nav" aria-label="Primary">
                 <a class="active" href="{{ url('/') }}">Home</a>
                 <a href="{{ url('/?section=food') }}">Menu</a>
+                <a href="{{ url('/?section=about') }}">About Us</a>
                 <a href="{{ url('/?section=book') }}">Book Table</a>
                 <a href="{{ route('mobile-app.download') }}">Download App</a>
             </nav>
@@ -717,8 +734,8 @@
                             </div>
                         </details>
                     @else
-                        <a href="{{ route('login') }}">Log In</a>
-                        <a href="{{ Route::has('register') ? route('register') : url('/') }}">Register</a>
+                        <a class="guest-auth-link guest-login-link" href="{{ route('login') }}">Log In</a>
+                        <a class="guest-auth-link guest-register-link" href="{{ Route::has('register') ? route('register') : url('/') }}">Register</a>
                     @endauth
                 @endif
             </div>
@@ -1095,6 +1112,7 @@
 </nav>
 @endif
 
+@if(request('section'))
 <button class="floating-cart-button" type="button" data-cart-popup data-cart-url="{{ url('my_cart') }}?embed=1" aria-label="Open cart">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L20 9H7"></path>
@@ -1111,6 +1129,7 @@
         <iframe class="cart-popup-frame" title="Shopping cart"></iframe>
     </section>
 </div>
+@endif
 
 <style>
     html body .floating-cart-button {
