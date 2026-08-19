@@ -265,17 +265,7 @@
 
         .cart-product {
             align-items: center;
-            display: grid;
-            gap: 18px;
-            grid-template-columns: 96px minmax(0, 1fr);
-        }
-
-        .cart-product img {
-            background: #f5f5f5;
-            border-radius: 16px;
-            height: 96px;
-            object-fit: cover;
-            width: 96px;
+            display: block;
         }
 
         .cart-product strong {
@@ -771,47 +761,12 @@
     @endif
 
     <main class="cart-page">
-        <h1 class="cart-title">Cart Page</h1>
+        @if(!$embeddedCart)
+            <h1 class="cart-title">Cart Page</h1>
+        @endif
 
         <section class="cart-shell">
             @php
-                $menuImages = [
-                    'chicken-burger' => 'chicken burger.png',
-                    'egg-bunwich' => 'egg-bunwich.png',
-                    'cheesy-chicken' => 'chessy-chicken.png',
-                    'cheesy-chicken-hotdog-sandwich' => 'chessy-chicken.png',
-                    'cheesy-chicken-hotdog' => 'chessy-chicken.png',
-                    'fries' => 'fries.png',
-                    'classic-fries' => 'fries.png',
-                    'ice-cream' => 'ice-cream.png',
-                    'mi-cusina-ice-cream' => 'ice-cream.png',
-                    'creamy-carbonara' => 'creamy-carbonara.png',
-                    'classic-spaghetti' => 'classic-spaghetti.png',
-                    'chicken-nugget' => 'chicken-nugget.png',
-                    'chicken-nuggets' => 'chicken-nugget.png',
-                    'chicken-nuggets-rice-bowl' => 'chicken-nugget.png',
-                    '2-pcs-chicken-meal' => '2-pcs chicken meal.png',
-                    '2-pc-chicken-meal' => '2-pcs chicken meal.png',
-                    '1-pc-chicken-meal' => '1-pc-chicken meal.png',
-                    'chicken-spaghetti' => 'chicken-spaghetti.png',
-                    'chicken-adobo-bunwich' => 'chicken-adobo-bundwich.png',
-                    'chicken-fillet' => 'chicken-fillet.png',
-                    'chicken-burger-spaghetti' => 'chicken-burger-spaghetti.png',
-                    'chicken-adobo-flakes' => 'chicken-adobo-flakes.png',
-                    'chicken-teriyaki' => 'chicken-tereyaki.png',
-                    'ham-bowl' => 'ham-bowl.png',
-                    'siomai' => 'siomai.png',
-                    'siomai-egg-rice-bowl' => 'siomai.png',
-                ];
-                $resolveFoodImage = function ($title, $image) use ($menuImages) {
-                    $slug = \Illuminate\Support\Str::of($title)
-                        ->slug()
-                        ->replace('chessy', 'cheesy')
-                        ->replace('bundwich', 'bunwich')
-                        ->replace('tereyaki', 'teriyaki')
-                        ->toString();
-                    return isset($menuImages[$slug]) ? asset('assets/imgs/' . $menuImages[$slug]) : asset('food_img/' . $image);
-                };
                 $total_price = 0;
                 $total_items = 0;
             @endphp
@@ -851,11 +806,9 @@
                                     $unitPrice = $lineTotal / $quantity;
                                     $decreaseQty = max(1, $quantity - 1);
                                     $increaseQty = $quantity + 1;
-                                    $cartImage = asset('food_img/' . $cart->image);
                                 @endphp
                                 <div class="cart-item">
                                     <div class="cart-product">
-                                        <img src="{{ $cartImage }}" alt="{{ $cart->title }}">
                                         <div>
                                             <strong>{{ $cart->title }}</strong>
                                             <span>&#8369;{{ number_format($unitPrice, 2) }} each</span>
