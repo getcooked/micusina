@@ -956,23 +956,6 @@
         z-index: 1;
     }
 
-    /* The supplied numbered collection cards have a small sequence badge in
-       the upper-left corner. Hide that badge without changing the food art. */
-    .mic-product-image-wrap::after {
-        background:#080808;
-        border-radius:50%;
-        content:"";
-        height:8.5%;
-        left:3%;
-        position:absolute;
-        top:3%;
-        width:15%;
-        z-index:2;
-    }
-
-
-
-
     @media (max-width:640px) {
         .mic-product-card {
             background: transparent;
