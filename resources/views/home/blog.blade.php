@@ -928,13 +928,13 @@
 
     .mic-product-image-wrap {
         align-items: center;
-        aspect-ratio: 3 / 5;
+        aspect-ratio: 285 / 488;
         background: #fff;
         border: 0;
         box-sizing: border-box;
         display: flex;
         flex: 0 0 260px;
-        height: 433px;
+        height: 445px;
         overflow: hidden;
         padding: 0;
         position: relative;
@@ -968,7 +968,7 @@
 
         .mic-product-image-wrap {
             flex-basis: 130px;
-            height: 217px;
+            height: 223px;
             width: 130px;
         }
 
