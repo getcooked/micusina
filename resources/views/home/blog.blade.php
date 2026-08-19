@@ -98,8 +98,10 @@
                     $sold = (int) ($soldCounts[$food->title] ?? 0);
                     $price = (float) $food->price;
                     $menuImage = $menuImages[$normalizeMenuSlug($food->title)] ?? null;
-                    $foodImage = $menuImage ? asset('assets/imgs/' . $menuImage) : asset('food_img/' . $food->image);
-                    $fallbackFoodImage = asset('food_img/' . $food->image);
+                    $foodImagePath = $menuImage ? 'assets/imgs/' . $menuImage : 'food_img/' . $food->image;
+                    $fallbackFoodImagePath = 'food_img/' . $food->image;
+                    $foodImage = asset($foodImagePath) . '?v=' . (file_exists(public_path($foodImagePath)) ? filemtime(public_path($foodImagePath)) : time());
+                    $fallbackFoodImage = asset($fallbackFoodImagePath) . '?v=' . (file_exists(public_path($fallbackFoodImagePath)) ? filemtime(public_path($fallbackFoodImagePath)) : time());
                 @endphp
 
                 <article class="mic-product-card"
