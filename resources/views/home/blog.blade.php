@@ -99,7 +99,6 @@
                     $price = (float) $food->price;
                     $menuImage = $menuImages[$normalizeMenuSlug($food->title)] ?? null;
                     $foodImage = $menuImage ? asset('assets/imgs/' . $menuImage) : asset('food_img/' . $food->image);
-                    $fallbackFoodImage = asset('food_img/' . $food->image);
                 @endphp
 
                 <article class="mic-product-card"
@@ -114,10 +113,6 @@
                     data-image="{{ $foodImage }}"
                     data-action="{{ url('/add_cart', $food->id) }}">
                     <button class="mic-product-open" type="button" aria-label="View {{ $food->title }}">
-                        <span class="mic-product-image-wrap">
-                            <img src="{{ $foodImage }}" data-fallback-image="{{ $fallbackFoodImage }}" alt="{{ $food->title }}" onerror="if (this.src !== this.dataset.fallbackImage) { this.src = this.dataset.fallbackImage; }">
-                            <span class="mic-product-ribbon">Mi Cusina</span>
-                        </span>
                         <span class="mic-product-body">
                             <span class="mic-product-title">{{ $food->title }}</span>
                             <span class="mic-product-price">&#8369;{{ number_format($price, 2) }}</span>
@@ -1003,6 +998,25 @@
     .mic-product-meta { font-family:Arial, Helvetica, sans-serif; font-size:15px; font-weight:700; justify-content:flex-start; margin-top:4px; }
     .mic-card-cart { align-items:center; gap:14px; }
     .mic-quantity-control { align-items:center; border:1px solid #dbe2ea; border-radius:11px; display:flex; height:46px; overflow:hidden; }
+
+    /* Menu cards intentionally have no product artwork. */
+    .mic-product-card {
+        display: block;
+        min-height: 0;
+        padding: 18px;
+    }
+
+    .mic-product-body {
+        padding: 0;
+    }
+
+    @media (max-width:700px) {
+        .mic-product-card {
+            display: block;
+            min-height: 0;
+            padding: 16px;
+        }
+    }
     .mic-quantity-control .mic-qty-change { background:#fff; border:0; box-shadow:none; color:#172033; font-size:23px; font-weight:700; height:100%; min-width:38px; padding:0; }
     .mic-quantity-control input { border:0; border-left:1px solid #dbe2ea; border-radius:0; border-right:1px solid #dbe2ea; height:100%; min-width:42px; padding:0; text-align:center; width:42px; }
     .mic-card-cart > button { border-radius:10px; flex:1; font-size:16px; font-weight:800; height:46px; }
