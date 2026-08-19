@@ -926,7 +926,7 @@
         border: 0;
         border-radius: 0;
         box-shadow: none;
-        grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+        grid-template-columns: minmax(0, 330px) minmax(0, 1fr);
         min-height: 0;
         overflow: visible;
         padding: 18px 0;
@@ -941,7 +941,7 @@
         align-items: center;
         aspect-ratio: 3 / 5;
         background: #080808;
-        border: 0;
+        border: 5px solid #ef55cf;
         box-sizing: border-box;
         display: flex;
         height: auto;
@@ -971,7 +971,7 @@
             border: 0;
             border-radius: 0;
             box-shadow: none;
-            grid-template-columns: 130px minmax(0, 1fr);
+            grid-template-columns: 150px minmax(0, 1fr);
             padding: 14px 0;
         }
 
