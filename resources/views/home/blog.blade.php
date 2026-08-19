@@ -941,14 +941,26 @@
         align-items: center;
         aspect-ratio: 3 / 5;
         background: #080808;
-        border: 5px solid #ef55cf;
+        border: 0;
         box-sizing: border-box;
         display: flex;
-        height: auto;
+        flex: 0 0 330px;
+        height: 550px;
         overflow: hidden;
         padding: 0;
+        position: relative;
         justify-content: center;
-        width: 100%;
+        width: 330px;
+    }
+
+    .mic-product-image-wrap::after {
+        border: 5px solid #ef55cf;
+        box-sizing: border-box;
+        content: "";
+        inset: 0;
+        pointer-events: none;
+        position: absolute;
+        z-index: 2;
     }
 
     .mic-product-image-wrap img {
@@ -973,6 +985,12 @@
             box-shadow: none;
             grid-template-columns: 150px minmax(0, 1fr);
             padding: 14px 0;
+        }
+
+        .mic-product-image-wrap {
+            flex-basis: 150px;
+            height: 250px;
+            width: 150px;
         }
 
     }
