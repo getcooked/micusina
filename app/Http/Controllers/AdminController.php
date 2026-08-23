@@ -215,7 +215,7 @@ class AdminController extends Controller
     {
         $this->requireAdmin();
 
-        return view('admin.sales_report', $this->salesReportData($request));
+        return view('admin.sales.sales_report', $this->salesReportData($request));
     }
 
     public function sales_report_pdf(Request $request)
@@ -296,7 +296,7 @@ class AdminController extends Controller
     {
         $this->requireAdmin();
 
-        return view('admin.transaction_history', $this->transactionHistoryData($request));
+        return view('admin.sales.transaction_history', $this->transactionHistoryData($request));
     }
 
     public function transaction_history_pdf(Request $request)
