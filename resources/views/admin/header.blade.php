@@ -17,6 +17,23 @@
         <span>Mi Cusina</span>
       </a>
 
+      <div class="admin-actions">
+      @if(Auth::check() && Auth::user()->usertype === 'admin')
+      <div class="admin-notifications dropdown">
+        <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Low-stock notifications">
+          <i class="fa fa-bell" aria-hidden="true"></i>
+        </button>
+        @if($headerLowStockFoods->isNotEmpty())<span class="admin-notification-count">{{ $headerLowStockFoods->count() }}</span>@endif
+        <div class="dropdown-menu dropdown-menu-right admin-user-menu admin-notification-menu" aria-labelledby="adminNotificationMenu">
+          <div class="admin-notification-title">Low-stock products</div><div class="dropdown-divider"></div>
+          @forelse($headerLowStockFoods as $food)
+            <a class="admin-notification-item" href="{{ url('inventory') }}"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span><strong>{{ $food->title }}</strong><small>{{ $food->stock <= 0 ? 'Out of stock' : $food->stock . ' left' }} &middot; Alert at {{ $headerLowStockThreshold }} or fewer</small></span></a>
+          @empty
+            <div class="admin-notification-empty">All products are sufficiently stocked.</div>
+          @endforelse
+        </div>
+      </div>
+      @endif
       <div class="admin-user dropdown">
         <button class="admin-user-trigger dropdown-toggle" type="button" id="adminUserMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <img src="{{ Auth::user()->profile_photo_path ? Auth::user()->profile_photo_url : asset('admin/img/avatar-6.jpg') }}" alt="{{ Auth::user()->name ?? 'Admin' }}">
@@ -43,6 +60,7 @@
             <button class="dropdown-item" type="submit">Log Out</button>
           </form>
         </div>
+      </div>
       </div>
     </div>
   </nav>

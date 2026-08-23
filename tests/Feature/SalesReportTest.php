@@ -57,4 +57,24 @@ class SalesReportTest extends TestCase
             ->assertSee('History customer')
             ->assertSee('Burger Meal x 1');
     }
+
+    public function test_admin_can_download_sales_report_pdf(): void
+    {
+        $admin = User::factory()->create(['usertype' => 'admin']);
+
+        $this->actingAs($admin)
+            ->get('/sales-report/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_admin_can_download_transaction_history_pdf(): void
+    {
+        $admin = User::factory()->create(['usertype' => 'admin']);
+
+        $this->actingAs($admin)
+            ->get('/transaction-history/pdf')
+            ->assertOk()
+            ->assertHeader('content-type', 'application/pdf');
+    }
 }

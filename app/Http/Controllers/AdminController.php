@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AdminController extends Controller
 {
@@ -214,6 +215,23 @@ class AdminController extends Controller
     {
         $this->requireAdmin();
 
+        return view('admin.sales_report', $this->salesReportData($request));
+    }
+
+    public function sales_report_pdf(Request $request)
+    {
+        $this->requireAdmin();
+
+        $data = $this->salesReportData($request);
+
+        return Pdf::loadView('admin.sales.sales_report_pdf', $data)
+            ->setPaper('a4', 'portrait')
+            ->download('sales-report-' . $data['from']->toDateString() . '-to-' . $data['to']->toDateString() . '.pdf');
+    }
+
+    private function salesReportData(Request $request): array
+    {
+
         $request->validate([
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
@@ -260,7 +278,7 @@ class AdminController extends Controller
             ];
         }
 
-        return view('admin.sales_report', [
+        return [
             'from' => $from,
             'to' => $to,
             'orderSales' => $orderSales,
@@ -271,12 +289,29 @@ class AdminController extends Controller
             'topItems' => $topItems,
             'recentSales' => $recentSales,
             'salesByDay' => $salesByDay,
-        ]);
+        ];
     }
 
     public function transaction_history(Request $request)
     {
         $this->requireAdmin();
+
+        return view('admin.transaction_history', $this->transactionHistoryData($request));
+    }
+
+    public function transaction_history_pdf(Request $request)
+    {
+        $this->requireAdmin();
+
+        $data = $this->transactionHistoryData($request);
+
+        return Pdf::loadView('admin.sales.transaction_history_pdf', $data)
+            ->setPaper('a4', 'landscape')
+            ->download('transaction-history-' . $data['from']->toDateString() . '-to-' . $data['to']->toDateString() . '.pdf');
+    }
+
+    private function transactionHistoryData(Request $request): array
+    {
 
         $request->validate([
             'from' => ['nullable', 'date'],
@@ -314,7 +349,7 @@ class AdminController extends Controller
 
         $transactions = $orderTransactions->concat($reservationTransactions)->sortByDesc('date')->values();
 
-        return view('admin.transaction_history', compact('transactions', 'from', 'to'));
+        return compact('transactions', 'from', 'to');
     }
 
     public function assign_rider(Request $request, $id)

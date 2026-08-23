@@ -13,6 +13,7 @@
     .sales-filter label { color:var(--mc-muted); font-size:12px; font-weight:700; margin:0; text-transform:uppercase; }
     .sales-filter input { background:#101116; border:1px solid var(--mc-border-strong); border-radius:5px; color:#fff; display:block; margin-top:6px; padding:8px 10px; }
     .sales-filter button { background:var(--mc-accent); border:0; border-radius:5px; color:#08090c; font-weight:800; padding:9px 18px; }
+    .pdf-button { background:#fff !important; color:#111827 !important; text-decoration:none; }
     .sales-cards { display:grid; gap:16px; grid-template-columns:repeat(4, minmax(0, 1fr)); margin-bottom:18px; }
     .sales-card { padding:18px; } .sales-card span { color:var(--mc-muted); display:block; font-size:12px; font-weight:700; text-transform:uppercase; } .sales-card strong { display:block; font-size:25px; margin-top:9px; }
     .sales-grid { display:grid; gap:18px; grid-template-columns:1.2fr .8fr; } .sales-panel { overflow:hidden; padding:20px; } .sales-panel h3 { font-size:17px; font-weight:800; margin:0 0 16px; }
@@ -33,6 +34,7 @@
       <label>From <input type="date" name="from" value="{{ $from->toDateString() }}"></label>
       <label>To <input type="date" name="to" value="{{ $to->toDateString() }}"></label>
       <button type="submit">Apply range</button>
+      <a class="pdf-button" href="{{ route('admin.sales-report.pdf', request()->only(['from', 'to'])) }}"><i class="fa fa-file-pdf-o"></i> Download PDF</a>
     </form>
     <section class="sales-cards">
       <div class="sales-card"><span>Total sales</span><strong>₱{{ number_format($totalSales, 2) }}</strong></div>
