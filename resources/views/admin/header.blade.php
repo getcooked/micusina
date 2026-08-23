@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="container-fluid d-flex align-items-center">
-      <a href="{{ url('home') }}" class="admin-brand" aria-label="Mi Cusina admin home">
+      <a href="{{ route('dashboard') }}" class="admin-brand" aria-label="Mi Cusina admin dashboard">
         <img src="{{ asset('assets/imgs/mi-cusina-transparent.png') }}" alt="Mi Cusina">
         <span>Mi Cusina</span>
       </a>

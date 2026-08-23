@@ -30,7 +30,8 @@ Route::middleware('guest')->group(function () {
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/home', [HomeController::class, 'index']);
+    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::redirect('/home', '/dashboard');
     Route::post('/customer/logout', [HomeController::class, 'logout'])->name('customer.logout');
     Route::post('/admin/profile-photo', [AdminController::class, 'update_profile_photo'])->name('admin.profile-photo.update');
     Route::post('/customer/profile-photo', [HomeController::class, 'update_profile_photo'])->name('customer.profile-photo.update');
@@ -76,24 +77,4 @@ Route::middleware('auth')->group(function () {
     Route::get('/add_staff', [AdminController::class, 'add_staff']);
     Route::post('/store_staff', [AdminController::class, 'store_staff']);
     Route::post('/chatbot/message', [HomeController::class, 'chatbot_message'])->middleware('throttle:30,1');
-});
-
-
-
-
-
-
-
-
-
-
-
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return redirect('/home');
-    })->name('dashboard');
 });

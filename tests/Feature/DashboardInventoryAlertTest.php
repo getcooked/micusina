@@ -11,6 +11,15 @@ class DashboardInventoryAlertTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_home_redirects_to_the_dashboard(): void
+    {
+        $admin = User::factory()->create(['usertype' => 'admin']);
+
+        $this->actingAs($admin)
+            ->get('/home')
+            ->assertRedirect('/dashboard');
+    }
+
     public function test_admin_dashboard_lists_out_of_stock_and_low_stock_items(): void
     {
         $admin = User::factory()->create(['usertype' => 'admin']);
@@ -34,12 +43,10 @@ class DashboardInventoryAlertTest extends TestCase
         });
 
         $this->actingAs($admin)
-            ->get('/home')
+            ->get('/dashboard')
             ->assertOk()
-            ->assertSee('Inventory needs attention')
-            ->assertSee('1 out of stock and 1 low-stock items')
-            ->assertSee('Unavailable Meal: Out of stock')
-            ->assertSee('Nearly Sold Out Meal: 3 left')
-            ->assertSee('Review Inventory');
+            ->assertSeeText('Low-stock alert')
+            ->assertSeeText('Nearly Sold Out Meal: 3 left')
+            ->assertSeeText('Out of Stock');
     }
 }

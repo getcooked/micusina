@@ -54,7 +54,7 @@ class HomeController extends Controller
         {
             if(Auth::check() && in_array(Auth::user()->usertype, ['admin', 'staff']))
             {
-                return redirect('/home');
+                return redirect()->route('dashboard');
             }
 
             $data = Food::all();

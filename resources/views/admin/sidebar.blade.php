@@ -13,7 +13,7 @@
         </div>
         <!-- Sidebar Navidation Menus--><span class="heading">Main</span>
         <ul class="list-unstyled">
-                <li class="{{ request()->is('home') ? 'active' : '' }}"><a href="{{ url('home') }}"> <i class="icon-home"></i>Dashboard </a></li>
+                <li class="{{ request()->is('dashboard') ? 'active' : '' }}"><a href="{{ route('dashboard') }}"> <i class="icon-home"></i>Dashboard </a></li>
                 @if(Auth::check() && Auth::user()->usertype == 'admin')
                 <li class="food-menu {{ request()->is('view_food') || request()->is('add_food') || request()->is('inventory') ? 'active' : '' }}">
                   <a href="#foodMenu" data-toggle="collapse" aria-expanded="false">
