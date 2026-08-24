@@ -427,6 +427,17 @@ class HomeController extends Controller
     
     }
 
+    public function checkout()
+    {
+        $data = Cart::where('userid', Auth::id())->get();
+
+        if ($data->isEmpty()) {
+            return redirect('my_cart')->with('message', 'Your cart is empty. Add something from the menu first.');
+        }
+
+        return view('home.checkout', compact('data'));
+    }
+
     public function update_cart(Request $request, $id)
     {
         $request->validate([

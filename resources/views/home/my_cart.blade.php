@@ -265,8 +265,14 @@
 
         .cart-product {
             align-items: center;
-            display: block;
+            display: flex;
+            gap: 16px;
         }
+
+        .cart-product img { border-radius: 12px; height: 72px; object-fit: cover; width: 72px; }
+
+        .cart-remove { background: transparent; border: 0; color: #b54b4b; cursor: pointer; font-size: 13px; font-weight: 800; margin-top: 7px; padding: 0; }
+        .cart-remove:hover { color: #7f2020; text-decoration: underline; }
 
         .cart-product strong {
             color: #000;
@@ -414,17 +420,23 @@
         }
 
         .checkout-button {
+            align-items: center;
             background: #F88379;
             border: 0;
             border-radius: 999px;
             color: #fff;
             cursor: pointer;
+            display: flex;
             font-size: 16px;
             font-weight: 900;
+            justify-content: center;
             margin-top: 24px;
             min-height: 54px;
+            text-decoration: none;
             width: 100%;
         }
+
+        .checkout-button:hover { color: #fff; text-decoration: none; }
 
         .checkout-button:disabled {
             background: #999;
@@ -809,9 +821,17 @@
                                 @endphp
                                 <div class="cart-item">
                                     <div class="cart-product">
+                                        @if($cart->image)
+                                            <img src="{{ asset('food_img/' . $cart->image) }}" alt="{{ $cart->title }}" onerror="this.style.display='none'">
+                                        @endif
                                         <div>
                                             <strong>{{ $cart->title }}</strong>
                                             <span>&#8369;{{ number_format($unitPrice, 2) }} each</span>
+                                            <form action="{{ url('remove_cart', $cart->id) }}" method="post">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="cart-remove" type="submit">Remove</button>
+                                            </form>
                                         </div>
                                     </div>
                                     <div>
@@ -859,7 +879,7 @@
                                 <span>Total</span>
                                 <span>&#8369;{{ number_format($total_price, 2) }}</span>
                             </div>
-                            <button class="checkout-button" id="openCheckout" type="button" {{ $data->isEmpty() ? 'disabled' : '' }}>Checkout Now</button>
+                            <a class="checkout-button" href="{{ route('checkout') }}" target="{{ $embeddedCart ? '_top' : '_self' }}" {{ $data->isEmpty() ? 'aria-disabled=true' : '' }}>Proceed to Checkout</a>
                         </div>
                     </aside>
                 </div>

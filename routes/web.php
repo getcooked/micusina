@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/add_cart/{id}', [HomeController::class, 'add_cart']);
     Route::post('/add_cart_ajax/{id}', [HomeController::class, 'add_cart_ajax']);
     Route::get('/my_cart', [HomeController::class, 'my_cart']);
+    Route::get('/checkout', [HomeController::class, 'checkout'])->name('checkout');
     Route::post('/update_cart/{id}', [HomeController::class, 'update_cart']);
     Route::delete('/remove_cart/{id}', [HomeController::class, 'remove_cart']);
     Route::get('/my_orders', [HomeController::class, 'my_orders']);
