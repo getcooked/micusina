@@ -9,7 +9,8 @@
     .history-filter label { color:var(--mc-muted); font-size:12px; font-weight:700; text-transform:uppercase; }
     .history-filter input { background:#101116; border:1px solid var(--mc-border-strong); border-radius:5px; color:#fff; display:block; margin-top:6px; padding:8px 10px; }
     .history-filter button { background:var(--mc-accent); border:0; border-radius:5px; color:#08090c; font-weight:800; padding:9px 18px; }
-    .pdf-button { background:#fff !important; color:#111827 !important; text-decoration:none; }
+    .pdf-button { align-items:center; background:#fff !important; border:2px solid #7c3aed; border-radius:8px; box-shadow:0 2px 6px rgba(124,58,237,.16); color:#5b21b6 !important; display:inline-flex; font-weight:800; gap:7px; padding:9px 14px; text-decoration:none; }
+    .pdf-button:hover { background:#f5f3ff !important; color:#4c1d95 !important; text-decoration:none; }
     .history-panel { background:var(--mc-panel); border:1px solid var(--mc-border); border-radius:8px; overflow-x:auto; }
     .history-table { border-collapse:collapse; min-width:850px; width:100%; } .history-table th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#475569; font-size:11px; padding:13px 14px; text-align:left; text-transform:uppercase; }
     .history-table td { border-top:1px solid var(--mc-border); padding:14px; vertical-align:top; } .history-table td:last-child { text-align:right; white-space:nowrap; }
