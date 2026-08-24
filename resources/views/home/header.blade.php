@@ -1186,18 +1186,18 @@
     }
 
     .cart-popup {
-        align-items: center;
+        align-items: stretch;
         display: none;
         inset: 0;
-        justify-content: center;
-        padding: 28px;
+        justify-content: flex-end;
         position: fixed;
         z-index: 1400;
     }
 
     .cart-popup.is-open { display: flex; }
     .cart-popup-backdrop { background: rgba(15, 23, 42, .52); inset: 0; position: absolute; }
-    .cart-popup-panel { background: #fff; border-radius: 20px; box-shadow: 0 28px 70px rgba(15, 23, 42, .35); height: min(820px, calc(100vh - 56px)); max-width: 1240px; overflow: hidden; position: relative; width: min(1240px, calc(100vw - 56px)); z-index: 1; }
+    .cart-popup-panel { background: #fff; box-shadow: -18px 0 48px rgba(15, 23, 42, .28); height: 100%; max-width: 560px; overflow: hidden; position: relative; transform: translateX(100%); transition: transform .28s ease; width: min(100%, 560px); z-index: 1; }
+    .cart-popup.is-open .cart-popup-panel { transform: translateX(0); }
     .cart-popup-frame { border: 0; height: 100%; width: 100%; }
     .cart-popup-close { align-items: center; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 4px 14px rgba(15, 23, 42, .18); color: #1f2937; cursor: pointer; display: flex; font-size: 28px; height: 42px; justify-content: center; line-height: 1; position: absolute; right: 16px; top: 16px; width: 42px; z-index: 2; }
 
@@ -1208,6 +1208,8 @@
             right: 16px;
             width: 56px;
         }
+
+        .cart-popup-panel { max-width: 100%; width: 100%; }
     }
 </style>
 
@@ -1219,18 +1221,30 @@
 
         if (!button || !popup || !frame) return;
 
+        function closeCartPopup() {
+            popup.classList.remove('is-open');
+            popup.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            button.focus();
+        }
+
         button.addEventListener('click', function () {
             if (!frame.src) frame.src = button.dataset.cartUrl;
             popup.classList.add('is-open');
             popup.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
+            popup.querySelector('.cart-popup-close').focus();
         });
 
         popup.addEventListener('click', function (event) {
             if (!event.target.closest('[data-close-cart-popup]')) return;
-            popup.classList.remove('is-open');
-            popup.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
+            closeCartPopup();
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && popup.classList.contains('is-open')) {
+                closeCartPopup();
+            }
         });
     });
 </script>
