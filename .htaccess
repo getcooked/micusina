@@ -2,6 +2,11 @@
     Options -Indexes
     RewriteEngine On
 
+    # Never serve application source, credentials, or dependency metadata.
+    <FilesMatch "^(\.env(?:\..*)?|artisan|composer\.(?:json|lock)|package(?:-lock)?\.json)$">
+        Require all denied
+    </FilesMatch>
+
     # This project is deployed with its repository directory as the web root.
     # Serve requests through Laravel's public directory without exposing files
     # outside that directory.
