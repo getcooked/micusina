@@ -27,7 +27,7 @@
         <div class="dropdown-menu dropdown-menu-right admin-user-menu admin-notification-menu" aria-labelledby="adminNotificationMenu">
           <div class="admin-notification-title">Low-stock products</div><div class="dropdown-divider"></div>
           @forelse($headerLowStockFoods as $food)
-            <a class="admin-notification-item" href="{{ url('inventory') }}"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span><strong>{{ $food->title }}</strong><small>{{ $food->stock <= 0 ? 'Out of stock' : $food->stock . ' left' }} &middot; Alert at {{ $headerLowStockThreshold }} or fewer</small></span></a>
+            <a class="admin-notification-item" href="{{ url('inventory') }}"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span><strong>{{ $food->title }}</strong><small>Current stocks: {{ max(0, $food->stock) }}</small></span></a>
           @empty
             <div class="admin-notification-empty">All products are sufficiently stocked.</div>
           @endforelse
