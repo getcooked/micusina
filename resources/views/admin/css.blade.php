@@ -94,9 +94,9 @@
         .admin-actions { align-items: center; display: flex; gap: 12px; margin-left: auto; }
         .admin-user { margin-left: 0; }
         .admin-notifications { position: relative; }
-        .admin-notification-trigger { align-items:center; background:#f3e8ff; border:1px solid #c084fc; border-radius:999px; color:#7c3aed; cursor:pointer; display:inline-flex; font-size:18px; height:46px; justify-content:center; width:46px; }
+        .admin-notification-trigger { align-items:center; background:#f3e8ff; border:1px solid #c084fc; border-radius:999px; color:#7c3aed; cursor:pointer; display:inline-flex; font-size:18px; height:46px; justify-content:center; position:relative; width:46px; }
         .admin-notification-trigger:hover { background:#ede9fe; border-color:#7c3aed; color:#5b21b6; }
-        .admin-notification-count { align-items:center; background:#ef4444; border:2px solid #fff; border-radius:999px; color:#fff; display:flex; font-size:10px; font-weight:800; height:19px; justify-content:center; position:absolute; right:-3px; top:-3px; min-width:19px; padding:0 4px; }
+        .admin-notification-count { align-items:center; background:#ef4444; border:2px solid #fff; border-radius:50%; color:#fff; display:flex; font-size:10px; font-weight:800; height:20px; justify-content:center; line-height:1; min-width:20px; padding:0 3px; position:absolute; right:-8px; top:-8px; z-index:2; }
         .admin-notification-menu { max-height:360px; min-width:310px; overflow-y:auto; }
         .admin-notification-title { color:var(--mc-text); font-size:14px; font-weight:800; padding:8px 10px; }
         .admin-notification-item { align-items:center; color:var(--mc-text); display:flex; gap:10px; padding:10px; white-space:normal; }

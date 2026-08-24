@@ -22,8 +22,8 @@
       <div class="admin-notifications dropdown">
         <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Low-stock notifications">
           <i class="fa fa-bell" aria-hidden="true"></i>
+          @if($headerLowStockFoods->isNotEmpty())<span class="admin-notification-count" aria-label="{{ $headerLowStockFoods->count() }} low-stock notifications">{{ $headerLowStockFoods->count() }}</span>@endif
         </button>
-        @if($headerLowStockFoods->isNotEmpty())<span class="admin-notification-count">{{ $headerLowStockFoods->count() }}</span>@endif
         <div class="dropdown-menu dropdown-menu-right admin-user-menu admin-notification-menu" aria-labelledby="adminNotificationMenu">
           <div class="admin-notification-title">Low-stock products</div><div class="dropdown-divider"></div>
           @forelse($headerLowStockFoods as $food)
