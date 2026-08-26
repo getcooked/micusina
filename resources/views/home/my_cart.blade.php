@@ -1,4 +1,6 @@
-@php($embeddedCart = request()->boolean('embed'))
+@php
+    $embeddedCart = request()->boolean('embed');
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
