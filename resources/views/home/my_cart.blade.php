@@ -646,6 +646,122 @@
             font-weight: 700 !important;
         }
 
+        /* Desktop cart: keep the whole checkout in one screen, like a POS cart. */
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background: #e9eaee;
+        }
+
+        .cart-page {
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 96px);
+            min-height: 0;
+            padding: 24px clamp(18px, 5vw, 72px);
+        }
+
+        .cart-title {
+            color: #20232b;
+            font-size: 24px !important;
+            line-height: 1 !important;
+            margin: 0 0 16px;
+        }
+
+        .cart-shell {
+            border-radius: 0;
+            box-shadow: 0 22px 48px rgba(22, 30, 48, .16);
+            display: flex;
+            flex: 1;
+            margin: 0 auto;
+            max-width: 1280px;
+            min-height: 0;
+            overflow: hidden;
+            padding: 0;
+            width: 100%;
+        }
+
+        .cart-grid {
+            gap: 0;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            height: 100%;
+            min-height: 0;
+            width: 100%;
+        }
+
+        .cart-main {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 32px clamp(24px, 3vw, 48px);
+        }
+
+        .cart-brand { display: none; }
+        .cart-main-head { border-bottom: 1px solid #e7e7e7; margin-bottom: 14px; padding-bottom: 16px; }
+        .cart-heading { font-size: 24px !important; }
+        .cart-count { font-size: 14px !important; }
+
+        .cart-list,
+        .checkout-details { border: 0; border-radius: 0; }
+
+        .cart-list {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .cart-list-head,
+        .cart-item {
+            gap: 12px;
+            grid-template-columns: minmax(220px, 1fr) 120px 90px 90px;
+            padding: 13px 0;
+        }
+
+        .cart-list-head { font-size: 10px !important; padding-top: 4px; }
+        .cart-product { gap: 12px; }
+        .cart-product img { border-radius: 2px; height: 58px; width: 58px; }
+        .cart-product strong { font-size: 14px !important; margin-bottom: 2px; }
+        .cart-product span, .cart-muted, .cart-remove { font-size: 11px !important; }
+        .cart-price { font-size: 13px !important; }
+        .qty-stepper { border-radius: 4px; gap: 5px; min-height: 30px; padding: 2px 4px; }
+        .qty-stepper button { font-size: 16px; height: 24px; width: 24px; }
+        .qty-stepper strong { font-size: 13px !important; }
+        .continue-shopping { flex: 0 0 auto; font-size: 12px !important; margin-top: 16px; }
+
+        .order-summary {
+            background: #f7f7f8;
+            border: 0;
+            border-left: 1px solid #ececef;
+            border-radius: 0;
+            min-height: 0;
+            padding: 32px 24px;
+        }
+
+        .order-summary h2 { font-size: 18px !important; margin-bottom: 22px; }
+        .summary-line { border-top: 1px solid #e4e4e7; font-size: 12px !important; margin: 0; padding: 14px 0; }
+        .summary-total { font-size: 15px !important; margin-top: 10px; padding-top: 16px; }
+        .checkout-button { border-radius: 2px; font-size: 12px !important; margin-top: 22px; min-height: 44px; }
+
+        body.cart-embed .cart-page {
+            height: 100vh;
+            padding: 0;
+        }
+
+        @media (max-width: 991.98px) {
+            html, body { height: auto; overflow: auto; }
+            .cart-page, body.cart-embed .cart-page { height: auto; min-height: 100vh; }
+            .cart-shell { display: block; overflow: visible; }
+            .cart-grid { display: block; height: auto; }
+            .cart-main { display: block; }
+            .cart-list { overflow: visible; }
+            .order-summary { border-left: 0; border-top: 1px solid #ececef; }
+        }
+
         .cart-shell .checkout-button {
             background: #ed0da8 !important;
             border-color: #ed0da8 !important;
