@@ -30,7 +30,7 @@ INJECTED from C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:4
 	android:theme
 		ADDED from C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:8:9-46
 	android:usesCleartextTraffic
-		ADDED from C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:9:9-44
+		ADDED from C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:9:9-45
 activity#com.micusina.app.MainActivity
 ADDED from C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:10:9-17:20
 	android:exported

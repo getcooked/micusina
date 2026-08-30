@@ -17,7 +17,7 @@
         android:label="Mi Cusina"
         android:supportsRtl="true"
         android:theme="@style/Theme.MiCusina"
-        android:usesCleartextTraffic="true" >
+        android:usesCleartextTraffic="false" >
         <activity
             android:name="com.micusina.app.MainActivity"
             android:exported="true" >

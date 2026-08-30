@@ -1,125 +1,28 @@
 package com.micusina.app;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.view.ViewGroup;
-import android.view.Gravity;
-import android.graphics.drawable.GradientDrawable;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.app.*; import android.os.*; import android.content.*; import android.graphics.Color; import android.view.*; import android.widget.*;
+import org.json.*; import java.io.*; import java.net.*; import java.nio.charset.StandardCharsets;
 
+/** Native client: no WebView and no website pages are embedded. */
 public class MainActivity extends Activity {
-    private WebView webView;
-
-    @SuppressLint("SetJavaScriptEnabled")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (BuildConfig.WEBSITE_URL.contains("your-mi-cusina-domain.com")) {
-            TextView notice = new TextView(this);
-            notice.setBackgroundColor(Color.WHITE);
-            notice.setTextColor(Color.BLACK);
-            notice.setGravity(android.view.Gravity.CENTER);
-            notice.setPadding(48, 48, 48, 48);
-            notice.setTextSize(18);
-            notice.setText("Mi Cusina mobile app\n\nSet your live website address in android-app/app/build.gradle, then build again.");
-            setContentView(notice);
-            return;
-        }
-
-        showRoleSelection();
-    }
-
-    private void showRoleSelection() {
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(48, 48, 48, 48);
-        layout.setBackgroundColor(Color.rgb(250, 244, 249));
-
-        TextView title = new TextView(this);
-        title.setText("Mi Cusina");
-        title.setTextSize(32);
-        title.setTextColor(Color.rgb(37, 25, 37));
-        title.setGravity(Gravity.CENTER);
-        title.setTypeface(null, android.graphics.Typeface.BOLD);
-        layout.addView(title, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        TextView subtitle = new TextView(this);
-        subtitle.setText("Choose how you want to continue");
-        subtitle.setTextSize(16);
-        subtitle.setTextColor(Color.DKGRAY);
-        subtitle.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        subtitleParams.setMargins(0, 16, 0, 40);
-        layout.addView(subtitle, subtitleParams);
-
-        Button customerButton = roleButton("Customer\nBrowse the menu and place orders");
-        customerButton.setOnClickListener(view -> openWebsite("/?section=food"));
-        layout.addView(customerButton, buttonParams());
-
-        Button staffButton = roleButton("Staff\nManage orders and deliveries");
-        staffButton.setOnClickListener(view -> openWebsite("/home"));
-        layout.addView(staffButton, buttonParams());
-
-        setContentView(layout);
-    }
-
-    private Button roleButton(String label) {
-        Button button = new Button(this);
-        button.setAllCaps(false);
-        button.setText(label);
-        button.setTextSize(17);
-        button.setTextColor(Color.WHITE);
-        button.setGravity(Gravity.CENTER);
-        GradientDrawable background = new GradientDrawable();
-        background.setColor(Color.rgb(205, 45, 180));
-        background.setCornerRadius(24);
-        button.setBackground(background);
-        return button;
-    }
-
-    private LinearLayout.LayoutParams buttonParams() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, 112);
-        params.setMargins(0, 0, 0, 20);
-        return params;
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    private void openWebsite(String path) {
-        webView = new WebView(this);
-        webView.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT));
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setDomStorageEnabled(true);
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                view.loadUrl(request.getUrl().toString());
-                return true;
-            }
-        });
-        webView.loadUrl(BuildConfig.WEBSITE_URL + path);
-        setContentView(webView);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
+  LinearLayout page; String token="", role="user"; SharedPreferences prefs; final int PINK=Color.rgb(205,45,180);
+  public void onCreate(Bundle b){super.onCreate(b);prefs=getSharedPreferences("mi_cusina",0);token=prefs.getString("token","");role=prefs.getString("role","user");if(token.isEmpty())login();else home();}
+  TextView t(String s,int z){TextView v=new TextView(this);v.setText(s);v.setTextSize(z);v.setTextColor(Color.DKGRAY);v.setPadding(0,10,0,10);return v;}
+  void screen(String h){ScrollView sc=new ScrollView(this);page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(32,24,32,32);page.setBackgroundColor(Color.rgb(250,244,249));sc.addView(page);setContentView(sc);page.addView(t(h,27));}
+  EditText input(String h,boolean pass){EditText e=new EditText(this);e.setHint(h);if(pass)e.setInputType(0x81);page.addView(e);return e;}
+  Button btn(String s){Button b=new Button(this);b.setText(s);b.setAllCaps(false);b.setTextColor(Color.WHITE);b.setBackgroundColor(PINK);page.addView(b);return b;}
+  void login(){screen("Mi Cusina");page.addView(t("Native customer and staff application",16));EditText e=input("Email",false),p=input("Password",true);btn("Sign in").setOnClickListener(v->{try{call("POST","/login",new JSONObject().put("email",e.getText()).put("password",p.getText()),r->{token=r.getString("token");role=r.getJSONObject("user").optString("usertype","user");prefs.edit().putString("token",token).putString("role",role).apply();home();});}catch(Exception x){toast(x.getMessage());}});page.addView(t("Create and verify a new account on the website, then use it here.",14));}
+  void nav(boolean staff){LinearLayout row=new LinearLayout(this);String[] x=staff?new String[]{"Dashboard","Orders","Inventory","Sign out"}:new String[]{"Menu","Cart","Orders","Sign out"};for(String s:x){Button b=new Button(this);b.setText(s);b.setAllCaps(false);row.addView(b,new LinearLayout.LayoutParams(0,-2,1));b.setOnClickListener(v->{if(s.equals("Menu"))menu();else if(s.equals("Cart"))cart();else if(s.equals("Orders")){if(staff)staffOrders();else orders();}else if(s.equals("Dashboard"))dashboard();else if(s.equals("Inventory"))inventory();else logout();});}page.addView(row);}
+  void home(){if(role.equals("admin")||role.equals("staff"))dashboard();else menu();}
+  void menu(){screen("Menu");nav(false);page.addView(t("Loading…",16));call("GET","/foods",null,r->{page.removeViewAt(2);JSONArray a=r.getJSONArray("foods");for(int i=0;i<a.length();i++){JSONObject f=a.getJSONObject(i);LinearLayout c=new LinearLayout(this);c.setOrientation(LinearLayout.VERTICAL);c.setBackgroundColor(Color.WHITE);c.addView(t(f.getString("title")+"  ₱"+f.getDouble("price")+"\n"+f.optString("detail","")+"\nStock: "+f.getInt("stock"),17));Button add=new Button(this);add.setText("Add to cart");add.setEnabled(f.getInt("stock")>0);int id=f.getInt("id");add.setOnClickListener(v->{try{call("POST","/cart/"+id,new JSONObject().put("quantity",1),z->toast("Added to cart"));}catch(Exception ex){toast(ex.getMessage());}});c.addView(add);page.addView(c);}});}
+  void cart(){screen("Cart");nav(false);page.addView(t("Loading…",16));call("GET","/cart",null,r->{page.removeViewAt(2);JSONArray a=r.getJSONArray("items");double total=0;for(int i=0;i<a.length();i++){JSONObject q=a.getJSONObject(i);total+=q.getDouble("price");page.addView(t(q.getString("title")+" × "+q.getInt("quantity")+" — ₱"+q.getDouble("price"),17));}page.addView(t("Total: ₱"+total,20));if(a.length()>0)checkout();});}
+  void checkout(){page.addView(t("Delivery details",20));EditText n=input("Full name",false),ph=input("Phone",false),m=input("Municipality",false),b=input("Barangay",false),pu=input("Purok",false),pm=input("Payment: Cash on Delivery, GCash, or Bank Transfer",false);btn("Place order").setOnClickListener(v->{try{JSONObject d=new JSONObject().put("name",n.getText()).put("phone",ph.getText()).put("municipality",m.getText()).put("barangay",b.getText()).put("purok",pu.getText()).put("payment_method",pm.getText());call("POST","/checkout",d,z->{toast("Order placed");orders();});}catch(Exception e){toast(e.getMessage());}});}
+  void orders(){screen("My orders");nav(false);page.addView(t("Loading…",16));call("GET","/orders",null,r->{page.removeViewAt(2);JSONArray a=r.getJSONArray("orders");for(int i=0;i<a.length();i++){JSONObject o=a.getJSONObject(i);page.addView(t("#"+o.getInt("id")+" "+o.getString("title")+" × "+o.getInt("quantity")+"\n"+o.getString("delivery_status"),17));}});}
+  void dashboard(){screen("Staff dashboard");nav(true);page.addView(t("Loading…",16));call("GET","/staff/dashboard",null,r->{page.removeViewAt(2);page.addView(t("Pending: "+r.getInt("pending_orders")+"\nOn the way: "+r.getInt("on_the_way_orders")+"\nDelivered: "+r.getInt("delivered_orders")+"\nLow stock: "+r.getInt("low_stock"),20));});}
+  void staffOrders(){screen("Manage orders");nav(true);page.addView(t("Loading…",16));call("GET","/staff/orders",null,r->{page.removeViewAt(2);JSONArray a=r.getJSONArray("orders");for(int i=0;i<a.length();i++){JSONObject o=a.getJSONObject(i);int id=o.getInt("id");page.addView(t("#"+id+" "+o.getString("title")+" — "+o.getString("delivery_status"),17));Button d=new Button(this);d.setText("Mark delivered");d.setOnClickListener(v->{try{call("PATCH","/staff/orders/"+id,new JSONObject().put("delivery_status","Delivered"),z->staffOrders());}catch(Exception e){toast(e.getMessage());}});page.addView(d);}});}
+  void inventory(){screen("Inventory");nav(true);page.addView(t("Loading…",16));call("GET","/staff/inventory",null,r->{page.removeViewAt(2);JSONArray a=r.getJSONArray("foods");for(int i=0;i<a.length();i++){JSONObject f=a.getJSONObject(i);page.addView(t(f.getString("title")+" — stock: "+f.getInt("stock"),17));}});}
+  void logout(){call("POST","/logout",null,r->{prefs.edit().clear().apply();token="";role="user";login();});}
+  interface Done{void ok(JSONObject r)throws Exception;}
+  void call(String method,String path,JSONObject body,Done done){new Thread(()->{try{HttpURLConnection c=(HttpURLConnection)new URL(BuildConfig.API_BASE_URL+path).openConnection();c.setRequestMethod(method);c.setRequestProperty("Accept","application/json");c.setRequestProperty("Content-Type","application/json");if(!token.isEmpty())c.setRequestProperty("Authorization","Bearer "+token);if(body!=null){c.setDoOutput(true);try(OutputStream o=c.getOutputStream()){o.write(body.toString().getBytes(StandardCharsets.UTF_8));}}int code=c.getResponseCode();InputStream in=code<400?c.getInputStream():c.getErrorStream();StringBuilder s=new StringBuilder();try(BufferedReader br=new BufferedReader(new InputStreamReader(in))){String l;while((l=br.readLine())!=null)s.append(l);}JSONObject r=new JSONObject(s.toString());runOnUiThread(()->{try{if(code>=400)throw new Exception(r.optString("message","Request failed"));done.ok(r);}catch(Exception e){toast(e.getMessage());}});}catch(Exception e){runOnUiThread(()->toast(e.getMessage()==null?"Could not reach server":e.getMessage()));}}).start();}
+  void toast(String s){Toast.makeText(this,s,Toast.LENGTH_LONG).show();}
 }

@@ -6,7 +6,7 @@
         android:label="Mi Cusina"
         android:supportsRtl="true"
         android:theme="@style/Theme.MiCusina"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true">

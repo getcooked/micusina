@@ -24,8 +24,8 @@
 18-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:7:9-35
 19        android:theme="@style/Theme.MiCusina"
 19-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:8:9-46
-20        android:usesCleartextTraffic="true" >
-20-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:9:9-44
+20        android:usesCleartextTraffic="false" >
+20-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:9:9-45
 21        <activity
 21-->C:\Micusina_project\android-app\app\src\main\AndroidManifest.xml:10:9-17:20
 22            android:name="com.micusina.app.MainActivity"
