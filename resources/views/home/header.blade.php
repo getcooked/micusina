@@ -1114,7 +1114,7 @@
 </nav>
 @endif
 
-@if(request('section') && request()->path() === '/' && !request('cart_background'))
+@if(request('section') && request()->path() === '/')
 <button class="floating-cart-button" type="button" data-cart-popup data-cart-url="{{ url('my_cart') }}?embed=1" aria-label="Open cart">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L20 9H7"></path>
@@ -1125,7 +1125,6 @@
 </button>
 
 <div class="cart-popup" id="cartPopup" aria-hidden="true">
-    <iframe class="cart-popup-menu-frame" src="{{ url('/') }}?section=food&amp;cart_background=1" title="Food menu background" aria-hidden="true" tabindex="-1"></iframe>
     <div class="cart-popup-backdrop" data-close-cart-popup></div>
     <section class="cart-popup-panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
         <button class="cart-popup-close" type="button" data-close-cart-popup aria-label="Close cart">&times;</button>
@@ -1197,9 +1196,8 @@
     }
 
     .cart-popup.is-open { display: flex; }
-    .cart-popup-menu-frame { border: 0; height: 100%; inset: 0; pointer-events: none; position: absolute; width: 100%; z-index: 0; }
-    .cart-popup-backdrop { background: rgba(38, 19, 42, .16); backdrop-filter: blur(1px); inset: 0; position: absolute; z-index: 1; }
-    .cart-popup-panel { background: #fff; border-radius: 24px; box-shadow: 0 18px 44px rgba(48, 21, 54, .34); height: min(86vh, 720px); max-width: 440px; overflow: hidden; position: relative; transform: scale(.96); transition: transform .22s ease, opacity .22s ease; width: min(100%, 440px); z-index: 2; }
+    .cart-popup-backdrop { background: rgba(38, 19, 42, .16); backdrop-filter: blur(1px); inset: 0; position: absolute; }
+    .cart-popup-panel { background: #fff; border-radius: 24px; box-shadow: 0 18px 44px rgba(48, 21, 54, .34); height: min(86vh, 720px); max-width: 440px; overflow: hidden; position: relative; transform: scale(.96); transition: transform .22s ease, opacity .22s ease; width: min(100%, 440px); z-index: 1; }
     .cart-popup.is-open .cart-popup-panel { transform: scale(1); }
     .cart-popup-frame { border: 0; height: 100%; width: 100%; }
     .cart-popup-close { align-items: center; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 4px 14px rgba(15, 23, 42, .18); color: #1f2937; cursor: pointer; display: flex; font-size: 28px; height: 42px; justify-content: center; line-height: 1; position: absolute; right: 16px; top: 16px; width: 42px; z-index: 2; }
