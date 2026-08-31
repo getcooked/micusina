@@ -646,6 +646,70 @@
             font-weight: 700 !important;
         }
 
+        /* Compact card layout used when the cart opens above the food menu. */
+        body.cart-embed {
+            background: #fff;
+            height: auto;
+            overflow: auto;
+        }
+
+        body.cart-embed .cart-page {
+            display: block;
+            height: auto;
+            min-height: 100%;
+            padding: 0;
+        }
+
+        body.cart-embed .cart-shell {
+            border-radius: 0;
+            box-shadow: none;
+            display: block;
+            min-height: 0;
+            overflow: visible;
+        }
+
+        body.cart-embed .cart-grid { display: block; height: auto; }
+        body.cart-embed .cart-main { display: block; padding: 64px 16px 8px; }
+        body.cart-embed .cart-main-head { align-items: center; display: flex; justify-content: center; margin-bottom: 14px; padding: 0 42px 14px; }
+        body.cart-embed .cart-heading { font-family: Arial, Helvetica, sans-serif !important; font-size: 17px !important; font-weight: 800 !important; }
+        body.cart-embed .cart-count { display: none; }
+        body.cart-embed .cart-list { overflow: visible; }
+        body.cart-embed .cart-list-head { display: none; }
+
+        body.cart-embed .cart-item {
+            background: #f0e2ef;
+            border: 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(34, 18, 36, .16);
+            display: grid;
+            gap: 4px 12px;
+            grid-template-columns: minmax(0, 1fr) auto;
+            margin-bottom: 10px;
+            padding: 12px;
+        }
+
+        body.cart-embed .cart-product { gap: 12px; grid-column: 1; grid-row: 1 / span 2; min-width: 0; }
+        body.cart-embed .cart-product img { border-radius: 6px; height: 62px; width: 62px; }
+        body.cart-embed .cart-product strong { font-size: 12px !important; font-weight: 800 !important; margin: 0 0 3px; }
+        body.cart-embed .cart-product span { font-size: 10px !important; line-height: 1.25 !important; }
+        body.cart-embed .cart-remove { font-size: 10px !important; margin-top: 4px; }
+        body.cart-embed .cart-item > div:nth-child(2) { align-self: start; grid-column: 2; grid-row: 1; }
+        body.cart-embed .cart-item > div:nth-child(3) { display: none; }
+        body.cart-embed .cart-item > div:nth-child(4) { align-self: end; grid-column: 2; grid-row: 2; }
+        body.cart-embed .cart-price { font-size: 13px !important; font-weight: 800 !important; }
+        body.cart-embed .qty-stepper { gap: 3px; min-height: 27px; padding: 1px 3px; }
+        body.cart-embed .qty-stepper button { font-size: 14px !important; height: 22px; width: 22px; }
+        body.cart-embed .qty-stepper strong { font-size: 12px !important; }
+        body.cart-embed .continue-shopping { display: none; }
+
+        body.cart-embed aside { display: block; padding: 0 16px 18px; }
+        body.cart-embed .order-summary { background: #fff; border: 0; border-radius: 0; padding: 12px 0 0; }
+        body.cart-embed .order-summary h2 { font-family: Arial, Helvetica, sans-serif !important; font-size: 14px !important; font-weight: 800 !important; margin-bottom: 10px; }
+        body.cart-embed .summary-line { font-size: 11px !important; padding: 5px 0; }
+        body.cart-embed .summary-line:nth-of-type(3) { display: none; }
+        body.cart-embed .summary-total { font-size: 15px !important; margin-top: 8px; padding-top: 12px; }
+        body.cart-embed .checkout-button { background: #9b4698 !important; border-radius: 5px; font-size: 14px !important; margin-top: 18px; min-height: 44px; }
+
         /* Desktop cart: keep the whole checkout in one screen, like a POS cart. */
         html,
         body {
