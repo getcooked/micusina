@@ -1128,7 +1128,7 @@
     <div class="cart-popup-backdrop" data-close-cart-popup></div>
     <section class="cart-popup-panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
         <button class="cart-popup-close" type="button" data-close-cart-popup aria-label="Close cart">&times;</button>
-        <iframe class="cart-popup-frame" title="Shopping cart"></iframe>
+        <iframe class="cart-popup-frame" name="cartPopupFrame" title="Shopping cart"></iframe>
     </section>
 </div>
 @endif
@@ -1229,7 +1229,9 @@
         }
 
         button.addEventListener('click', function () {
-            if (!frame.src) frame.src = button.dataset.cartUrl;
+            // Reload the embedded cart every time so newly added items and
+            // quantities are always shown while the menu stays behind it.
+            frame.src = button.dataset.cartUrl;
             popup.classList.add('is-open');
             popup.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
