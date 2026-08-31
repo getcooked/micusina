@@ -1114,7 +1114,7 @@
 </nav>
 @endif
 
-@if(request('section'))
+@if(request('section') && request()->path() === '/')
 <button class="floating-cart-button" type="button" data-cart-popup data-cart-url="{{ url('my_cart') }}?embed=1" aria-label="Open cart">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M3 4h2l2.1 10.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L20 9H7"></path>
@@ -1196,7 +1196,7 @@
     }
 
     .cart-popup.is-open { display: flex; }
-    .cart-popup-backdrop { background: rgba(38, 19, 42, .32); backdrop-filter: blur(2px); inset: 0; position: absolute; }
+    .cart-popup-backdrop { background: rgba(38, 19, 42, .16); backdrop-filter: blur(1px); inset: 0; position: absolute; }
     .cart-popup-panel { background: #fff; border-radius: 24px; box-shadow: 0 18px 44px rgba(48, 21, 54, .34); height: min(86vh, 720px); max-width: 440px; overflow: hidden; position: relative; transform: scale(.96); transition: transform .22s ease, opacity .22s ease; width: min(100%, 440px); z-index: 1; }
     .cart-popup.is-open .cart-popup-panel { transform: scale(1); }
     .cart-popup-frame { border: 0; height: 100%; width: 100%; }
