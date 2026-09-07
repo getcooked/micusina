@@ -697,6 +697,56 @@
         .hero-food-frame--bottom-right { bottom: -50px; right: -59px; }
         .burger-panel::before { height: 32px; justify-content: center; padding: 0; }
     }
+    /* Phone-first homepage layout: prevents the brand, auth buttons and headline from overflowing. */
+    @media (max-width: 575.98px) {
+        html body .burger-panel {
+            background-position: center center !important;
+            background-size: cover !important;
+        }
+        html body .burger-topbar {
+            grid-template-columns: minmax(0, 1fr) auto;
+            min-height: 72px;
+            padding: 10px 14px;
+        }
+        html body .burger-mark { gap: 6px; min-width: 0; }
+        html body .burger-mark::after {
+            font-size: clamp(18px, 5.7vw, 23px);
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        html body .burger-mark img { height: 34px; width: 38px; }
+        html body .burger-login { gap: 7px; }
+        html body .burger-login > a:first-child,
+        html body .burger-login > a:last-child {
+            font-size: 12px;
+            padding: 9px 11px;
+        }
+        html body .burger-copy {
+            min-height: calc(100vh - 72px);
+            padding: 46px 18px 76px;
+        }
+        html body .burger-copy h1,
+        html body .burger-copy h1 span {
+            font-size: clamp(40px, 11.5vw, 48px);
+            letter-spacing: -.045em;
+            line-height: .98;
+            margin-bottom: 18px;
+        }
+        html body .burger-copy p {
+            font-size: 16px;
+            line-height: 1.45;
+            max-width: 330px;
+        }
+        html body .burger-actions { gap: 10px; width: min(100%, 350px); }
+        html body .burger-primary,
+        html body .burger-secondary {
+            flex: 1 1 0;
+            font-size: 13px;
+            justify-content: center;
+            min-height: 48px;
+            padding: 0 12px;
+        }
+    }
 </style>
 
 <header class="burger-front" id="home">
@@ -1045,13 +1095,15 @@
             padding: 16px 20px;
         }
 
-        .inner-navbar .navbar-collapse {
+        .inner-navbar .navbar-collapse.show {
             align-items: flex-start;
             display: flex !important;
             flex-direction: column;
             gap: 18px;
             margin-top: 16px;
         }
+
+        .inner-navbar .navbar-collapse:not(.show) { display: none !important; }
 
         .inner-navbar .navbar-nav {
             align-items: flex-start;

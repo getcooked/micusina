@@ -1,4 +1,11 @@
 R_DEF: Internal format may change without notice
 local
+drawable auth_food_combo_cutout
+drawable hero_adobo_bunwich_transparent
+drawable hero_burger_spaghetti_transparent
+drawable hero_chicken_burger_transparent
+drawable hero_chicken_teriyaki_transparent
+drawable hero_hotdog_sandwich_transparent
+drawable mi_cusina_hero_food_edge
 string app_name
 style Theme.MiCusina

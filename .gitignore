@@ -14,6 +14,11 @@
 /auth.json
 /node_modules
 /vendor
+/mobile-app/.dart_tool/
+/mobile-app/.flutter-plugins
+/mobile-app/.flutter-plugins-dependencies
+/mobile-app/.packages
+/mobile-app/build/
 Homestead.json
 Homestead.yaml
 Thumbs.db

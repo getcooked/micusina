@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cart;
+use App\Models\Book;
 use App\Models\Food;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\PayMongoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,8 +24,8 @@ class MobileApiController extends Controller
             return response()->json(['message' => 'The email address or password is incorrect.'], 422);
         }
 
-        $user->tokens()->where('name', 'android-mobile')->delete();
-        return response()->json(['token' => $user->createToken('android-mobile')->plainTextToken, 'user' => $this->user($user)]);
+        $user->tokens()->where('name', 'mobile-app')->delete();
+        return response()->json(['token' => $user->createToken('mobile-app')->plainTextToken, 'user' => $this->user($user)]);
     }
 
     public function logout(Request $request): JsonResponse
@@ -100,6 +102,37 @@ class MobileApiController extends Controller
     }
 
     public function orders(Request $request): JsonResponse { return response()->json(['orders' => Order::where('email', $request->user()->email)->latest()->get()]); }
+
+    public function reservations(Request $request): JsonResponse
+    {
+        return response()->json(['reservations' => Book::where('user_id', $request->user()->id)->latest()->get()]);
+    }
+
+    public function createReservation(Request $request, PayMongoService $payMongo): JsonResponse
+    {
+        $data = $request->validate([
+            'first_name' => ['required', 'string', 'max:120'], 'last_name' => ['required', 'string', 'max:120'],
+            'phone' => ['required', 'regex:/^(09[0-9]{9}|\+639[0-9]{9})$/'], 'guest' => ['required', 'integer', 'min:1'],
+            'date' => ['required', 'date', 'after_or_equal:today'], 'time' => ['required', 'string', 'max:50'],
+            'payment_method' => ['required', 'in:GCash,Bank Transfer'],
+        ]);
+        $user = $request->user();
+        $booking = Book::create([
+            'user_id' => $user->id, 'first_name' => $data['first_name'], 'last_name' => $data['last_name'],
+            'name' => trim($data['first_name'].' '.$data['last_name']), 'email' => $user->email, 'phone' => str_replace('+63', '0', $data['phone']),
+            'guest' => $data['guest'], 'date' => $data['date'], 'time' => $data['time'], 'reservation_price' => 250,
+            'deposit_amount' => 125, 'payment_method' => $data['payment_method'], 'payment_status' => 'Pending', 'status' => 'Awaiting Payment',
+        ]);
+        $booking->update(['gcash_reference' => 'BK-'.str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT)]);
+        try {
+            $checkout = $payMongo->createCheckout($booking);
+            $booking->update(['paymongo_checkout_id' => data_get($checkout, 'id')]);
+            return response()->json(['message' => 'Continue payment in your browser.', 'reservation' => $booking->fresh(), 'checkout_url' => data_get($checkout, 'attributes.checkout_url')], 201);
+        } catch (\Throwable $exception) {
+            report($exception); $booking->delete();
+            return response()->json(['message' => 'Secure payment could not be started. Please try again.'], 422);
+        }
+    }
 
     public function staffDashboard(Request $request): JsonResponse
     {

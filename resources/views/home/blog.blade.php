@@ -984,6 +984,26 @@
     .mic-card-cart > button { border-radius:10px; flex:1; font-size:16px; font-weight:800; height:46px; }
     @media (max-width:700px) { .mic-product-title { font-size:22px; } .mic-product-description { font-size:14px; } }
 
+    /* Final phone layout: retain the full food-card information at a readable size. */
+    @media (max-width:640px) {
+        .mic-marketplace { background:#f6f8fb; padding:18px 0 32px; }
+        .mic-marketplace-inner { background:#fff; border:1px solid #e4e7ec; border-radius:18px; padding:14px; }
+        .mic-sortbar { display:flex; margin-bottom:14px; }
+        .mic-product-grid { display:grid; gap:14px; grid-template-columns:1fr; }
+        .mic-product-card { align-items:start; background:#fff; border:1px solid #e4e7ec; border-radius:14px; box-shadow:0 6px 16px rgba(15,23,42,.08); display:grid; grid-template-columns:120px minmax(0,1fr); min-height:0; overflow:hidden; padding:12px; }
+        .mic-product-open { display:contents; pointer-events:auto; }
+        .mic-product-image-wrap { align-items:center; aspect-ratio:auto; background:#fff; display:flex; grid-row:1 / span 2; height:205px; justify-content:center; overflow:hidden; padding:0; width:120px; }
+        .mic-product-image-wrap img { border-radius:10px; display:block; height:100% !important; max-height:none; object-fit:contain !important; width:100% !important; }
+        .mic-product-body { align-items:flex-start; display:flex; flex-direction:column; padding:0 0 0 12px; }
+        .mic-product-title { color:#172033; display:block; font-size:19px; line-height:1.1; min-height:0; }
+        .mic-product-price { color:#ef5d5d; display:block; font-size:18px; }
+        .mic-product-description { -webkit-box-orient:vertical; -webkit-line-clamp:2; color:#475569; display:-webkit-box; font-size:13px; line-height:1.35; overflow:hidden; }
+        .mic-stock, .mic-product-meta { display:flex; font-size:12px; }
+        .mic-card-cart { align-items:center; display:flex; gap:8px; grid-column:2; padding:7px 0 0 12px; }
+        .mic-card-cart input { height:34px; width:42px; }
+        .mic-card-cart > button { font-size:12px; height:36px; padding:0 9px; }
+    }
+
 </style>
 
 <script>

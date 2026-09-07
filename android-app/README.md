@@ -1,6 +1,6 @@
-# Mi Cusina Android app
+# Mi Cusina Kotlin Android app
 
-This native Android project provides a Mi Cusina app for both customers and staff. At launch,
+This native Android project is implemented in Kotlin and provides a Mi Cusina app for both customers and staff. At launch,
 the user chooses a role:
 
 - **Customer:** opens the menu, cart, checkout, order tracking, and reservations.
@@ -9,6 +9,17 @@ the user chooses a role:
 
 The app keeps each user's website login session and supports image selection for staff uploads.
 Payment-provider links open in the phone's browser, where they are safer and more reliable.
+
+## Included features
+
+- Customer sign-in and secure persisted session
+- Website registration link for new customers
+- Menu browsing and stock-aware add-to-cart actions
+- Cart quantity changes, removal, and running totals
+- Checkout with validated Bantayan Island municipality and payment choices
+- Customer order history and status tracking
+- Staff dashboard, delivery status management, and cancellation
+- Administrator inventory stock updates
 
 ## Configure the live website
 
