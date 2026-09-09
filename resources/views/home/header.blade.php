@@ -1178,8 +1178,11 @@
 
 <div class="cart-popup" id="cartPopup" aria-hidden="true">
     <div class="cart-popup-backdrop" data-close-cart-popup></div>
-    <section class="cart-popup-panel" role="dialog" aria-modal="true" aria-label="Shopping cart">
-        <button class="cart-popup-close" type="button" data-close-cart-popup aria-label="Close cart">&times;</button>
+    <section class="cart-popup-panel" role="dialog" aria-label="Shopping cart">
+        <header class="cart-popup-header">
+            <strong>Shopping Cart</strong>
+            <button class="cart-popup-close" type="button" data-close-cart-popup aria-label="Close cart">&times;</button>
+        </header>
         <iframe class="cart-popup-frame" name="cartPopupFrame" title="Shopping cart"></iframe>
     </section>
 </div>
@@ -1238,21 +1241,21 @@
     }
 
     .cart-popup {
-        align-items: center;
         display: none;
-        inset: 0;
-        justify-content: center;
-        padding: 24px;
         position: fixed;
-        z-index: 1400;
+        right: 24px;
+        bottom: 104px;
+        z-index: 3001;
     }
 
-    .cart-popup.is-open { display: flex; }
-    .cart-popup-backdrop { background: rgba(38, 19, 42, .16); backdrop-filter: blur(1px); inset: 0; position: absolute; }
-    .cart-popup-panel { background: #fff; border-radius: 24px; box-shadow: 0 18px 44px rgba(48, 21, 54, .34); height: min(86vh, 720px); max-width: 440px; overflow: hidden; position: relative; transform: scale(.96); transition: transform .22s ease, opacity .22s ease; width: min(100%, 440px); z-index: 1; }
-    .cart-popup.is-open .cart-popup-panel { transform: scale(1); }
-    .cart-popup-frame { border: 0; height: 100%; width: 100%; }
-    .cart-popup-close { align-items: center; background: #fff; border: 0; border-radius: 50%; box-shadow: 0 4px 14px rgba(15, 23, 42, .18); color: #1f2937; cursor: pointer; display: flex; font-size: 28px; height: 42px; justify-content: center; line-height: 1; position: absolute; right: 16px; top: 16px; width: 42px; z-index: 2; }
+    .cart-popup.is-open { display: block; }
+    .cart-popup-backdrop { display: none; }
+    .cart-popup-panel { background: #fff; border: 1px solid rgba(0, 0, 0, .08); border-radius: 8px; box-shadow: 0 18px 60px rgba(0, 0, 0, .28); display: flex; flex-direction: column; height: min(500px, calc(100vh - 128px)); overflow: hidden; transform: translateY(8px); transition: transform .2s ease, opacity .2s ease; width: min(380px, calc(100vw - 32px)); }
+    .cart-popup.is-open .cart-popup-panel { transform: translateY(0); }
+    .cart-popup-header { align-items: center; background: #242424; color: #fff; display: flex; flex: 0 0 auto; justify-content: space-between; padding: 14px 16px; }
+    .cart-popup-header strong { font-size: 16px; }
+    .cart-popup-frame { border: 0; flex: 1 1 auto; min-height: 0; width: 100%; }
+    .cart-popup-close { background: transparent; border: 0; color: #fff; cursor: pointer; font-size: 28px; line-height: 1; padding: 0; }
 
     @media (max-width:640px) {
         .floating-cart-button {
@@ -1262,8 +1265,8 @@
             width: 56px;
         }
 
-        .cart-popup { padding: 12px; }
-        .cart-popup-panel { border-radius: 20px; height: min(90vh, 720px); max-width: 440px; width: 100%; }
+        .cart-popup { bottom: 88px; right: 16px; }
+        .cart-popup-panel { height: min(500px, calc(100vh - 104px)); width: min(calc(100vw - 32px), 380px); }
     }
 </style>
 
@@ -1278,7 +1281,6 @@
         function closeCartPopup() {
             popup.classList.remove('is-open');
             popup.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
             button.focus();
         }
 
@@ -1292,7 +1294,6 @@
             frame.src = button.dataset.cartUrl;
             popup.classList.add('is-open');
             popup.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
             popup.querySelector('.cart-popup-close').focus();
         }
 
