@@ -1283,6 +1283,10 @@
         }
 
         button.addEventListener('click', function () {
+            openCartPopup();
+        });
+
+        function openCartPopup() {
             // Reload the embedded cart every time so newly added items and
             // quantities are always shown while the menu stays behind it.
             frame.src = button.dataset.cartUrl;
@@ -1290,6 +1294,16 @@
             popup.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
             popup.querySelector('.cart-popup-close').focus();
+        }
+
+        // Menu actions use this event after a successful AJAX add, keeping
+        // the customer on the current page while showing the live cart.
+        document.addEventListener('cart:updated', function (event) {
+            var count = event.detail && event.detail.count;
+            document.querySelectorAll('.floating-cart-count').forEach(function (badge) {
+                if (typeof count !== 'undefined') badge.textContent = count;
+            });
+            openCartPopup();
         });
 
         popup.addEventListener('click', function (event) {

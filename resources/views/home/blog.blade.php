@@ -1096,6 +1096,50 @@
 
         updateVisibleCards();
 
+        // Add items without leaving the menu. Buy Now intentionally retains
+        // its normal checkout navigation.
+        document.addEventListener('submit', async function (event) {
+            const form = event.target;
+            if (!form.matches('.mic-card-cart, #micProductForm')) return;
+
+            const submitter = event.submitter;
+            if (submitter && submitter.name === 'buy_now') return;
+
+            event.preventDefault();
+
+            const addUrl = form.action.replace('/add_cart/', '/add_cart_ajax/');
+            const submitButton = submitter || form.querySelector('button[type="submit"]');
+            const originalLabel = submitButton ? submitButton.textContent : '';
+
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Adding...';
+            }
+
+            try {
+                const response = await fetch(addUrl, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.message || 'Unable to add this item to your cart.');
+
+                document.dispatchEvent(new CustomEvent('cart:updated', {
+                    detail: { count: result.cart_count }
+                }));
+            } catch (error) {
+                window.alert(error.message || 'Unable to add this item to your cart.');
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = originalLabel;
+                }
+            }
+        });
+
         grid.addEventListener('click', function (event) {
             const opener = event.target.closest('.mic-product-open');
             if (!opener) return;
