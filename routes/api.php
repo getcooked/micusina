@@ -8,7 +8,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::prefix('mobile')->group(function () {
+Route::prefix('mobile')->middleware('throttle:120,1')->group(function () {
     Route::post('/login', [MobileApiController::class, 'login'])->middleware('throttle:5,1');
     Route::get('/foods', [MobileApiController::class, 'foods']);
     Route::middleware('auth:sanctum')->group(function () {

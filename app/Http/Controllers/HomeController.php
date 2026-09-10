@@ -786,6 +786,7 @@ class HomeController extends Controller
         try {
             $checkout = $payMongo->createCheckout($data);
             $data->paymongo_checkout_id = data_get($checkout, 'id');
+            $data->paymongo_checkout_url = data_get($checkout, 'attributes.checkout_url');
             $data->save();
 
             return redirect()->away(data_get($checkout, 'attributes.checkout_url'));

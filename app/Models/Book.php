@@ -21,12 +21,17 @@ class Book extends Model
         'payment_method',
         'gcash_reference',
         'paymongo_checkout_id',
+        'paymongo_checkout_url',
         'paymongo_payment_id',
         'payment_status',
         'paid_at',
         'status',
         'approved_by',
         'approved_at',
+    ];
+
+    protected $hidden = [
+        'paymongo_checkout_url',
     ];
 
     protected function casts(): array

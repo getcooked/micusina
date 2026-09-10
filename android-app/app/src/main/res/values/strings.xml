@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Mi Cusina</string>
+    <string name="logo_initials">MC</string>
+    <string name="login_validation_error">Enter a valid email address and password.</string>
+    <string name="remove">Remove</string>
 </resources>

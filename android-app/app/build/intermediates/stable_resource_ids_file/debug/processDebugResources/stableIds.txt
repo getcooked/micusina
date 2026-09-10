@@ -1,9 +1,0 @@
-com.micusina.app:string/app_name = 0x7f020000
-com.micusina.app:drawable/mi_cusina_hero_food_edge = 0x7f010006
-com.micusina.app:drawable/hero_hotdog_sandwich_transparent = 0x7f010005
-com.micusina.app:style/Theme.MiCusina = 0x7f030000
-com.micusina.app:drawable/hero_burger_spaghetti_transparent = 0x7f010002
-com.micusina.app:drawable/hero_chicken_teriyaki_transparent = 0x7f010004
-com.micusina.app:drawable/hero_adobo_bunwich_transparent = 0x7f010001
-com.micusina.app:drawable/hero_chicken_burger_transparent = 0x7f010003
-com.micusina.app:drawable/auth_food_combo_cutout = 0x7f010000

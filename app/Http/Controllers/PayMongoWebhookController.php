@@ -7,16 +7,26 @@ use App\Services\PayMongoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
+use Throwable;
 
 class PayMongoWebhookController extends Controller
 {
-    public function complete(Book $booking, PayMongoService $payMongo): RedirectResponse
+    public function complete(Request $request, Book $booking, PayMongoService $payMongo): RedirectResponse
     {
-        abort_unless(auth()->id() === $booking->user_id, 403);
+        $this->authorizeCallback($request);
 
         if ($booking->payment_status !== 'Paid' && $booking->paymongo_checkout_id) {
-            $checkout = $payMongo->retrieveCheckout($booking->paymongo_checkout_id);
-            $payment = $payMongo->paidPayment($checkout);
+            try {
+                $checkout = $payMongo->retrieveCheckout($booking->paymongo_checkout_id);
+                $payment = $payMongo->paidPayment($checkout);
+            } catch (Throwable $exception) {
+                report($exception);
+
+                return redirect('/?section=book')->withErrors([
+                    'payment' => 'We could not verify the payment right now. Your reservation will update automatically once PayMongo confirms it.',
+                ]);
+            }
 
             if ($payment) {
                 $this->markPaid($booking, $payment);
@@ -34,9 +44,9 @@ class PayMongoWebhookController extends Controller
             ->with('booking_receipt', $this->receipt($booking->fresh()));
     }
 
-    public function cancel(Book $booking): RedirectResponse
+    public function cancel(Request $request, Book $booking): RedirectResponse
     {
-        abort_unless(auth()->id() === $booking->user_id, 403);
+        $this->authorizeCallback($request);
 
         return redirect('/?section=book')->withErrors([
             'payment' => 'Payment was cancelled. Your booking has not been confirmed.',
@@ -71,6 +81,11 @@ class PayMongoWebhookController extends Controller
         }
 
         return response()->json(['received' => true]);
+    }
+
+    private function authorizeCallback(Request $request): void
+    {
+        abort_unless(URL::hasValidSignature($request), 403, 'This payment return link is invalid or has expired.');
     }
 
     private function markPaid(Book $booking, array $payment): void

@@ -10,6 +10,13 @@ use App\Http\Controllers\PayMongoWebhookController;
 
 Route::post('/paymongo/webhook', [PayMongoWebhookController::class, 'webhook'])->name('paymongo.webhook');
 
+Route::middleware(['signed', 'throttle:20,1'])->group(function () {
+    Route::get('/booking/payment/return/{booking}', [PayMongoWebhookController::class, 'complete'])
+        ->name('booking.payment.return');
+    Route::get('/booking/payment/cancel/{booking}', [PayMongoWebhookController::class, 'cancel'])
+        ->name('booking.payment.cancel');
+});
+
 route::get('/', [HomeController::class, 'my_home']);
 
 Route::get('/download-app', function () {
@@ -71,8 +78,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/paid/{id}', [AdminController::class, 'paid']);
 
     Route::post('/book_table', [HomeController::class, 'book_table'])->middleware('throttle:10,1');
-    Route::get('/booking/payment/return/{booking}', [PayMongoWebhookController::class, 'complete'])->name('booking.payment.return');
-    Route::get('/booking/payment/cancel/{booking}', [PayMongoWebhookController::class, 'cancel'])->name('booking.payment.cancel');
     Route::get('/reservations', [AdminController::class, 'reservations']);
     Route::post('/approve_reservation/{id}', [AdminController::class, 'approve_reservation']);
     Route::get('/add_staff', [AdminController::class, 'add_staff']);

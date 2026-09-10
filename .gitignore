@@ -19,6 +19,14 @@
 /mobile-app/.flutter-plugins-dependencies
 /mobile-app/.packages
 /mobile-app/build/
+/android-app/.gradle/
+/android-app/.idea/
+/android-app/local.properties
+/android-app/app/build/
+/android-app/build/
+/android-app/*.jks
+/android-app/*.keystore
+/android-app/keystore.properties
 Homestead.json
 Homestead.yaml
 Thumbs.db

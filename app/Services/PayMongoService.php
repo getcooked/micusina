@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Book;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\URL;
 use RuntimeException;
 
 class PayMongoService
@@ -21,6 +22,7 @@ class PayMongoService
     {
         $method = $booking->payment_method === 'GCash' ? 'gcash' : 'qrph';
         $reference = 'BK-'.str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT);
+        $callbackExpiresAt = now()->addDay();
 
         $response = $this->client()->post(config('services.paymongo.base_url').'/checkout_sessions', [
             'data' => [
@@ -30,7 +32,11 @@ class PayMongoService
                         'email' => $booking->email,
                         'phone' => $booking->phone,
                     ],
-                    'cancel_url' => route('booking.payment.cancel', $booking),
+                    'cancel_url' => URL::temporarySignedRoute(
+                        'booking.payment.cancel',
+                        $callbackExpiresAt,
+                        ['booking' => $booking],
+                    ),
                     'description' => 'Mi Cusina table reservation downpayment',
                     'line_items' => [[
                         'amount' => (int) round(((float) $booking->deposit_amount) * 100),
@@ -44,7 +50,11 @@ class PayMongoService
                     'send_email_receipt' => true,
                     'show_description' => true,
                     'show_line_items' => true,
-                    'success_url' => route('booking.payment.return', $booking),
+                    'success_url' => URL::temporarySignedRoute(
+                        'booking.payment.return',
+                        $callbackExpiresAt,
+                        ['booking' => $booking],
+                    ),
                 ],
             ],
         ]);
