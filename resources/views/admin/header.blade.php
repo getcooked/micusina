@@ -20,16 +20,27 @@
       <div class="admin-actions">
       @if(Auth::check() && Auth::user()->usertype === 'admin')
       <div class="admin-notifications dropdown">
-        <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Low-stock notifications">
+        <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Admin notifications">
           <i class="fa fa-bell" aria-hidden="true"></i>
-          @if($headerLowStockFoods->isNotEmpty())<span class="admin-notification-count" aria-label="{{ $headerLowStockFoods->count() }} low-stock notifications">{{ $headerLowStockFoods->count() }}</span>@endif
+          @if($headerNotificationCount > 0)<span class="admin-notification-count" aria-label="{{ $headerNotificationCount }} notifications">{{ $headerNotificationCount }}</span>@endif
         </button>
         <div class="dropdown-menu dropdown-menu-right admin-user-menu admin-notification-menu" aria-labelledby="adminNotificationMenu">
-          <div class="admin-notification-title">Low-stock products</div><div class="dropdown-divider"></div>
+          <div class="admin-notification-title">Notifications</div><div class="dropdown-divider"></div>
+          @if($headerNewUserCount > 0)
+            <a class="admin-notification-item" href="{{ url('users') }}"><i class="fa fa-user-plus" aria-hidden="true"></i><span><strong>{{ $headerNewUserCount }} new {{ Str::plural('customer', $headerNewUserCount) }}</strong><small>Registered today</small></span></a>
+          @endif
+          @if($headerPendingOrderCount > 0)
+            <a class="admin-notification-item" href="{{ url('orders') }}"><i class="fa fa-shopping-bag" aria-hidden="true"></i><span><strong>{{ $headerPendingOrderCount }} {{ Str::plural('order', $headerPendingOrderCount) }} need attention</strong><small>In progress and awaiting fulfillment</small></span></a>
+          @endif
+          @if($headerPendingReservationCount > 0)
+            <a class="admin-notification-item" href="{{ url('reservations') }}"><i class="fa fa-calendar" aria-hidden="true"></i><span><strong>{{ $headerPendingReservationCount }} pending {{ Str::plural('reservation', $headerPendingReservationCount) }}</strong><small>Paid and waiting for approval</small></span></a>
+          @endif
+          @if($headerLowStockFoods->isNotEmpty() && ($headerNewUserCount > 0 || $headerPendingOrderCount > 0 || $headerPendingReservationCount > 0))<div class="dropdown-divider"></div>@endif
+          @if($headerLowStockFoods->isNotEmpty())<div class="admin-notification-title">Low-stock products</div>@endif
           @forelse($headerLowStockFoods as $food)
             <a class="admin-notification-item" href="{{ url('inventory') }}"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i><span><strong>{{ $food->title }}</strong><small>Current stocks: {{ max(0, $food->stock) }}</small></span></a>
           @empty
-            <div class="admin-notification-empty">All products are sufficiently stocked.</div>
+            @if($headerNotificationCount === 0)<div class="admin-notification-empty">No new notifications.</div>@endif
           @endforelse
         </div>
       </div>
