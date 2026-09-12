@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
@@ -179,7 +180,17 @@ class MobileApiController extends Controller
                 $food = Food::lockForUpdate()->find($item->food_id);
                 abort_if(! $food || $food->stock < $item->quantity, 422, $item->title.' is no longer available in this quantity.');
                 $lineTotal = round($this->price($food->price) * (int) $item->quantity, 2);
-                $created->push(Order::create(['user_id' => $user->id, 'checkout_group_id' => $checkoutGroupId, 'name' => $data['name'], 'email' => $user->email, 'phone' => $data['phone'], 'address' => $address, 'title' => $item->title, 'quantity' => $item->quantity, 'price' => $lineTotal, 'image' => $item->image, 'delivery_status' => 'In Progress', 'payment_method' => $data['payment_method'], 'payment_status' => $data['payment_method'] === 'Cash on Delivery' ? 'Unpaid' : 'Pending Verification', 'payment_reference' => $data['payment_reference'] ?? null]));
+                $orderData = ['name' => $data['name'], 'email' => $user->email, 'phone' => $data['phone'], 'address' => $address, 'title' => $item->title, 'quantity' => $item->quantity, 'price' => $lineTotal, 'image' => $item->image, 'delivery_status' => 'In Progress', 'payment_method' => $data['payment_method'], 'payment_status' => $data['payment_method'] === 'Cash on Delivery' ? 'Unpaid' : 'Pending Verification', 'payment_reference' => $data['payment_reference'] ?? null];
+
+                if (Schema::hasColumn('orders', 'user_id')) {
+                    $orderData['user_id'] = $user->id;
+                }
+
+                if (Schema::hasColumn('orders', 'checkout_group_id')) {
+                    $orderData['checkout_group_id'] = $checkoutGroupId;
+                }
+
+                $created->push(Order::create($orderData));
                 $food->decrement('stock', $item->quantity);
                 $item->delete();
             }

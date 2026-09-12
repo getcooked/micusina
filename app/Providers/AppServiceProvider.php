@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Observers\FoodObserver;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,11 +30,12 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer(['admin.header', 'admin.sidebar'], function ($view) {
             $threshold = (int) config('services.low_stock.threshold', 5);
-            $pendingOrderCount = Order::query()
-                ->where('delivery_status', 'In Progress')
-                ->get(['id', 'checkout_group_id'])
-                ->unique(fn (Order $order) => $order->checkout_group_id ?: 'legacy-'.$order->id)
-                ->count();
+            $pendingOrders = Order::query()->where('delivery_status', 'In Progress');
+            $pendingOrderCount = Schema::hasColumn('orders', 'checkout_group_id')
+                ? $pendingOrders->get(['id', 'checkout_group_id'])
+                    ->unique(fn (Order $order) => $order->checkout_group_id ?: 'legacy-'.$order->id)
+                    ->count()
+                : $pendingOrders->count();
 
             $newUserCount = User::query()
                 ->where('usertype', 'user')
