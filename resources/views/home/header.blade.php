@@ -577,6 +577,12 @@
         padding-left: clamp(22px, 9vw, 130px);
     }
     .burger-panel::before { content:none !important; display:none !important; }
+    html body .burger-front.is-inner-page,
+    html body .burger-front.is-inner-page .burger-panel { min-height:0 !important; }
+    html body .burger-front.is-inner-page .burger-copy,
+    html body .burger-front.is-inner-page .hero-food-frame,
+    html body .burger-front.is-inner-page .burger-art,
+    html body .burger-front.is-inner-page .burger-thumbs { display:none !important; }
     html body .burger-topbar {
         align-items: center;
         background: #fff !important;
@@ -751,7 +757,8 @@
     }
 </style>
 
-<header class="burger-front" id="home">
+@php($isHomepage = request()->getPathInfo() === '/')
+<header class="burger-front {{ $isHomepage ? '' : 'is-inner-page' }}" id="home">
     <div class="burger-panel">
         <div class="burger-topbar">
             <a class="burger-mark" href="{{ url('/') }}" aria-label="Mi Cusina Home">
@@ -796,6 +803,8 @@
         </div>
 
         <div class="burger-copy">
+            <h1>Comfort food for<br><span class="headline-accent">your table</span></h1>
+            <p>Discover Filipino comfort food, thoughtfully made and served with love at Mi Cusina.</p>
             <div class="burger-actions">
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
                 <a class="burger-secondary" href="{{ url('/?section=about') }}">About Us</a>
