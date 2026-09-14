@@ -612,6 +612,7 @@
         white-space: nowrap;
     }
     html body .mobile-app-button:hover { background: #272925 !important; color: #fff !important; }
+    html body .homepage-download { margin-top:16px; text-decoration:none; }
     html body .burger-login > a:first-child { border: 1px solid #272925; border-radius: 999px; font-weight: 700; padding: 12px 19px; }
     html body .burger-login > a.track-order-link:first-child { border: 0 !important; border-radius: 0 !important; font-weight: 600; padding: 9px 0 !important; }
     html body .burger-login > a:last-child { border: 1px solid #272925; border-radius: 999px; font-weight: 700; padding: 12px 19px; }
@@ -738,6 +739,7 @@
             max-width: 330px;
         }
         html body .burger-actions { gap: 10px; width: min(100%, 350px); }
+        html body .homepage-download { font-size:13px; padding:11px 16px; }
         html body .burger-primary,
         html body .burger-secondary {
             flex: 1 1 0;
@@ -798,6 +800,7 @@
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
                 <a class="burger-secondary" href="{{ url('/?section=about') }}">About Us</a>
             </div>
+            <a class="mobile-app-button homepage-download" href="{{ route('mobile-app.download') }}">Download App</a>
         </div>
 
         <div class="hero-food-frame hero-food-frame--top-left" aria-hidden="true">
