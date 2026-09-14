@@ -576,7 +576,7 @@
         letter-spacing: .01em;
         padding-left: clamp(22px, 9vw, 130px);
     }
-    .burger-panel::before { display: none; }
+    .burger-panel::before { content:none !important; display:none !important; }
     html body .burger-topbar {
         align-items: center;
         background: #fff !important;
@@ -800,7 +800,6 @@
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
                 <a class="burger-secondary" href="{{ url('/?section=about') }}">About Us</a>
             </div>
-            <a class="mobile-app-button homepage-download" href="{{ route('mobile-app.download') }}">Download App</a>
         </div>
 
         <div class="hero-food-frame hero-food-frame--top-left" aria-hidden="true">
