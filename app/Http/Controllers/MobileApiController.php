@@ -329,10 +329,21 @@ class MobileApiController extends Controller
                 abort_if($nextStatus === 'Delivered' && ! $relatedOrders->every(fn (Order $related) => $related->delivery_status === 'On The Way'), 422, 'Assign a rider before marking this order delivered.');
             }
 
-            Order::whereKey($relatedOrders->modelKeys())->update(['delivery_status' => $nextStatus]);
+            Order::whereKey($relatedOrders->pluck('id')->all())->update(['delivery_status' => $nextStatus]);
 
             if (in_array($nextStatus, ['Delivered', 'Canceled'], true)) {
-                User::whereIn('id', $relatedOrders->pluck('rider_id')->filter()->unique())->update(['rider_available' => true]);
+                foreach ($relatedOrders->pluck('rider_id')->filter()->unique() as $riderId) {
+                    $rider = User::query()->whereKey($riderId)->lockForUpdate()->first();
+
+                    if (! $rider) {
+                        continue;
+                    }
+
+                    $hasActiveDelivery = Order::where('rider_id', $riderId)
+                        ->where('delivery_status', 'On The Way')
+                        ->exists();
+                    $rider->update(['rider_available' => ! $hasActiveDelivery]);
+                }
             }
 
             return $lockedOrder->fresh();

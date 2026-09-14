@@ -1,6 +1,9 @@
 # Mi Cusina Flutter app
 
-This is the cross-platform Mi Cusina customer app. It uses the Laravel Sanctum API in the project root.
+This is the legacy cross-platform Mi Cusina customer prototype. The current
+Android release target and production build instructions are in
+[`android-app`](../android-app/README.md). This Flutter prototype is preserved,
+but is not part of the native Android release verification or an iOS release.
 
 ## First setup
 

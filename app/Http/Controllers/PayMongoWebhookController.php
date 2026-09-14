@@ -7,6 +7,7 @@ use App\Services\PayMongoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Throwable;
 
@@ -57,25 +58,27 @@ class PayMongoWebhookController extends Controller
     {
         $payload = $request->getContent();
 
-        if (!$payMongo->validWebhookSignature($payload, $request->header('Paymongo-Signature'))) {
+        if (! $payMongo->validWebhookSignature($payload, $request->header('Paymongo-Signature'))) {
             return response()->json(['message' => 'Invalid signature.'], 401);
         }
 
         $event = json_decode($payload, true);
         $eventType = data_get($event, 'data.attributes.type');
-        $payment = data_get($event, 'data.attributes.data');
+        $resource = data_get($event, 'data.attributes.data');
 
-        if (in_array($eventType, ['payment.paid', 'checkout_session.payment.paid'], true)) {
-            $checkoutId = data_get($payment, 'attributes.checkout_session_id');
-            $reference = data_get($payment, 'attributes.external_reference_number')
-                ?? data_get($payment, 'attributes.reference_number');
+        if (is_array($resource) && in_array($eventType, ['payment.paid', 'checkout_session.payment.paid'], true)) {
+            $isCheckout = $eventType === 'checkout_session.payment.paid';
+            $payment = $isCheckout ? $payMongo->paidPayment($resource) : $resource;
+            $checkoutId = $isCheckout ? data_get($resource, 'id') : data_get($resource, 'attributes.checkout_session_id');
+            $reference = data_get($resource, 'attributes.external_reference_number')
+                ?? data_get($resource, 'attributes.reference_number');
 
             $booking = $checkoutId ? Book::where('paymongo_checkout_id', $checkoutId)->first() : null;
-            if (!$booking && is_string($reference) && preg_match('/^BK-0*(\d+)$/', $reference, $matches)) {
+            if (! $booking && is_string($reference) && preg_match('/^BK-0*(\d+)$/', $reference, $matches)) {
                 $booking = Book::find((int) $matches[1]);
             }
 
-            if ($booking) {
+            if ($booking && $payment) {
                 $this->markPaid($booking, $payment);
             }
         }
@@ -98,11 +101,23 @@ class PayMongoWebhookController extends Controller
             return;
         }
 
-        $booking->payment_status = 'Paid';
-        $booking->paymongo_payment_id = data_get($payment, 'id');
-        $booking->paid_at = now();
-        $booking->status = 'Pending';
-        $booking->save();
+        DB::transaction(function () use ($booking, $payment): void {
+            $lockedBooking = Book::query()->lockForUpdate()->findOrFail($booking->id);
+
+            if ($lockedBooking->payment_status === 'Paid') {
+                return;
+            }
+
+            $lockedBooking->payment_status = 'Paid';
+            $lockedBooking->paymongo_payment_id = data_get($payment, 'id');
+            $lockedBooking->paid_at = now();
+
+            if ($lockedBooking->status === 'Awaiting Payment') {
+                $lockedBooking->status = 'Pending';
+            }
+
+            $lockedBooking->save();
+        }, 3);
     }
 
     private function receipt(Book $booking): array

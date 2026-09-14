@@ -27,7 +27,9 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import android.view.accessibility.AccessibilityNodeInfo
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -80,6 +82,23 @@ class MainActivity : Activity() {
     private var checkoutMutationInFlight = false
     private var reservationMutationInFlight = false
     private var paymentBrowserOpen = false
+    private var restoredDestination: String? = null
+    private var menuQuery = ""
+    private var formDrafts = Bundle()
+    private var scrollPositions = Bundle()
+    private var pageScroll: ScrollView? = null
+    private var cartItemCount = 0
+    private var cartCountRequest = 0
+    private var cartBadge: TextView? = null
+    private var cartTab: View? = null
+    private val draftInputs = mutableMapOf<String, EditText>()
+    private val draftSpinners = mutableMapOf<String, Spinner>()
+    private val buttonAccessibility = object : View.AccessibilityDelegate() {
+        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfo) {
+            super.onInitializeAccessibilityNodeInfo(host, info)
+            info.className = "android.widget.Button"
+        }
+    }
 
     private val requestExecutor = Executors.newFixedThreadPool(3)
     private val imageExecutor = Executors.newFixedThreadPool(2)
@@ -104,6 +123,10 @@ class MainActivity : Activity() {
         userEmail = preferences.getString(KEY_EMAIL, "").orEmpty()
         userPhone = preferences.getString(KEY_PHONE, "").orEmpty()
         staffRole = preferences.getString(KEY_STAFF_ROLE, "").orEmpty()
+        restoredDestination = savedInstanceState?.getString("destination")
+        menuQuery = savedInstanceState?.getString("menu_query").orEmpty()
+        formDrafts = savedInstanceState?.getBundle("form_drafts") ?: Bundle()
+        scrollPositions = savedInstanceState?.getBundle("scroll_positions") ?: Bundle()
 
         if (token.isBlank()) showLogin() else verifySession()
     }
@@ -112,7 +135,12 @@ class MainActivity : Activity() {
         showLaunchState("Preparing your kitchen…")
         request("GET", "/me", onSuccess = { response ->
             saveUser(response.getJSONObject("user"))
-            showHome()
+            val checkoutPending = preferences.getBoolean(KEY_CHECKOUT_PENDING, false)
+            val reservationPending = preferences.getBoolean(KEY_RESERVATION_PENDING, false)
+            navigate(AppNavigation.restore(restoredDestination, role, staffRole, checkoutPending, reservationPending))
+            restoredDestination = null
+            refreshCartCount()
+            if (checkoutPending || reservationPending) toast("An interrupted request may have completed. Check this list and refresh before submitting again.")
         }, onError = { message, code ->
             if (code == 401) expireSession() else showOfflineLaunch(message)
         }, handleUnauthorized = false)
@@ -152,6 +180,7 @@ class MainActivity : Activity() {
 
     private fun showLogin() {
         loginInFlight = false
+        pageScroll = null
         pageGeneration++
         currentDestination = "login"
         detailReturnDestination = null
@@ -168,17 +197,19 @@ class MainActivity : Activity() {
             contentDescription = "Mi Cusina food"
         }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(210)))
         root.addView(title("Welcome to Mi Cusina", 30f).apply { gravity = Gravity.CENTER })
-        root.addView(caption("Fresh local favorites, simple ordering, and live delivery updates.").apply { gravity = Gravity.CENTER; textAlignment = View.TEXT_ALIGNMENT_CENTER }, topMargin(dp(8)))
+        root.addView(caption("Fresh local favorites, simple ordering, and delivery tracking.").apply { gravity = Gravity.CENTER; textAlignment = View.TEXT_ALIGNMENT_CENTER }, topMargin(dp(8)))
 
         val card = card().apply { orientation = LinearLayout.VERTICAL }
         val email = field("Email address", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS).apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) setAutofillHints(View.AUTOFILL_HINT_EMAIL_ADDRESS)
         }
         val password = field("Password", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD).apply {
+            isSaveEnabled = false
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) setAutofillHints(View.AUTOFILL_HINT_PASSWORD)
             imeOptions = EditorInfo.IME_ACTION_DONE
         }
         val twoFactor = field("6-digit authentication code", InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD).apply {
+            isSaveEnabled = false
             filters = arrayOf(android.text.InputFilter.LengthFilter(6))
             imeOptions = EditorInfo.IME_ACTION_DONE
             visibility = View.GONE
@@ -205,7 +236,7 @@ class MainActivity : Activity() {
             val needsTwoFactor = twoFactor.visibility == View.VISIBLE
             val twoFactorCode = twoFactor.text.toString().trim()
             if (needsTwoFactor && !Regex("^[0-9]{6}$").matches(twoFactorCode)) {
-                error.text = "Enter the 6-digit code from your authenticator app."
+                error.text = getString(R.string.two_factor_validation_error)
                 error.visibility = View.VISIBLE
                 return
             }
@@ -240,7 +271,9 @@ class MainActivity : Activity() {
                         sessionGeneration++
                         tokenStore.write(token)
                         saveUser(user)
+                        hideKeyboard()
                         showHome()
+                        refreshCartCount()
                     }
                 }
             }, onError = { message, _ ->
@@ -274,21 +307,42 @@ class MainActivity : Activity() {
         preferences.edit().putString(KEY_ROLE, role).putString(KEY_NAME, userName).putString(KEY_EMAIL, userEmail).putString(KEY_PHONE, userPhone).putString(KEY_STAFF_ROLE, staffRole).apply()
     }
 
-    private fun showHome() { if (isStaff()) showDashboard() else showMenu() }
+    private fun showHome() = navigate(AppNavigation.home(role))
     private fun isStaff(): Boolean = role == "admin" || role == "staff"
 
     private fun showShell(titleText: String, destination: String, detail: Boolean = false, returnTo: String? = null) {
+        rememberScrollPosition()
+        rememberFormDrafts()
+        draftInputs.clear()
+        draftSpinners.clear()
+        cartBadge = null
+        cartTab = null
         pageGeneration++
         currentDestination = destination
-        detailReturnDestination = if (detail) returnTo else null
+        detailReturnDestination = if (detail) AppNavigation.parent(destination, role) ?: returnTo else null
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(BACKGROUND) }
         root.addView(appBar(titleText, detail), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64)))
         val scroll = ScrollView(this).apply { isFillViewport = true; overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS }
+        pageScroll = scroll
         page = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(20), dp(18), dp(28)) }
         scroll.addView(page, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-        root.addView(scroll, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
-        if (!detail) root.addView(bottomNavigation(destination), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(74)))
+        val useRail = resources.configuration.screenWidthDp >= 600 && !detail
+        if (useRail) {
+            val content = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            val rail = ScrollView(this).apply {
+                isFillViewport = true
+                setBackgroundColor(SURFACE)
+                addView(bottomNavigation(destination, rail = true), ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+            }
+            content.addView(rail, LinearLayout.LayoutParams(dp(100), ViewGroup.LayoutParams.MATCH_PARENT))
+            content.addView(scroll, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
+            root.addView(content, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+        } else {
+            root.addView(scroll, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f))
+            if (!detail) root.addView(bottomNavigation(destination), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        }
         setContentView(root)
+        restoreScrollPosition(pageGeneration)
     }
 
     private fun appBar(titleText: String, detail: Boolean): View = LinearLayout(this).apply {
@@ -298,66 +352,136 @@ class MainActivity : Activity() {
         background = rounded(SURFACE, 0f)
         elevation = dp(3).toFloat()
         if (detail) {
-            addView(iconAction("‹", "Go back") { navigate(detailReturnDestination ?: if (isStaff()) "dashboard" else "menu") }, LinearLayout.LayoutParams(dp(46), dp(46)))
+            addView(iconAction("‹", "Go back") { handleBack() }, LinearLayout.LayoutParams(dp(48), dp(48)))
         } else {
             addView(TextView(this@MainActivity).apply {
                 text = getString(R.string.logo_initials); textSize = 13f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER; setTextColor(Color.WHITE)
                 background = rounded(PRIMARY, dp(14).toFloat()); contentDescription = "Mi Cusina"
-            }, LinearLayout.LayoutParams(dp(42), dp(42)))
+            }, LinearLayout.LayoutParams(dp(48), dp(48)))
         }
-        addView(title(titleText, 21f).apply { setPadding(dp(12), 0, dp(8), 0) }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
+        addView(title(titleText, 21f).apply {
+            setPadding(dp(12), 0, dp(8), 0)
+            maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END
+        }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         if (!detail) {
+            if (currentDestination != "more") {
+                addView(ImageView(this@MainActivity).apply {
+                    setImageResource(R.drawable.ic_nav_refresh)
+                    imageTintList = ColorStateList.valueOf(PRIMARY_DARK)
+                    setPadding(dp(12), dp(12), dp(12), dp(12))
+                    background = ripple(Color.TRANSPARENT, dp(24).toFloat())
+                    contentDescription = "Refresh $titleText"; isFocusable = true; accessibilityDelegate = buttonAccessibility
+                    setOnClickListener { navigate(currentDestination) }
+                }, LinearLayout.LayoutParams(dp(48), dp(48)))
+            }
             val initial = userName.trim().firstOrNull()?.uppercase() ?: "U"
             addView(TextView(this@MainActivity).apply {
                 text = initial; textSize = 15f; gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK)
-                background = ripple(PRIMARY_SOFT, dp(21).toFloat()); contentDescription = "Open account"; setOnClickListener { navigate("more") }
-            }, LinearLayout.LayoutParams(dp(42), dp(42)))
+                background = ripple(PRIMARY_SOFT, dp(24).toFloat()); contentDescription = "Open account"; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { navigate("more") }
+            }, LinearLayout.LayoutParams(dp(48), dp(48)))
         }
     }
 
     private data class Destination(val id: String, val label: String, val icon: Int)
 
-    private fun bottomNavigation(selected: String): View {
-        val destinations = if (isStaff()) listOf(
+    private fun bottomNavigation(selected: String, rail: Boolean = false): View {
+        cartBadge = null
+        cartTab = null
+        val destinations = listOf(
             Destination("dashboard", "Home", R.drawable.ic_nav_home),
             Destination("staff_orders", "Orders", R.drawable.ic_nav_orders),
             Destination("inventory", "Inventory", R.drawable.ic_nav_inventory),
-            Destination("more", "Account", R.drawable.ic_nav_account),
-        ) else listOf(
             Destination("menu", "Menu", R.drawable.ic_nav_menu),
             Destination("cart", "Cart", R.drawable.ic_nav_cart),
             Destination("orders", "Orders", R.drawable.ic_nav_orders),
             Destination("reserve", "Reserve", R.drawable.ic_nav_reserve),
             Destination("more", "Account", R.drawable.ic_nav_account),
         )
+        val available = AppNavigation.destinations(role, staffRole).map { key -> destinations.first { it.id == key } }
         return LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER; setPadding(dp(6), dp(5), dp(6), dp(5)); setBackgroundColor(SURFACE); elevation = dp(8).toFloat()
-            destinations.forEach { item ->
+            orientation = if (rail) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
+            gravity = if (rail) Gravity.TOP else Gravity.CENTER
+            setPadding(dp(6), dp(8), dp(6), dp(8)); setBackgroundColor(SURFACE); elevation = dp(8).toFloat()
+            available.forEach { item ->
                 val active = selected == item.id
                 addView(LinearLayout(this@MainActivity).apply {
                     orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; isFocusable = true
+                    minimumHeight = dp(60); setPadding(dp(2), dp(6), dp(2), dp(6)); isSelected = active
                     background = ripple(if (active) PRIMARY_SOFT else Color.TRANSPARENT, dp(18).toFloat()); contentDescription = item.label
-                    addView(ImageView(this@MainActivity).apply { setImageResource(item.icon); imageTintList = ColorStateList.valueOf(if (active) PRIMARY else TEXT_MUTED) }, LinearLayout.LayoutParams(dp(23), dp(23)))
+                    accessibilityDelegate = buttonAccessibility
+                    val iconFrame = FrameLayout(this@MainActivity)
+                    iconFrame.addView(ImageView(this@MainActivity).apply {
+                        setImageResource(item.icon); imageTintList = ColorStateList.valueOf(if (active) PRIMARY_DARK else TEXT_MUTED)
+                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    }, FrameLayout.LayoutParams(dp(23), dp(23), Gravity.CENTER))
+                    if (item.id == "cart") {
+                        cartTab = this
+                        cartBadge = TextView(this@MainActivity).apply {
+                            textSize = 10f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER
+                            setTextColor(Color.WHITE); background = rounded(PRIMARY_DARK, dp(10).toFloat())
+                            setPadding(dp(3), 0, dp(3), 0); minimumWidth = dp(18)
+                            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                        }
+                        iconFrame.addView(cartBadge, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(18), Gravity.TOP or Gravity.END))
+                    }
+                    addView(iconFrame, LinearLayout.LayoutParams(dp(42), dp(28)))
                     addView(TextView(this@MainActivity).apply {
                         text = item.label; textSize = 11f; gravity = Gravity.CENTER; typeface = if (active) Typeface.DEFAULT_BOLD else Typeface.DEFAULT; setTextColor(if (active) PRIMARY_DARK else TEXT_MUTED)
+                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
                     }, topMargin(dp(2)))
-                    setOnClickListener { if (!active) navigate(item.id) }
-                }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f).apply { setMargins(dp(2), 0, dp(2), 0) })
+                    setOnClickListener {
+                        if (!active) navigate(item.id)
+                        else if (!blockNavigationDuringMutation()) {
+                            scrollPositions.putInt(item.id, 0)
+                            pageScroll?.smoothScrollTo(0, 0)
+                        }
+                    }
+                }, (if (rail) LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    else LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f)).apply { setMargins(dp(2), dp(2), dp(2), dp(2)) })
             }
+            updateCartBadge()
         }
     }
 
     private fun navigate(destination: String) {
         if (blockNavigationDuringMutation()) return
-        when (destination) {
+        val resolved = AppNavigation.resolve(destination, role, staffRole)
+        if (reviewInterruptedRequest(resolved) { navigate(resolved) }) return
+        hideKeyboard()
+        when (resolved) {
             "menu" -> showMenu(); "cart" -> showCart(); "orders" -> showOrders(); "reserve" -> showReservations()
             "dashboard" -> showDashboard(); "staff_orders" -> showStaffOrders(); "inventory" -> showInventory()
-            "gallery" -> showGallery(); "more" -> showMore(); else -> showHome()
+            "gallery" -> showGallery(); "more" -> showMore()
+            "checkout" -> showCheckout(); "booking" -> showReservationForm(); "success" -> showOrderSuccess()
         }
+    }
+
+    private fun reviewInterruptedRequest(destination: String, proceed: () -> Unit): Boolean {
+        val key = when (destination) {
+            "checkout" -> KEY_CHECKOUT_PENDING
+            "booking" -> KEY_RESERVATION_PENDING
+            else -> return false
+        }
+        if (!preferences.getBoolean(key, false)) return false
+        val listing = if (destination == "checkout") "orders" else "reserve"
+        val label = if (destination == "checkout") "My orders" else "Reservations"
+        AlertDialog.Builder(this)
+            .setTitle("Check your previous request")
+            .setMessage("The connection was interrupted, so the previous request may have completed. Review and refresh $label before creating another request.")
+            .setPositiveButton("Review $label") { _, _ -> navigate(listing) }
+            .setNegativeButton("Cancel", null)
+            .setNeutralButton("Start a new request") { _, _ ->
+                preferences.edit().remove(key).apply()
+                proceed()
+            }
+            .show()
+        return true
     }
 
     private fun blockNavigationDuringMutation(): Boolean {
         val message = when {
+            loginInFlight -> "Please wait while sign-in completes."
+            cartMutationInFlight -> "Please wait while your cart is being updated."
             checkoutMutationInFlight -> "Please wait while your order is being placed."
             reservationMutationInFlight -> "Please wait while your secure payment is being created."
             orderMutationInFlight -> "Please wait while the order status is being updated."
@@ -374,7 +498,9 @@ class MainActivity : Activity() {
         page.addView(caption("Explore today's freshly prepared Mi Cusina favorites."), topMargin(dp(4)))
         val search = field("Search the menu", InputType.TYPE_CLASS_TEXT).apply {
             setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_search, 0, 0, 0); compoundDrawablePadding = dp(10); imeOptions = EditorInfo.IME_ACTION_SEARCH
+            setText(menuQuery)
         }
+        search.addTextChangedListener(SimpleTextWatcher { menuQuery = it })
         page.addView(search, topMargin(dp(18)))
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         page.addView(list, topMargin(dp(16)))
@@ -391,7 +517,11 @@ class MainActivity : Activity() {
                 if (filtered.isEmpty()) showEmpty(list, "No dishes found", "Try a different search.")
                 else filtered.forEach { list.addView(foodCard(it), bottomMargin(dp(12))) }
             }
-            render(); search.addTextChangedListener(SimpleTextWatcher { render(it) })
+            render(search.text.toString())
+            search.addTextChangedListener(SimpleTextWatcher {
+                scrollPositions.remove("menu")
+                render(it)
+            })
         }, onError = { message, _ -> if (generation == pageGeneration) showRetry(list, "Menu unavailable", message) { showMenu() } })
     }
 
@@ -405,10 +535,14 @@ class MainActivity : Activity() {
         details.addView(caption(if (stock > 0) "$stock available" else "Currently unavailable").apply { setTextColor(if (stock > 0) SUCCESS else ERROR) }, topMargin(dp(3)))
         val add = compactButton(if (stock > 0) "Add to cart" else "Sold out", stock > 0) { }
         if (stock > 0) add.setOnClickListener {
+            if (cartMutationInFlight) return@setOnClickListener
+            cartMutationInFlight = true
             setButtonBusy(add, true, "Adding…")
             request("POST", "/cart/${food.getInt("id")}", JSONObject().put("quantity", 1), onSuccess = {
+                cartMutationInFlight = false
+                refreshCartCount()
                 setButtonBusy(add, false, "Add to cart"); toast("${food.optString("title")} added to cart")
-            }, onError = { message, _ -> setButtonBusy(add, false, "Add to cart"); toast(message) })
+            }, onError = { message, _ -> cartMutationInFlight = false; setButtonBusy(add, false, "Add to cart"); toast(message) }, pageScoped = false)
         }
         details.addView(add, topMargin(dp(10)))
         row.addView(details, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
@@ -416,7 +550,6 @@ class MainActivity : Activity() {
     }
 
     private fun showCart() {
-        cartMutationInFlight = false
         showShell("Your cart", "cart")
         val generation = pageGeneration
         val host = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -425,9 +558,12 @@ class MainActivity : Activity() {
             if (generation != pageGeneration) return@request
             host.removeAllViews()
             val items = response.getJSONArray("items").objects()
+            cartCountRequest++
+            cartItemCount = items.sumOf { it.optInt("quantity") }
+            updateCartBadge()
             if (items.isEmpty()) {
                 showEmpty(host, "Your cart is empty", "Add a favorite from the menu to get started.")
-                host.addView(primaryButton("Browse menu") { showMenu() }, topMargin(dp(20)))
+                host.addView(primaryButton("Browse menu") { navigate("menu") }, topMargin(dp(20)))
                 return@request
             }
             host.addView(caption("Review quantities before checkout."), bottomMargin(dp(14)))
@@ -438,7 +574,7 @@ class MainActivity : Activity() {
             summary.addView(summaryRow("Items", items.sumOf { it.optInt("quantity") }.toString()), topMargin(dp(14)))
             summary.addView(summaryRow("Subtotal", money(total)), topMargin(dp(8)))
             summary.addView(caption("Delivery fee is confirmed during order processing."), topMargin(dp(10)))
-            summary.addView(primaryButton("Continue to checkout") { showCheckout() }, topMargin(dp(18)))
+            summary.addView(primaryButton("Continue to checkout") { navigate("checkout") }, topMargin(dp(18)))
             host.addView(summary, topMargin(dp(4)))
         }, onError = { message, _ -> if (generation == pageGeneration) showRetry(host, "Cart unavailable", message) { showCart() } })
     }
@@ -451,14 +587,15 @@ class MainActivity : Activity() {
         center.addView(bodyText(money(item.optDouble("price"))).apply { typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK) }, topMargin(dp(3)))
         val quantity = item.optInt("quantity", 1)
         val controls = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        controls.addView(quantityButton("−", quantity > 1) { updateCart(item.getInt("id"), quantity - 1) })
-        controls.addView(bodyText(quantity.toString()).apply { gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD }, LinearLayout.LayoutParams(dp(42), dp(38)))
-        controls.addView(quantityButton("+", true) { updateCart(item.getInt("id"), quantity + 1) })
-        controls.addView(TextView(this).apply {
-            text = getString(R.string.remove); textSize = 13f; gravity = Gravity.CENTER; setTextColor(ERROR); setPadding(dp(14), 0, dp(8), 0); background = ripple(Color.TRANSPARENT, dp(16).toFloat())
-            setOnClickListener { confirm("Remove item?", "Remove ${item.optString("title")} from your cart?") { removeCart(item.getInt("id")) } }
-        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(38)))
+        controls.addView(quantityButton("−", quantity > 1) { updateCart(item.getInt("id"), quantity - 1) }.apply { contentDescription = "Decrease ${item.optString("title")} quantity" })
+        controls.addView(bodyText(quantity.toString()).apply { gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD }, LinearLayout.LayoutParams(dp(36), dp(48)))
+        controls.addView(quantityButton("+", true) { updateCart(item.getInt("id"), quantity + 1) }.apply { contentDescription = "Increase ${item.optString("title")} quantity" })
         center.addView(controls, topMargin(dp(10)))
+        center.addView(TextView(this).apply {
+            text = getString(R.string.remove); textSize = 13f; gravity = Gravity.START or Gravity.CENTER_VERTICAL; setTextColor(ERROR); setPadding(dp(4), 0, dp(8), 0); background = ripple(Color.TRANSPARENT, dp(16).toFloat())
+            contentDescription = "Remove ${item.optString("title")} from cart"; isFocusable = true; accessibilityDelegate = buttonAccessibility
+            setOnClickListener { confirm("Remove item?", "Remove ${item.optString("title")} from your cart?") { removeCart(item.getInt("id")) } }
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(48)))
         card.addView(center, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         return card
     }
@@ -468,9 +605,11 @@ class MainActivity : Activity() {
         cartMutationInFlight = true
         request("PATCH", "/cart/$cartId", JSONObject().put("quantity", quantity), onSuccess = {
             cartMutationInFlight = false
+            refreshCartCount()
             if (currentDestination == "cart") showCart() else toast("Cart updated.")
         }, onError = { message, _ ->
             cartMutationInFlight = false
+            refreshCartCount()
             toast(message)
         }, pageScoped = false)
     }
@@ -480,6 +619,7 @@ class MainActivity : Activity() {
         cartMutationInFlight = true
         request("DELETE", "/cart/$cartId", onSuccess = {
             cartMutationInFlight = false
+            refreshCartCount()
             if (currentDestination == "cart") showCart() else toast("Item removed from cart.")
         }, onError = { message, _ ->
             cartMutationInFlight = false
@@ -496,22 +636,31 @@ class MainActivity : Activity() {
         val municipality = labeledSpinner("Municipality", municipalities)
         val barangayLabel = label("Barangay")
         val barangay = Spinner(this); styleSpinner(barangay)
+        barangay.contentDescription = "Barangay"
         val purok = labeledField("Purok", "", InputType.TYPE_CLASS_TEXT)
         val details = labeledField("Landmark or delivery notes (optional)", "", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
         val payment = labeledSpinner("Payment method", arrayOf("Cash on Delivery", "GCash", "Bank Transfer"))
         val referenceLabel = label("Payment reference")
         val reference = field("Reference number", InputType.TYPE_CLASS_TEXT)
+        bindDraft("Payment reference", reference)
+        draftSpinners["checkout:Barangay"] = barangay
         referenceLabel.visibility = View.GONE; reference.visibility = View.GONE
         page.addView(name.first, topMargin(dp(18))); page.addView(phone.first, topMargin(dp(12))); page.addView(municipality.first, topMargin(dp(12)))
         page.addView(barangayLabel, topMargin(dp(12))); page.addView(barangay); page.addView(purok.first, topMargin(dp(12))); page.addView(details.first, topMargin(dp(12)))
         page.addView(payment.first, topMargin(dp(12))); page.addView(referenceLabel, topMargin(dp(12))); page.addView(reference)
 
-        fun refreshBarangays(position: Int) { barangay.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, BARANGAYS[municipalities[position]].orEmpty()) }
+        fun refreshBarangays(position: Int) {
+            val options = BARANGAYS[municipalities[position]].orEmpty()
+            barangay.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, options)
+            if (formDrafts.getInt("checkout:Municipality", 0) == position) {
+                barangay.setSelection(formDrafts.getInt("checkout:Barangay", 0).coerceIn(0, options.lastIndex))
+            }
+        }
         municipality.second.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = refreshBarangays(position)
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
-        refreshBarangays(0)
+        refreshBarangays(municipality.second.selectedItemPosition)
         payment.second.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val visible = position != 0
@@ -524,6 +673,7 @@ class MainActivity : Activity() {
         val placeOrder = primaryButton("Place order") { }; page.addView(placeOrder, topMargin(dp(24)))
         placeOrder.setOnClickListener {
             if (checkoutMutationInFlight) return@setOnClickListener
+            if (reviewInterruptedRequest("checkout") { placeOrder.performClick() }) return@setOnClickListener
             val phoneValue = phone.second.text.toString().trim()
             if (name.second.text.isBlank() || !PHONE_REGEX.matches(phoneValue) || purok.second.text.isBlank()) { toast("Enter your name, a valid Philippine mobile number, and purok."); return@setOnClickListener }
             if (payment.second.selectedItemPosition != 0 && reference.text.isBlank()) { toast("Enter the payment reference number."); return@setOnClickListener }
@@ -534,15 +684,22 @@ class MainActivity : Activity() {
             if (payment.second.selectedItemPosition != 0) body.put("payment_reference", reference.text.toString().trim())
             val requestPage = pageGeneration
             checkoutMutationInFlight = true
+            preferences.edit().putBoolean(KEY_CHECKOUT_PENDING, true).apply()
             setButtonBusy(placeOrder, true, "Placing order…")
             request("POST", "/checkout", body, onSuccess = {
                 checkoutMutationInFlight = false
+                preferences.edit().remove(KEY_CHECKOUT_PENDING).apply()
+                clearDraft("checkout")
+                cartItemCount = 0
+                cartCountRequest++
+                updateCartBadge()
                 if (requestPage == pageGeneration && currentDestination == "checkout") showOrderSuccess()
                 else toast("Order confirmed. You can track it from My orders.")
-            }, onError = { message, _ ->
+            }, onError = { message, code ->
                 checkoutMutationInFlight = false
+                if (code != null && code in 400..499) preferences.edit().remove(KEY_CHECKOUT_PENDING).apply()
                 if (requestPage == pageGeneration && currentDestination == "checkout") setButtonBusy(placeOrder, false, "Place order")
-                toast(message)
+                toast(if (code == null || code >= 500) "$message Check My orders before trying again." else message)
             }, pageScoped = false)
         }
     }
@@ -553,7 +710,7 @@ class MainActivity : Activity() {
         page.addView(TextView(this).apply { text = "✓"; textSize = 50f; gravity = Gravity.CENTER; setTextColor(SUCCESS); background = rounded(SUCCESS_SOFT, dp(42).toFloat()) }, LinearLayout.LayoutParams(dp(84), dp(84)))
         page.addView(title("Thank you!", 28f).apply { gravity = Gravity.CENTER }, topMargin(dp(22)))
         page.addView(caption("Your order has been received. Track its progress from My orders.").apply { gravity = Gravity.CENTER; textAlignment = View.TEXT_ALIGNMENT_CENTER }, topMargin(dp(8)))
-        page.addView(primaryButton("Track my order") { showOrders() }, topMargin(dp(24))); page.addView(secondaryButton("Back to menu") { showMenu() }, topMargin(dp(10)))
+        page.addView(primaryButton("Track my order") { navigate("orders") }, topMargin(dp(24))); page.addView(secondaryButton("Back to menu") { navigate("menu") }, topMargin(dp(10)))
     }
 
     private fun showOrders() = showOrderList("My orders", false)
@@ -564,7 +721,7 @@ class MainActivity : Activity() {
         val generation = pageGeneration
         val header = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         header.addView(caption(if (staff) "Review and update fulfillment status." else "Follow the latest status of your orders."), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-        header.addView(textButton("Refresh") { navigate(if (staff) "staff_orders" else "orders") }); page.addView(header, bottomMargin(dp(16)))
+        page.addView(header, bottomMargin(dp(16)))
         val host = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }; page.addView(host); showLoading(host, "Loading orders…")
         request("GET", if (staff) "/staff/orders" else "/orders", onSuccess = { response ->
             if (generation != pageGeneration) return@request
@@ -610,7 +767,7 @@ class MainActivity : Activity() {
         val resumeHost = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         savedPaymentUrl?.let { pendingUrl -> resumeHost.addView(paymentResumeCard(pendingUrl), topMargin(dp(16))) }
         page.addView(resumeHost)
-        page.addView(primaryButton("Book a table") { showReservationForm() }, topMargin(dp(18))); page.addView(sectionTitle("Your reservations"), topMargin(dp(26)))
+        page.addView(primaryButton("Book a table") { navigate("booking") }, topMargin(dp(18))); page.addView(sectionTitle("Your reservations"), topMargin(dp(26)))
         val host = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }; page.addView(host, topMargin(dp(12)))
         val generation = pageGeneration; showLoading(host, "Loading reservations…")
         request("GET", "/reservations", onSuccess = { response ->
@@ -673,6 +830,7 @@ class MainActivity : Activity() {
     private fun showReservationForm() {
         showShell("Book a table", "booking", detail = true, returnTo = "reserve")
         page.addView(title("Reservation details", 26f)); page.addView(caption("A ₱125 deposit confirms your ₱250 reservation."), topMargin(dp(4)))
+        page.addView(caption("Reservation dates and times use Philippine time."), topMargin(dp(4)))
         val first = labeledField("First name", userName.substringBefore(" "), InputType.TYPE_CLASS_TEXT)
         val last = labeledField("Last name", userName.substringAfter(" ", ""), InputType.TYPE_CLASS_TEXT)
         val phone = labeledField("Mobile number", userPhone, InputType.TYPE_CLASS_PHONE); val guests = labeledField("Number of guests", "2", InputType.TYPE_CLASS_NUMBER)
@@ -692,6 +850,7 @@ class MainActivity : Activity() {
         val submit = primaryButton("Continue to secure payment") { }; page.addView(submit, topMargin(dp(24)))
         submit.setOnClickListener {
             if (reservationMutationInFlight) return@setOnClickListener
+            if (reviewInterruptedRequest("booking") { submit.performClick() }) return@setOnClickListener
             val guestCount = guests.second.text.toString().toIntOrNull()
             val phoneValue = phone.second.text.toString().trim()
             if (first.second.text.isBlank() || last.second.text.isBlank() || !PHONE_REGEX.matches(phoneValue) || guestCount == null || guestCount !in 1..20 || date.second.text.isBlank() || time.second.text.isBlank()) { toast("Complete all details. Reservations support 1–20 guests."); return@setOnClickListener }
@@ -700,9 +859,12 @@ class MainActivity : Activity() {
                 .put("phone", phoneValue).put("guest", guestCount).put("date", date.second.text.toString()).put("time", time.second.text.toString()).put("payment_method", payment.second.selectedItem.toString())
             val requestPage = pageGeneration
             reservationMutationInFlight = true
+            preferences.edit().putBoolean(KEY_RESERVATION_PENDING, true).apply()
             setButtonBusy(submit, true, "Creating payment…")
             request("POST", "/reservations", body, onSuccess = { response ->
                 reservationMutationInFlight = false
+                preferences.edit().remove(KEY_RESERVATION_PENDING).apply()
+                clearDraft("booking")
                 val reservation = response.optJSONObject("reservation")
                 val checkoutUrl = response.optString("checkout_url").takeUnless { it.isBlank() || it == "null" }
                     ?: reservation?.optString("checkout_url")?.takeUnless { it.isBlank() || it == "null" }
@@ -714,16 +876,17 @@ class MainActivity : Activity() {
                     reservation?.optLong("id")?.takeIf { it > 0 }?.let { editor.putLong(KEY_PENDING_PAYMENT_BOOKING_ID, it) }
                     editor.apply()
                     if (requestPage == pageGeneration && currentDestination == "booking") {
+                        showReservations()
                         paymentBrowserOpen = openPayment(checkoutUrl)
-                        if (!paymentBrowserOpen) setButtonBusy(submit, false, "Continue to secure payment")
                     } else {
                         toast("Reservation created. Resume its payment from Reservations.")
                     }
                 }
-            }, onError = { message, _ ->
+            }, onError = { message, code ->
                 reservationMutationInFlight = false
+                if (code != null && code in 400..499) preferences.edit().remove(KEY_RESERVATION_PENDING).apply()
                 if (requestPage == pageGeneration && currentDestination == "booking") setButtonBusy(submit, false, "Continue to secure payment")
-                toast(message)
+                toast(if (code == null || code >= 500) "$message Check Reservations before trying again." else message)
             }, pageScoped = false)
         }
     }
@@ -741,7 +904,9 @@ class MainActivity : Activity() {
                 val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
                 chunk.forEach { (label, value) -> row.addView(metricCard(label, value), LinearLayout.LayoutParams(0, dp(126), 1f).apply { setMargins(dp(5), dp(5), dp(5), dp(5)) }) }; host.addView(row)
             }
-            host.addView(primaryButton("Manage orders") { showStaffOrders() }, topMargin(dp(18)))
+            if ("staff_orders" in AppNavigation.destinations(role, staffRole)) {
+                host.addView(primaryButton("Manage orders") { navigate("staff_orders") }, topMargin(dp(18)))
+            }
         }, onError = { message, _ -> if (generation == pageGeneration) showRetry(host, "Dashboard unavailable", message) { showDashboard() } })
     }
 
@@ -842,6 +1007,17 @@ class MainActivity : Activity() {
         checkoutMutationInFlight = false
         reservationMutationInFlight = false
         paymentBrowserOpen = false
+        restoredDestination = null
+        menuQuery = ""
+        formDrafts.clear()
+        draftInputs.clear()
+        draftSpinners.clear()
+        scrollPositions.clear()
+        pageScroll = null
+        cartItemCount = 0
+        cartCountRequest++
+        cartBadge = null
+        cartTab = null
         tokenStore.clear()
         preferences.edit().clear().apply()
         token = ""
@@ -859,7 +1035,7 @@ class MainActivity : Activity() {
         if (currentDestination == "launch") return
         if (blockNavigationDuringMutation()) return
         detailReturnDestination?.let { navigate(it); return }
-        val home = if (isStaff()) "dashboard" else "menu"
+        val home = AppNavigation.home(role)
         if (currentDestination != home && currentDestination != "login") navigate(home) else finishAfterTransition()
     }
 
@@ -875,13 +1051,14 @@ class MainActivity : Activity() {
     ) {
         val requestPage = pageGeneration
         val requestSession = sessionGeneration
+        val requestToken = token
         requestExecutor.execute {
             var connection: HttpURLConnection? = null
             try {
                 connection = (URL(BuildConfig.API_BASE_URL.trimEnd('/') + path).openConnection() as HttpURLConnection).apply {
                     requestMethod = method; connectTimeout = 15_000; readTimeout = 20_000; useCaches = false
                     setRequestProperty("Accept", "application/json"); setRequestProperty("Content-Type", "application/json; charset=utf-8"); setRequestProperty("X-Requested-With", "MiCusinaAndroid")
-                    if (token.isNotBlank()) setRequestProperty("Authorization", "Bearer $token")
+                    if (requestToken.isNotBlank()) setRequestProperty("Authorization", "Bearer $requestToken")
                     if (body != null) { doOutput = true; outputStream.use { it.write(body.toString().toByteArray(Charsets.UTF_8)) } }
                 }
                 val code = connection.responseCode
@@ -894,7 +1071,10 @@ class MainActivity : Activity() {
                         when {
                             code == 401 && handleUnauthorized -> expireSession()
                             code >= 400 && code !in acceptedErrorCodes -> onError(apiMessage(response, code), code)
-                            else -> onSuccess(response)
+                            else -> {
+                                onSuccess(response)
+                                if (method == "GET" && pageScoped) restoreScrollPosition(requestPage)
+                            }
                         }
                     } catch (_: Exception) {
                         onError("Mi Cusina returned an unexpected response. Please try again.", code)
@@ -971,6 +1151,70 @@ class MainActivity : Activity() {
         super.onDestroy()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        rememberScrollPosition()
+        rememberFormDrafts()
+        outState.putString("destination", if (currentDestination == "launch") restoredDestination else currentDestination)
+        outState.putString("menu_query", menuQuery)
+        outState.putBundle("scroll_positions", Bundle(scrollPositions))
+        outState.putBundle("form_drafts", Bundle(formDrafts))
+        super.onSaveInstanceState(outState)
+    }
+
+    private fun rememberScrollPosition() {
+        pageScroll?.let { scrollPositions.putInt(currentDestination, it.scrollY) }
+    }
+
+    private fun restoreScrollPosition(generation: Int) {
+        val scroll = pageScroll ?: return
+        val position = scrollPositions.getInt(currentDestination, 0)
+        scroll.post { if (!isDestroyed && generation == pageGeneration) scroll.scrollTo(0, position) }
+    }
+
+    private fun rememberFormDrafts() {
+        draftInputs.forEach { (key, input) -> formDrafts.putString(key, input.text.toString()) }
+        draftSpinners.forEach { (key, spinner) -> formDrafts.putInt(key, spinner.selectedItemPosition) }
+    }
+
+    private fun bindDraft(name: String, input: EditText) {
+        val key = "$currentDestination:$name"
+        if (formDrafts.containsKey(key)) input.setText(formDrafts.getString(key))
+        draftInputs[key] = input
+    }
+
+    private fun clearDraft(destination: String) {
+        formDrafts.keySet().filter { it.startsWith("$destination:") }.forEach(formDrafts::remove)
+        draftInputs.keys.removeAll { it.startsWith("$destination:") }
+        draftSpinners.keys.removeAll { it.startsWith("$destination:") }
+        scrollPositions.remove(destination)
+    }
+
+    private fun hideKeyboard() {
+        currentFocus?.let { focused ->
+            (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(focused.windowToken, 0)
+            focused.clearFocus()
+        }
+    }
+
+    private fun refreshCartCount() {
+        if (token.isBlank() || isStaff()) return
+        val revision = ++cartCountRequest
+        request("GET", "/cart", onSuccess = { response ->
+            if (revision == cartCountRequest) {
+                cartItemCount = response.getJSONArray("items").objects().sumOf { it.optInt("quantity") }
+                updateCartBadge()
+            }
+        }, onError = { _, _ -> }, pageScoped = false)
+    }
+
+    private fun updateCartBadge() {
+        cartBadge?.apply {
+            text = if (cartItemCount > 99) "99+" else cartItemCount.toString()
+            visibility = if (cartItemCount > 0) View.VISIBLE else View.GONE
+        }
+        cartTab?.contentDescription = if (cartItemCount > 0) "Cart, $cartItemCount items" else "Cart, empty"
+    }
+
     private fun showLoading(host: LinearLayout, message: String) {
         host.removeAllViews(); host.gravity = Gravity.CENTER_HORIZONTAL
         host.addView(ProgressBar(this).apply { indeterminateTintList = ColorStateList.valueOf(PRIMARY) }, LinearLayout.LayoutParams(dp(38), dp(38))); host.addView(caption(message).apply { gravity = Gravity.CENTER }, topMargin(dp(10)))
@@ -995,32 +1239,37 @@ class MainActivity : Activity() {
 
     private fun labeledField(labelText: String, value: String, type: Int): Pair<LinearLayout, EditText> {
         val input = field(labelText, type).apply { setText(value) }
+        if (currentDestination == "checkout" || currentDestination == "booking") bindDraft(labelText, input)
         return LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; addView(label(labelText)); addView(input, topMargin(dp(6))) } to input
     }
 
     private fun labeledSpinner(labelText: String, values: Array<String>): Pair<LinearLayout, Spinner> {
         val spinner = Spinner(this); spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, values); styleSpinner(spinner)
+        val key = "$currentDestination:$labelText"
+        spinner.contentDescription = labelText
+        spinner.setSelection(formDrafts.getInt(key, 0).coerceIn(0, values.lastIndex))
+        draftSpinners[key] = spinner
         return LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; addView(label(labelText)); addView(spinner, topMargin(dp(6))) } to spinner
     }
 
     private fun styleSpinner(spinner: Spinner) { spinner.background = rounded(SURFACE, dp(12).toFloat(), BORDER, dp(1)); spinner.setPadding(dp(10), 0, dp(10), 0); spinner.minimumHeight = dp(50) }
     private fun card(): LinearLayout = LinearLayout(this).apply { setPadding(dp(16), dp(16), dp(16), dp(16)); background = rounded(SURFACE, dp(16).toFloat(), BORDER, dp(1)); elevation = dp(2).toFloat() }
 
-    private fun primaryButton(value: String, action: () -> Unit): TextView = buttonView(value, Color.WHITE, PRIMARY, action)
+    private fun primaryButton(value: String, action: () -> Unit): TextView = buttonView(value, Color.WHITE, PRIMARY_DARK, action)
     private fun secondaryButton(value: String, action: () -> Unit): TextView = buttonView(value, PRIMARY_DARK, SURFACE, action, BORDER)
-    private fun compactButton(value: String, enabled: Boolean, action: () -> Unit): TextView = buttonView(value, Color.WHITE, if (enabled) PRIMARY else TEXT_LIGHT, action).apply { minHeight = dp(40); isEnabled = enabled }
-    private fun smallOutlineButton(value: String, action: () -> Unit): TextView = buttonView(value, PRIMARY_DARK, SURFACE, action, PRIMARY_SOFT).apply { minHeight = dp(38); setPadding(dp(12), 0, dp(12), 0); textSize = 12f }
-    private fun smallDangerButton(value: String, action: () -> Unit): TextView = buttonView(value, ERROR, ERROR_SOFT, action).apply { minHeight = dp(38); setPadding(dp(12), 0, dp(12), 0); textSize = 12f }
+    private fun compactButton(value: String, enabled: Boolean, action: () -> Unit): TextView = buttonView(value, Color.WHITE, if (enabled) PRIMARY_DARK else TEXT_MUTED, action).apply { minHeight = dp(48); isEnabled = enabled }
+    private fun smallOutlineButton(value: String, action: () -> Unit): TextView = buttonView(value, PRIMARY_DARK, SURFACE, action, PRIMARY_SOFT).apply { minHeight = dp(48); setPadding(dp(12), 0, dp(12), 0); textSize = 12f }
+    private fun smallDangerButton(value: String, action: () -> Unit): TextView = buttonView(value, ERROR, ERROR_SOFT, action).apply { minHeight = dp(48); setPadding(dp(12), 0, dp(12), 0); textSize = 12f }
 
     private fun buttonView(value: String, color: Int, backgroundColor: Int, action: () -> Unit, strokeColor: Int? = null): TextView = TextView(this).apply {
         text = value; textSize = 14f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER; setTextColor(color); minHeight = dp(50); setPadding(dp(18), 0, dp(18), 0)
         background = if (strokeColor == null) ripple(backgroundColor, dp(25).toFloat()) else RippleDrawable(ColorStateList.valueOf(PRIMARY_SOFT), rounded(backgroundColor, dp(25).toFloat(), strokeColor, dp(1)), null)
-        isClickable = true; isFocusable = true; setOnClickListener { action() }
+        isClickable = true; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { action() }
     }
 
-    private fun textButton(value: String, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 13f; typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK); gravity = Gravity.CENTER; setPadding(dp(12), dp(8), dp(12), dp(8)); background = ripple(PRIMARY_SOFT, dp(18).toFloat()); setOnClickListener { action() } }
-    private fun quantityButton(value: String, enabled: Boolean, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 20f; gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD; setTextColor(if (enabled) PRIMARY_DARK else TEXT_LIGHT); background = ripple(PRIMARY_SOFT, dp(19).toFloat()); isEnabled = enabled; setOnClickListener { action() }; layoutParams = LinearLayout.LayoutParams(dp(38), dp(38)) }
-    private fun iconAction(value: String, description: String, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 34f; gravity = Gravity.CENTER; setTextColor(TEXT); background = ripple(Color.TRANSPARENT, dp(23).toFloat()); contentDescription = description; setOnClickListener { action() } }
+    private fun textButton(value: String, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 13f; typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK); gravity = Gravity.CENTER; minHeight = dp(48); isFocusable = true; accessibilityDelegate = buttonAccessibility; setPadding(dp(12), dp(8), dp(12), dp(8)); background = ripple(PRIMARY_SOFT, dp(18).toFloat()); setOnClickListener { action() } }
+    private fun quantityButton(value: String, enabled: Boolean, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 20f; gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD; setTextColor(if (enabled) PRIMARY_DARK else TEXT_LIGHT); background = ripple(PRIMARY_SOFT, dp(24).toFloat()); isEnabled = enabled; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { action() }; layoutParams = LinearLayout.LayoutParams(dp(48), dp(48)) }
+    private fun iconAction(value: String, description: String, action: () -> Unit): TextView = TextView(this).apply { text = value; textSize = 34f; gravity = Gravity.CENTER; setTextColor(TEXT); background = ripple(Color.TRANSPARENT, dp(24).toFloat()); contentDescription = description; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { action() } }
 
     private fun summaryRow(labelText: String, value: String): View = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; addView(bodyText(labelText), LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)); addView(bodyText(value).apply { typeface = Typeface.DEFAULT_BOLD }) }
 
@@ -1044,6 +1293,7 @@ class MainActivity : Activity() {
             paymentBrowserOpen = false
             showReservations()
         }
+        if (currentDestination !in listOf("login", "launch") && !cartMutationInFlight && !checkoutMutationInFlight) refreshCartCount()
     }
 
     private fun openWebsite(path: String) { openExternal(BuildConfig.WEB_BASE_URL.trimEnd('/') + path) }
@@ -1079,7 +1329,7 @@ class MainActivity : Activity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             val content = findViewById<View>(android.R.id.content)
             content.setOnApplyWindowInsetsListener { view, insets ->
-                val bars = insets.getInsets(WindowInsets.Type.systemBars())
+                val bars = insets.getInsets(WindowInsets.Type.systemBars() or WindowInsets.Type.displayCutout() or WindowInsets.Type.ime())
                 view.setPadding(bars.left, bars.top, bars.right, bars.bottom)
                 insets
             }
@@ -1089,7 +1339,7 @@ class MainActivity : Activity() {
             window.navigationBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) SURFACE else PRIMARY_DARK
         }
     }
-    private fun money(value: Double): String = NumberFormat.getCurrencyInstance(Locale("en", "PH")).format(value)
+    private fun money(value: Double): String = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-PH")).format(value)
     private fun deviceName(): String {
         val devicePreferences = getSharedPreferences(DEVICE_PREFERENCES, Context.MODE_PRIVATE)
         val installationId = devicePreferences.getString(KEY_INSTALLATION_ID, null) ?: UUID.randomUUID().toString().also {
@@ -1115,6 +1365,8 @@ class MainActivity : Activity() {
     }
 
     private companion object {
+        const val KEY_CHECKOUT_PENDING = "checkout_pending"
+        const val KEY_RESERVATION_PENDING = "reservation_pending"
         const val PREFERENCES = "mi_cusina_profile"; const val DEVICE_PREFERENCES = "mi_cusina_device"; const val KEY_INSTALLATION_ID = "installation_id"; const val KEY_ROLE = "role"; const val KEY_NAME = "name"; const val KEY_EMAIL = "email"; const val KEY_PHONE = "phone"; const val KEY_STAFF_ROLE = "staff_role"; const val KEY_PENDING_PAYMENT_URL = "pending_payment_url"; const val KEY_PENDING_PAYMENT_BOOKING_ID = "pending_payment_booking_id"
         val PRIMARY = Color.rgb(237, 13, 168); val PRIMARY_DARK = Color.rgb(135, 28, 119); val PRIMARY_SOFT = Color.rgb(250, 230, 246)
         val BACKGROUND = Color.rgb(248, 249, 251); val SURFACE = Color.WHITE; val BORDER = Color.rgb(230, 232, 236)

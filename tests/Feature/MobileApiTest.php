@@ -2,15 +2,12 @@
 
 namespace Tests\Feature;
 
-use App\Models\Book;
 use App\Models\Cart;
 use App\Models\Food;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Fortify;
@@ -99,6 +96,26 @@ class MobileApiTest extends TestCase
         $this->assertSame(1, $user->tokens()->where('name', 'mobile-app: Pixel 9')->count());
     }
 
+    public function test_login_has_an_independent_five_attempt_rate_limit(): void
+    {
+        $user = User::factory()->create();
+
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->getJson('/api/mobile/foods')->assertOk();
+            $this->postJson('/api/mobile/login', [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ])->assertUnprocessable();
+        }
+
+        $this->postJson('/api/mobile/login', [
+            'email' => $user->email,
+            'password' => 'password',
+        ])->assertStatus(429);
+        $this->getJson('/api/mobile/foods')->assertOk();
+        $this->assertDatabaseCount('personal_access_tokens', 0);
+    }
+
     public function test_cart_mutations_accept_the_legacy_string_user_id_without_weakening_ownership(): void
     {
         $user = User::factory()->create();
@@ -180,8 +197,10 @@ class MobileApiTest extends TestCase
     {
         $cashier = User::factory()->create(['usertype' => 'staff', 'staff_role' => 'cashier']);
         $rider = User::factory()->create(['usertype' => 'staff', 'staff_role' => 'rider', 'rider_available' => false]);
-        $first = $this->order(['email' => 'group@example.com', 'rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
-        $second = $this->order(['email' => 'group@example.com', 'rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
+        $groupId = (string) Str::uuid();
+        $first = $this->order(['checkout_group_id' => $groupId, 'email' => 'group@example.com', 'rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
+        $second = $this->order(['checkout_group_id' => $groupId, 'email' => 'group@example.com', 'rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
+        $otherCheckout = $this->order(['checkout_group_id' => (string) Str::uuid(), 'email' => 'group@example.com']);
 
         Sanctum::actingAs($cashier);
 
@@ -191,7 +210,27 @@ class MobileApiTest extends TestCase
 
         $this->assertSame('Delivered', $first->fresh()->delivery_status);
         $this->assertSame('Delivered', $second->fresh()->delivery_status);
+        $this->assertSame('In Progress', $otherCheckout->fresh()->delivery_status);
         $this->assertTrue((bool) $rider->fresh()->rider_available);
+    }
+
+    public function test_legacy_delivery_updates_only_that_row_and_keeps_busy_riders_unavailable(): void
+    {
+        $rider = User::factory()->create(['usertype' => 'staff', 'staff_role' => 'rider', 'rider_available' => false]);
+        $first = $this->order(['rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
+        $second = $this->order(['rider_id' => $rider->id, 'delivery_status' => 'On The Way']);
+
+        Sanctum::actingAs($rider);
+
+        $this->patchJson('/api/mobile/staff/orders/'.$first->id, ['delivery_status' => 'Delivered'])
+            ->assertOk()
+            ->assertJsonPath('order.delivery_status', 'Delivered');
+
+        $this->assertSame('On The Way', $second->fresh()->delivery_status);
+        $this->assertFalse($rider->fresh()->rider_available);
+
+        $this->patchJson('/api/mobile/staff/orders/'.$second->id, ['delivery_status' => 'Delivered'])->assertOk();
+        $this->assertTrue($rider->fresh()->rider_available);
     }
 
     public function test_reservations_reject_a_time_that_has_already_passed_in_manila(): void

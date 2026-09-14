@@ -10,10 +10,37 @@ destinations. The former injected-WebView shell has been retired.
 - Staff dashboard and order fulfillment actions
 - Administrator inventory updates
 - Role-aware bottom navigation and in-app loading, error, empty, and retry states
+- Scrollable navigation rail on wide screens, accessible controls, and a cart count badge
+- Restored navigation, menu search, scroll position, and checkout/reservation drafts
 - External browser handoff for registration, website support, and payment pages
 
 The server-provided account role determines the available navigation. The app
 does not ask users to choose or impersonate a role.
+
+## Navigation
+
+| Account | Main destinations |
+| --- | --- |
+| Customer | Menu, Cart, Orders, Reserve, Account |
+| Administrator / cashier | Home, Orders, Inventory, Account |
+| Rider | Home, Orders, Account |
+| Other staff | Home, Inventory, Account |
+
+Only administrators can edit inventory. Back returns from checkout to Cart,
+from a reservation form to Reserve, and from the gallery to Account. Reselecting
+the active tab scrolls to the top; the toolbar refresh action reloads current
+data without clearing the menu search. Tabs move into a scrollable side rail at
+600dp screen width; the content remains scrollable when the keyboard is open.
+
+Search text, scroll position, and delivery/reservation drafts survive Activity
+recreation. Passwords and authentication codes are not saved in instance state.
+If checkout or reservation creation is interrupted, the next launch opens the
+corresponding history list and asks the customer to review it before submitting
+again. This is recovery guidance, not server-side request idempotency; never
+automatically retry a payment or reservation creation request.
+
+The Android build in this directory is the release target. The separate
+`mobile-app` Flutter prototype is not included in this release or its checks.
 
 ## Requirements
 
@@ -95,6 +122,10 @@ enable R8 code shrinking and resource shrinking. Retain the generated mapping
 file from `app/build/outputs/mapping/release/` for crash de-obfuscation.
 The repository's `Tests` GitHub Actions workflow runs the same release lint,
 test, R8, and assembly checks for every push and pull request.
+The JVM navigation tests verify role restrictions, detail-screen parents, and
+restoration after interrupted submissions. Laravel regression tests cover
+mobile authentication, cart ownership, checkout, delivery updates, and signed
+payment callbacks/webhooks.
 
 ## Release checklist
 
@@ -108,3 +139,17 @@ test, R8, and assembly checks for every push and pull request.
 7. Register the developer identity and `com.micusina.app` package in Play
    Console (or Android Developer Console for off-Play distribution) before the
    applicable Android developer-verification deadline.
+8. Deploy the matching Laravel API and apply pending migrations after taking
+   a database backup. Confirm order identity, unique cart rows, and stored
+   reservation checkout URLs exist before enabling the rebuilt app.
+
+### Device smoke checks
+
+- Sign in as a customer, a cashier, and a rider; confirm each gets only its tabs.
+- Complete the authenticator challenge for a two-factor-enabled account.
+- Add, increment, remove, and checkout items; confirm the badge and totals update.
+- Rotate during menu search and during an unfinished form; check the draft and tab.
+- Rotate or interrupt connectivity during submission; check history before retrying.
+- Complete/cancel a sandbox reservation payment; return and resume a pending booking.
+- Verify gesture Back, keyboard visibility, TalkBack labels, large text, and
+  landscape navigation on a phone and a wide-screen device.

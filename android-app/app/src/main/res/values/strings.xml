@@ -2,5 +2,6 @@
     <string name="app_name">Mi Cusina</string>
     <string name="logo_initials">MC</string>
     <string name="login_validation_error">Enter a valid email address and password.</string>
+    <string name="two_factor_validation_error">Enter the 6-digit code from your authenticator app.</string>
     <string name="remove">Remove</string>
 </resources>

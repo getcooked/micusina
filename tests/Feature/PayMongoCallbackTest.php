@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Testing\TestResponse;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -168,6 +169,92 @@ class PayMongoCallbackTest extends TestCase
             'payment_status' => 'Pending',
             'status' => 'Awaiting Payment',
         ]);
+    }
+
+    public function test_checkout_webhook_confirms_the_embedded_payment_without_a_browser_return(): void
+    {
+        $booking = $this->booking(['paymongo_checkout_id' => 'cs_webhook_paid']);
+
+        $this->postSignedWebhook('checkout_session.payment.paid', [
+            'id' => 'cs_webhook_paid',
+            'type' => 'checkout_session',
+            'attributes' => [
+                'reference_number' => 'BK-'.str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT),
+                'payments' => [$this->payment()],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('books', [
+            'id' => $booking->id,
+            'payment_status' => 'Paid',
+            'paymongo_payment_id' => 'pay_webhook_paid',
+            'status' => 'Pending',
+        ]);
+    }
+
+    public function test_repeated_payment_webhooks_preserve_approval_and_the_original_paid_time(): void
+    {
+        $booking = $this->booking(['paymongo_checkout_id' => 'cs_webhook_paid']);
+        $payment = $this->payment();
+        $payment['attributes']['checkout_session_id'] = 'cs_webhook_paid';
+
+        $this->postSignedWebhook('payment.paid', $payment)->assertOk();
+        $paidAt = $booking->fresh()->paid_at;
+        $booking->update(['status' => 'Approved']);
+
+        $this->travel(1)->minutes();
+        $this->postSignedWebhook('payment.paid', $payment)->assertOk();
+
+        $this->assertSame('Approved', $booking->fresh()->status);
+        $this->assertTrue($booking->fresh()->paid_at->equalTo($paidAt));
+    }
+
+    public function test_webhooks_cannot_confirm_the_wrong_amount_or_an_invalid_signature(): void
+    {
+        $booking = $this->booking(['paymongo_checkout_id' => 'cs_webhook_paid']);
+        $payment = $this->payment();
+        $payment['attributes']['checkout_session_id'] = 'cs_webhook_paid';
+        $payment['attributes']['amount'] = 1;
+
+        $this->postSignedWebhook('payment.paid', $payment)->assertOk();
+        $this->postJson('/paymongo/webhook', [
+            'data' => ['attributes' => ['type' => 'payment.paid', 'data' => $this->payment()]],
+        ])->assertUnauthorized();
+
+        $this->assertDatabaseHas('books', [
+            'id' => $booking->id,
+            'payment_status' => 'Pending',
+            'status' => 'Awaiting Payment',
+        ]);
+    }
+
+    private function payment(): array
+    {
+        return [
+            'id' => 'pay_webhook_paid',
+            'type' => 'payment',
+            'attributes' => [
+                'status' => 'paid',
+                'amount' => 12500,
+                'currency' => 'PHP',
+            ],
+        ];
+    }
+
+    private function postSignedWebhook(string $eventType, array $resource): TestResponse
+    {
+        config(['services.paymongo.webhook_secret' => 'webhook-test-secret']);
+        $payload = json_encode([
+            'data' => ['attributes' => ['type' => $eventType, 'data' => $resource]],
+        ], JSON_THROW_ON_ERROR);
+        $timestamp = time();
+        $signature = hash_hmac('sha256', $timestamp.'.'.$payload, 'webhook-test-secret');
+
+        return $this->call('POST', '/paymongo/webhook', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_ACCEPT' => 'application/json',
+            'HTTP_PAYMONGO_SIGNATURE' => 't='.$timestamp.',te='.$signature,
+        ], $payload);
     }
 
     private function signedUrl(string $route, Book $booking): string
