@@ -794,7 +794,6 @@
         </div>
 
         <div class="burger-copy">
-            <p>Discover Filipino comfort food, thoughtfully made and served with love at Mi Cusina.</p>
             <div class="burger-actions">
                 <a class="burger-primary" href="{{ url('/?section=food') }}">Order Now</a>
                 <a class="burger-secondary" href="{{ url('/?section=about') }}">About Us</a>

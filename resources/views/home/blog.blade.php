@@ -1004,6 +1004,20 @@
         .mic-card-cart > button { font-size:12px; height:36px; padding:0 9px; }
     }
 
+    /* Full-width menu: every food keeps its own clear card. */
+    .mic-menu-hero,
+    .mic-menu-heading { display:none; }
+    .mic-marketplace { padding:0 24px 40px; }
+    .mic-marketplace-inner { border-left:0; border-radius:0; border-right:0; max-width:none; width:100%; }
+    .mic-product-grid { grid-template-columns:1fr !important; }
+    .mic-product-card { grid-template-columns:minmax(0, 260px) minmax(0, 1fr); width:100%; }
+
+    @media (max-width:640px) {
+        .mic-marketplace { padding:0 12px 28px; }
+        .mic-marketplace-inner { border:0; border-radius:0; padding:12px 0; }
+        .mic-product-card { grid-template-columns:120px minmax(0, 1fr); }
+    }
+
 </style>
 
 <script>
