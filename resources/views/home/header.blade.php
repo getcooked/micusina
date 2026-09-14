@@ -688,13 +688,46 @@
     html body .burger-thumb img { object-fit: contain; }
 
     @media (max-width: 991.98px) {
-        body.front-only { padding: 0; }
+        body.front-only { height: auto; min-height: 100vh; overflow-y: auto; padding: 0; }
         html body .burger-front, html body .burger-panel { min-height: 100vh; }
-        html body .burger-topbar { grid-template-columns: auto 1fr auto; height: auto; min-height: 76px; padding: 12px 20px; }
+        html body .burger-panel { display: flex; flex-direction: column; }
+        html body .burger-topbar {
+            column-gap: 12px;
+            flex-shrink: 0;
+            grid-template-columns: minmax(0, 1fr) auto;
+            height: auto;
+            min-height: 76px;
+            padding: 12px 20px;
+            row-gap: 10px;
+        }
+        html body .burger-mark { grid-column: 1; grid-row: 1; }
+        html body .burger-login { grid-column: 2; grid-row: 1; }
         html body .burger-mark::after { font-size: 24px; }
         html body .burger-mark img { height: 36px; width: 42px; }
-        html body .burger-nav { display: none; }
-        html body .burger-copy { min-height: calc(100vh - 180px); padding: 72px 22px 125px; }
+        html body .burger-nav {
+            border-top: 1px solid #f1f0ec;
+            display: grid;
+            gap: 6px;
+            grid-column: 1 / -1;
+            grid-row: 2;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            padding-top: 10px;
+        }
+        html body.front-only .burger-nav a {
+            align-items: center;
+            border-radius: 12px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            line-height: 1.25;
+            min-height: 44px;
+            padding: 8px;
+            text-align: center;
+        }
+        html body.front-only .burger-nav .burger-download { background: #8f5f87 !important; color: #fff !important; }
+        html body.front-only .burger-nav .burger-download:hover { background: #74496d !important; }
+        html body.front-only .burger-nav a:focus-visible { outline: 2px solid #74496d; outline-offset: 2px; }
+        html body .burger-copy { flex: 1; min-height: 0; padding: 72px 22px 125px; }
         html body .burger-art { opacity: .24; right: -14vw; top: 42%; width: 78vw; }
         html body .burger-thumbs { bottom: 18px; left: 18px; }
         .hero-food-frame { opacity: .3; width: 170px; }
@@ -729,9 +762,10 @@
             padding: 9px 11px;
         }
         html body .burger-copy {
-            min-height: calc(100vh - 72px);
+            min-height: 0;
             padding: 46px 18px 76px;
         }
+        html body.front-only .burger-nav a { font-size: 12px; }
         html body .burger-copy h1,
         html body .burger-copy h1 span {
             font-size: clamp(40px, 11.5vw, 48px);
@@ -755,6 +789,9 @@
             padding: 0 12px;
         }
     }
+    @media (max-width: 359.98px) {
+        html body .burger-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
 </style>
 
 @php($isHomepage = request()->getPathInfo() === '/')
@@ -768,7 +805,7 @@
                 <a class="active" href="{{ url('/') }}">Home</a>
                 <a href="{{ url('/?section=food') }}">Menu</a>
                 <a href="{{ url('/?section=book') }}">Book Table</a>
-                <a href="{{ route('mobile-app.download') }}">Download App</a>
+                <a class="burger-download" href="{{ route('mobile-app.download') }}">Download App</a>
             </nav>
             <div class="burger-login">
                 @if (Route::has('login'))
