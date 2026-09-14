@@ -37,6 +37,16 @@ class AppServiceProvider extends ServiceProvider
                     ->count()
                 : $pendingOrders->count();
 
+            $ordersSeenAt = session('admin_orders_seen_at');
+            $unreadPendingOrders = Order::query()
+                ->where('delivery_status', 'In Progress')
+                ->when($ordersSeenAt, fn ($query) => $query->where('created_at', '>', $ordersSeenAt));
+            $unreadPendingOrderCount = Schema::hasColumn('orders', 'checkout_group_id')
+                ? $unreadPendingOrders->get(['id', 'checkout_group_id'])
+                    ->unique(fn (Order $order) => $order->checkout_group_id ?: 'legacy-'.$order->id)
+                    ->count()
+                : $unreadPendingOrders->count();
+
             $newUserCount = User::query()
                 ->where('usertype', 'user')
                 ->whereDate('created_at', today())
@@ -57,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
                 'headerLowStockThreshold' => $threshold,
                 'headerNewUserCount' => $newUserCount,
                 'headerPendingOrderCount' => $pendingOrderCount,
+                'headerUnreadPendingOrderCount' => $unreadPendingOrderCount,
                 'headerPendingReservationCount' => $pendingReservationCount,
                 'headerNotificationCount' => $lowStockFoods->count() + $newUserCount + $pendingOrderCount + $pendingReservationCount,
             ]);

@@ -200,6 +200,10 @@ class AdminController extends Controller
     {
         $this->requireStaffOrAdmin();
 
+        // The Orders page is the acknowledgement point for the sidebar badge.
+        // Orders created after this timestamp will make the badge appear again.
+        session(['admin_orders_seen_at' => now()->toDateTimeString()]);
+
         $data = Order::orderByDesc('updated_at')
             ->orderByDesc('created_at')
             ->orderByDesc('id')

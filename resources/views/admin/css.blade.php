@@ -104,7 +104,7 @@
         .admin-notification-item i { color:var(--mc-orange); font-size:17px; }
         .admin-notification-item small { color:var(--mc-muted); display:block; margin-top:2px; }
         .admin-notification-empty { color:var(--mc-muted); padding:10px; }
-        .admin-sidebar-count { align-items:center; background:#dc2626; border:2px solid #fff; border-radius:999px; color:#fff; display:inline-flex; font-size:10px; font-weight:800; height:20px; justify-content:center; line-height:1; margin-left:auto; min-width:20px; padding:0 5px; }
+        .admin-sidebar-count { align-items:center; background:#dc2626 !important; border:2px solid #fff !important; border-radius:999px; color:#fff !important; display:inline-flex; font-size:10px; font-weight:800; height:20px; justify-content:center; line-height:1; margin-left:auto; min-width:20px; padding:0 5px; }
         nav#sidebar li > a { align-items:center; display:flex; }
 
         .admin-user-trigger {

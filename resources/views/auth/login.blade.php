@@ -396,8 +396,8 @@
         .auth-submit { background: linear-gradient(135deg, #ff6b72, #ed0da8) !important; border-radius: 999px; box-shadow: 0 12px 25px rgba(237, 13, 168, .25); color: #fff !important; font-size: 14px; height: 45px; margin: 0 auto 19px; width: 100%; }
         .auth-divider { color: #999; font-size: 12px; margin-bottom: 18px; }
         .auth-divider::before, .auth-divider::after { background: #e4e1e4; }
-        .auth-socials { gap: 10px; margin-bottom: 20px; }
-        .auth-social { border-color: #e4e1e4; border-radius: 5px; font-size: 12px; gap: 8px; height: 42px; }
+        .auth-socials { gap: 10px; grid-template-columns: repeat(2, 42px); justify-content: center; margin-bottom: 20px; }
+        .auth-social { border-color: #e4e1e4; border-radius: 5px; font-size: 12px; gap: 0; height: 42px; width: 42px; }
         .auth-social svg { height: 18px; width: 18px; }
         .auth-switch { font-size: 13px; }
         .auth-switch a { color: #ed0da8 !important; }
@@ -467,13 +467,11 @@
                             <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/>
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 4 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                         </svg>
-                        Google
                     </span>
                     <span class="auth-social" aria-label="Continue with Facebook" title="Facebook">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                             <path fill="#1877F2" d="M24 12.07C24 5.71 18.63.5 12 .5S0 5.71 0 12.07c0 5.75 4.39 10.52 10.13 11.36v-8.04H7.08v-3.32h3.05V9.54c0-2.88 1.79-4.47 4.54-4.47 1.32 0 2.69.23 2.69.23v2.83h-1.52c-1.49 0-1.96.89-1.96 1.8v2.16h3.34l-.53 3.32h-2.81v8.04C19.61 22.49 24 17.72 24 12.07z"/>
                         </svg>
-                        Facebook
                     </span>
                 </div>
 
