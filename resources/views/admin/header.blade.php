@@ -22,7 +22,7 @@
       <div class="admin-notifications dropdown">
         <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Admin notifications">
           <i class="fa fa-bell" aria-hidden="true"></i>
-          @if($headerNotificationCount > 0)<span class="admin-notification-count" aria-label="{{ $headerNotificationCount }} notifications">{{ $headerNotificationCount }}</span>@endif
+          @if($headerNotificationCount > 0)<span id="adminNotificationCount" class="admin-notification-count" aria-label="{{ $headerNotificationCount }} notifications">{{ $headerNotificationCount }}</span>@endif
         </button>
         <div class="dropdown-menu dropdown-menu-right admin-user-menu admin-notification-menu" aria-labelledby="adminNotificationMenu">
           <div class="admin-notification-title">Notifications</div><div class="dropdown-divider"></div>
@@ -84,6 +84,25 @@
       photoInput.addEventListener('change', function () {
         if (photoInput.files.length) photoInput.form.submit();
       });
+    }
+
+    var notificationButton = document.getElementById('adminNotificationMenu');
+    if (notificationButton) {
+      notificationButton.addEventListener('click', function () {
+        var count = document.getElementById('adminNotificationCount');
+        if (!count) return;
+
+        count.remove();
+        fetch('{{ route('admin.notifications.read') }}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+          }
+        });
+      }, { once: true });
     }
   });
 </script>

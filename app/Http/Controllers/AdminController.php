@@ -215,6 +215,15 @@ class AdminController extends Controller
         return view('admin.order', compact('data', 'availableRiders'));
     }
 
+    public function markNotificationsRead(Request $request)
+    {
+        $this->requireAdmin();
+
+        session(['admin_notifications_seen_at' => now()->toDateTimeString()]);
+
+        return response()->noContent();
+    }
+
     public function sales_report(Request $request)
     {
         $this->requireAdmin();

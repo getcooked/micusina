@@ -62,6 +62,11 @@ class AppServiceProvider extends ServiceProvider
                 ->orderBy('title')
                 ->get();
 
+            $notificationsSeenAt = session('admin_notifications_seen_at');
+            $unreadNotificationCount = $notificationsSeenAt
+                ? 0
+                : $lowStockFoods->count() + $newUserCount + $pendingOrderCount + $pendingReservationCount;
+
             $view->with([
                 'headerLowStockFoods' => $lowStockFoods,
                 'headerLowStockThreshold' => $threshold,
@@ -69,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
                 'headerPendingOrderCount' => $pendingOrderCount,
                 'headerUnreadPendingOrderCount' => $unreadPendingOrderCount,
                 'headerPendingReservationCount' => $pendingReservationCount,
-                'headerNotificationCount' => $lowStockFoods->count() + $newUserCount + $pendingOrderCount + $pendingReservationCount,
+                'headerNotificationCount' => $unreadNotificationCount,
             ]);
         });
 

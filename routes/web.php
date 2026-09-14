@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::redirect('/home', '/dashboard');
     Route::post('/customer/logout', [HomeController::class, 'logout'])->name('customer.logout');
     Route::post('/admin/profile-photo', [AdminController::class, 'update_profile_photo'])->name('admin.profile-photo.update');
+    Route::post('/admin/notifications/read', [AdminController::class, 'markNotificationsRead'])->name('admin.notifications.read');
     Route::post('/customer/profile-photo', [HomeController::class, 'update_profile_photo'])->name('customer.profile-photo.update');
 
     Route::get('/add_food', [AdminController::class, 'add_food']);
