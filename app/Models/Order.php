@@ -4,9 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -31,26 +28,6 @@ class Order extends Model
         'confirmed_by',
         'confirmed_at',
     ];
-
-    protected static function booted(): void
-    {
-        static::creating(function (Order $order): void {
-            if (Schema::hasColumn('orders', 'user_id') && ! $order->user_id && Auth::check()) {
-                $order->user_id = Auth::id();
-            }
-
-            if (Schema::hasColumn('orders', 'checkout_group_id') && ! $order->checkout_group_id && ! app()->runningInConsole() && app()->bound('request')) {
-                $request = request();
-                $attribute = 'micusina_order_checkout_group_id';
-
-                if (! $request->attributes->has($attribute)) {
-                    $request->attributes->set($attribute, (string) Str::uuid());
-                }
-
-                $order->checkout_group_id = $request->attributes->get($attribute);
-            }
-        });
-    }
 
     public function rider()
     {

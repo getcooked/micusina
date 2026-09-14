@@ -205,15 +205,20 @@ class MobileApiController extends Controller
     public function orders(Request $request): JsonResponse
     {
         $user = $request->user();
-        $orders = Order::query()
-            ->where(function ($query) use ($user) {
+        $orders = Order::query();
+
+        if (Schema::hasColumn('orders', 'user_id')) {
+            $orders->where(function ($query) use ($user) {
                 $query->where('user_id', $user->id)
                     ->orWhere(function ($legacy) use ($user) {
                         $legacy->whereNull('user_id')->where('email', $user->email);
                     });
-            })
-            ->latest()
-            ->get();
+            });
+        } else {
+            $orders->where('email', $user->email);
+        }
+
+        $orders = $orders->latest()->get();
 
         return response()->json(['orders' => $orders]);
     }
@@ -302,7 +307,7 @@ class MobileApiController extends Controller
         $nextStatus = $data['delivery_status'];
 
         $updatedOrder = DB::transaction(function () use ($order, $user, $nextStatus): Order {
-            if ($order->checkout_group_id) {
+            if (Schema::hasColumn('orders', 'checkout_group_id') && $order->checkout_group_id) {
                 $relatedOrders = Order::query()
                     ->where('checkout_group_id', $order->checkout_group_id)
                     ->orderBy('id')
