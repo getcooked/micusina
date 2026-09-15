@@ -27,6 +27,7 @@
 /android-app/*.jks
 /android-app/*.keystore
 /android-app/keystore.properties
+/android-app/.signing/
 Homestead.json
 Homestead.yaml
 Thumbs.db

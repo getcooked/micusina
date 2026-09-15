@@ -295,6 +295,7 @@ class MainActivity : Activity() {
         root.addView(secondaryButton("Create customer account") { openWebsite("/register") }, topMargin(dp(14)))
         root.addView(textButton("Forgot your password?") { openWebsite("/forgot-password") }, topMargin(dp(10)))
         root.addView(caption("By continuing, you agree to use Mi Cusina's secure ordering service.").apply { gravity = Gravity.CENTER; textAlignment = View.TEXT_ALIGNMENT_CENTER }, topMargin(dp(18)))
+        root.addView(caption("Mi Cusina ${BuildConfig.VERSION_NAME} · Native mobile app").apply { gravity = Gravity.CENTER }, topMargin(dp(12)))
         setContentView(scroll)
     }
 

@@ -100,12 +100,83 @@ a separately reviewed cleanup, and store the replacement only in protected CI
 secrets. `.gitignore` now prevents new keystores and Android build outputs from
 being added accidentally.
 
-The APK currently stored at `public/downloads/Mi-Cusina.apk` is the legacy
-v2.7.0 debuggable build signed with Android's debug certificate. The v3 build
-must not overwrite that download until it is signed with a protected production
-key and verified. Direct-install users of the debug-signed package will need to
-uninstall it before installing the first properly signed production build;
-store-managed installs should follow the store's signing-key migration process.
+The website APK at `public/downloads/Mi-Cusina.apk` is the native v3 release.
+The previous v2.7.0 download was a debug-signed website wrapper that forced a
+1280px desktop viewport. It is not fixed by changing the website's phone CSS;
+customers must install the replacement APK. The new app opens a native sign-in
+screen and shows `Mi Cusina 3.0.0` below it. After sign-in, customers get Menu,
+Cart, Orders, Reserve, and Account tabs sized for the phone.
+
+Direct-install users must uninstall the old debug-signed app once before
+installing the first production-signed build. This clears on-device sessions
+and drafts; server-side accounts and orders remain on the server. Future
+releases must use this same production key and a higher version code so they
+can update in place. Store-managed installs should follow the store's
+signing-key migration process. The separate debug build is labeled
+`Mi Cusina Preview` and must never be used for the customer download.
+
+### Local Windows signing helper
+
+`build-release.ps1` keeps the production keystore in the ignored `.signing/`
+directory outside the web root. It restricts access to the creating Windows
+account and SYSTEM, and encrypts the generated password using Windows DPAPI.
+No key or password is checked in, printed, or passed as a command-line value.
+Set `JAVA_HOME` to your JDK 17 installation and `ANDROID_HOME` to the SDK first.
+
+One-time creation of a **new** signing identity (never run this to update an
+already signed app):
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-release.ps1 -InitializeSigning
+```
+
+Build, test, and stage subsequent releases with the existing protected key:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\build-release.ps1 -StageWebsiteApk
+```
+
+The execution-policy setting applies only to this helper process. The helper
+refuses to initialize over an existing `.signing/` directory. It decrypts the
+password only for the build process, then restores previous environment
+settings. This helper does not push or deploy anything.
+
+**Key backup is essential before public distribution.** The DPAPI password
+file is tied to the current Windows account and computer; copying `.signing/`
+alone is not a portable recovery plan. Securely store both the PKCS12 keystore
+and its decrypted password in your organization's protected backup/password
+manager while you still have access to this account. Never commit these files,
+put them in `public/`, or send the password in chat. Losing this identity means
+existing direct installs cannot accept future updates signed with a new key.
+
+### Updating the website download
+
+With signing configured locally or through protected CI settings, run:
+
+```powershell
+.\gradlew.bat --no-daemon :app:stageWebsiteApk
+```
+
+This task runs release lint, navigation tests, and release assembly, verifies
+the APK's signature and native launcher, rejects debug certificates and
+debuggable/wrong-package builds, and atomically replaces only
+`public/downloads/Mi-Cusina.apk`. A failed check preserves the previous APK.
+Keep the generated AAB and R8 mapping with your release archive.
+
+Commit/push the verified public APK and deploy the matching Laravel revision
+separately (see `../HOSTINGER.md`). Local builds do not change the live phone
+download or an already installed app. After deployment, download
+`https://micusina-pos.com/download-app`, confirm the downloaded file's SHA-256
+matches the staged artifact, and install it on a physical phone. Do not copy
+the private `.signing/` directory to the website host.
+
+The initial native customer release is version `3.0.0` (code `19`), 8,632,685
+bytes. Its APK SHA-256 is
+`763BC332D10B2FC0456EE415349965AABF5236FFE24D53C9BD770EA8224514AC`.
+The production certificate SHA-256 fingerprint is
+`F694D12923069530FE9540CF6C3852D6F1BBAB6A4B6192B0D7BA3B065A7562D5`.
+These are public verification values, not signing secrets. Update the APK
+checksum for each release; keep the signing certificate unchanged for updates.
 
 ## Build and verify
 
