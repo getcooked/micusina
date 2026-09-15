@@ -320,9 +320,9 @@ class MainActivity : Activity() {
         cartTab = null
         pageGeneration++
         currentDestination = destination
-        detailReturnDestination = if (detail) AppNavigation.parent(destination, role) ?: returnTo else null
+        detailReturnDestination = AppNavigation.parent(destination, role) ?: if (detail) returnTo else null
         val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(BACKGROUND) }
-        root.addView(appBar(titleText, detail), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64)))
+        root.addView(appBar(titleText, detail, showBack = destination == "cart"), LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64)))
         val scroll = ScrollView(this).apply { isFillViewport = true; overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS }
         pageScroll = scroll
         page = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(18), dp(20), dp(18), dp(28)) }
@@ -346,13 +346,13 @@ class MainActivity : Activity() {
         restoreScrollPosition(pageGeneration)
     }
 
-    private fun appBar(titleText: String, detail: Boolean): View = LinearLayout(this).apply {
+    private fun appBar(titleText: String, detail: Boolean, showBack: Boolean = false): View = LinearLayout(this).apply {
         orientation = LinearLayout.HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
         setPadding(dp(14), dp(6), dp(14), dp(6))
         background = rounded(SURFACE, 0f)
         elevation = dp(3).toFloat()
-        if (detail) {
+        if (detail || showBack) {
             addView(iconAction("‹", "Go back") { handleBack() }, LinearLayout.LayoutParams(dp(48), dp(48)))
         } else {
             addView(TextView(this@MainActivity).apply {
@@ -365,7 +365,7 @@ class MainActivity : Activity() {
             maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END
         }, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
         if (!detail) {
-            if (currentDestination != "more") {
+            if (currentDestination !in listOf("more", "help")) {
                 addView(ImageView(this@MainActivity).apply {
                     setImageResource(R.drawable.ic_nav_refresh)
                     imageTintList = ColorStateList.valueOf(PRIMARY_DARK)
@@ -375,63 +375,81 @@ class MainActivity : Activity() {
                     setOnClickListener { navigate(currentDestination) }
                 }, LinearLayout.LayoutParams(dp(48), dp(48)))
             }
-            val initial = userName.trim().firstOrNull()?.uppercase() ?: "U"
-            addView(TextView(this@MainActivity).apply {
-                text = initial; textSize = 15f; gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK)
-                background = ripple(PRIMARY_SOFT, dp(24).toFloat()); contentDescription = "Open account"; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { navigate("more") }
-            }, LinearLayout.LayoutParams(dp(48), dp(48)))
+            if (!isStaff()) {
+                addView(cartShortcut(), LinearLayout.LayoutParams(dp(48), dp(48)))
+            } else {
+                val initial = userName.trim().firstOrNull()?.uppercase() ?: "U"
+                addView(TextView(this@MainActivity).apply {
+                    text = initial; textSize = 15f; gravity = Gravity.CENTER; typeface = Typeface.DEFAULT_BOLD; setTextColor(PRIMARY_DARK)
+                    background = ripple(PRIMARY_SOFT, dp(24).toFloat()); contentDescription = "Open account"; isFocusable = true; accessibilityDelegate = buttonAccessibility; setOnClickListener { navigate("more") }
+                }, LinearLayout.LayoutParams(dp(48), dp(48)))
+            }
         }
+    }
+
+    private fun cartShortcut(): View = FrameLayout(this).apply {
+        background = ripple(PRIMARY_SOFT, dp(24).toFloat())
+        contentDescription = "Cart, empty"
+        isFocusable = true
+        accessibilityDelegate = buttonAccessibility
+        setOnClickListener { navigate("cart") }
+        addView(ImageView(this@MainActivity).apply {
+            setImageResource(R.drawable.ic_nav_cart)
+            imageTintList = ColorStateList.valueOf(PRIMARY_DARK)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }, FrameLayout.LayoutParams(dp(24), dp(24), Gravity.CENTER))
+        cartBadge = TextView(this@MainActivity).apply {
+            textSize = 10f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER
+            setTextColor(Color.WHITE); background = rounded(PRIMARY_DARK, dp(10).toFloat())
+            setPadding(dp(3), 0, dp(3), 0); minimumWidth = dp(18)
+            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+        }
+        addView(cartBadge, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(18), Gravity.TOP or Gravity.END))
+        cartTab = this
+        updateCartBadge()
     }
 
     private data class Destination(val id: String, val label: String, val icon: Int)
 
     private fun bottomNavigation(selected: String, rail: Boolean = false): View {
-        cartBadge = null
-        cartTab = null
         val destinations = listOf(
             Destination("dashboard", "Home", R.drawable.ic_nav_home),
             Destination("staff_orders", "Orders", R.drawable.ic_nav_orders),
             Destination("inventory", "Inventory", R.drawable.ic_nav_inventory),
             Destination("menu", "Menu", R.drawable.ic_nav_menu),
-            Destination("cart", "Cart", R.drawable.ic_nav_cart),
             Destination("orders", "Orders", R.drawable.ic_nav_orders),
             Destination("reserve", "Reserve", R.drawable.ic_nav_reserve),
+            Destination("help", "Help", R.drawable.ic_nav_help),
             Destination("more", "Account", R.drawable.ic_nav_account),
         )
         val available = AppNavigation.destinations(role, staffRole).map { key -> destinations.first { it.id == key } }
+        val selectedTab = AppNavigation.topLevel(selected, role, staffRole)
         return LinearLayout(this).apply {
             orientation = if (rail) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL
             gravity = if (rail) Gravity.TOP else Gravity.CENTER
             setPadding(dp(6), dp(8), dp(6), dp(8)); setBackgroundColor(SURFACE); elevation = dp(8).toFloat()
             available.forEach { item ->
-                val active = selected == item.id
+                val active = selectedTab == item.id
                 addView(LinearLayout(this@MainActivity).apply {
                     orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; isClickable = true; isFocusable = true
                     minimumHeight = dp(60); setPadding(dp(2), dp(6), dp(2), dp(6)); isSelected = active
-                    background = ripple(if (active) PRIMARY_SOFT else Color.TRANSPARENT, dp(18).toFloat()); contentDescription = item.label
+                    background = ripple(Color.TRANSPARENT, dp(18).toFloat()); contentDescription = item.label
                     accessibilityDelegate = buttonAccessibility
-                    val iconFrame = FrameLayout(this@MainActivity)
+                    val iconFrame = FrameLayout(this@MainActivity).apply {
+                        background = rounded(if (active) PRIMARY_SOFT else Color.TRANSPARENT, dp(16).toFloat())
+                        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+                    }
                     iconFrame.addView(ImageView(this@MainActivity).apply {
                         setImageResource(item.icon); imageTintList = ColorStateList.valueOf(if (active) PRIMARY_DARK else TEXT_MUTED)
                         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
                     }, FrameLayout.LayoutParams(dp(23), dp(23), Gravity.CENTER))
-                    if (item.id == "cart") {
-                        cartTab = this
-                        cartBadge = TextView(this@MainActivity).apply {
-                            textSize = 10f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER
-                            setTextColor(Color.WHITE); background = rounded(PRIMARY_DARK, dp(10).toFloat())
-                            setPadding(dp(3), 0, dp(3), 0); minimumWidth = dp(18)
-                            importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
-                        }
-                        iconFrame.addView(cartBadge, FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(18), Gravity.TOP or Gravity.END))
-                    }
-                    addView(iconFrame, LinearLayout.LayoutParams(dp(42), dp(28)))
+                    addView(iconFrame, LinearLayout.LayoutParams(dp(48), dp(32)))
                     addView(TextView(this@MainActivity).apply {
                         text = item.label; textSize = 11f; gravity = Gravity.CENTER; typeface = if (active) Typeface.DEFAULT_BOLD else Typeface.DEFAULT; setTextColor(if (active) PRIMARY_DARK else TEXT_MUTED)
                         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
                     }, topMargin(dp(2)))
                     setOnClickListener {
-                        if (!active) navigate(item.id)
+                        if (selected != item.id) navigate(item.id)
                         else if (!blockNavigationDuringMutation()) {
                             scrollPositions.putInt(item.id, 0)
                             pageScroll?.smoothScrollTo(0, 0)
@@ -451,6 +469,7 @@ class MainActivity : Activity() {
         hideKeyboard()
         when (resolved) {
             "menu" -> showMenu(); "cart" -> showCart(); "orders" -> showOrders(); "reserve" -> showReservations()
+            "help" -> showHelp()
             "dashboard" -> showDashboard(); "staff_orders" -> showStaffOrders(); "inventory" -> showInventory()
             "gallery" -> showGallery(); "more" -> showMore()
             "checkout" -> showCheckout(); "booking" -> showReservationForm(); "success" -> showOrderSuccess()
@@ -978,9 +997,58 @@ class MainActivity : Activity() {
         page.addView(sectionTitle("Explore"), topMargin(dp(24)))
         page.addView(settingsRow("Food gallery", "Bundled Mi Cusina favorites", android.R.drawable.ic_menu_gallery) { showGallery() }, topMargin(dp(10)))
         page.addView(settingsRow("Visit Mi Cusina online", "Open our secure website", android.R.drawable.ic_menu_compass) { openWebsite("/") }, topMargin(dp(8)))
-        page.addView(settingsRow("Help & contact", "Get support from the restaurant", android.R.drawable.ic_menu_help) { openWebsite("/?section=contact") }, topMargin(dp(8)))
+        page.addView(settingsRow("Help & contact", "Get support from the restaurant", R.drawable.ic_nav_help) {
+            if (isStaff()) openWebsite("/?section=contact") else navigate("help")
+        }, topMargin(dp(8)))
         page.addView(secondaryButton("Sign out") { confirm("Sign out?", "You'll need your password to sign in again.") { logout() } }, topMargin(dp(24)))
         page.addView(caption("Mi Cusina ${BuildConfig.VERSION_NAME} · Secure native app").apply { gravity = Gravity.CENTER }, topMargin(dp(20)))
+    }
+
+    private fun showHelp() {
+        showShell("Help", "help")
+        page.addView(title("How can we help?", 27f))
+        page.addView(caption("Quick answers and support from Mi Cusina."), topMargin(dp(6)))
+        page.addView(settingsRow("My orders", "Check the latest status of your order", R.drawable.ic_nav_orders) {
+            navigate("orders")
+        }, topMargin(dp(20)))
+        page.addView(settingsRow("My reservations", "Review bookings or resume a pending payment", R.drawable.ic_nav_reserve) {
+            navigate("reserve")
+        }, topMargin(dp(10)))
+
+        page.addView(sectionTitle("Get in touch"), topMargin(dp(24)))
+        page.addView(settingsRow("Call Mi Cusina", getString(R.string.support_phone), android.R.drawable.ic_menu_call) {
+            openSupportApp(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${getString(R.string.support_phone)}")))
+        }, topMargin(dp(12)))
+        page.addView(settingsRow("Email Mi Cusina", getString(R.string.support_email), android.R.drawable.ic_dialog_email) {
+            openSupportApp(Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", getString(R.string.support_email), null)))
+        }, topMargin(dp(10)))
+        page.addView(card().apply {
+            orientation = LinearLayout.VERTICAL
+            addView(sectionTitle("Visit us"))
+            addView(bodyText(getString(R.string.support_address)), topMargin(dp(6)))
+        }, topMargin(dp(10)))
+
+        page.addView(sectionTitle("Common questions"), topMargin(dp(24)))
+        listOf(
+            "Where is my cart?" to "Tap the cart icon at the top-right. Its badge shows the number of items. Review your quantities there, then continue to checkout.",
+            "How do I reserve a table?" to "Open Reserve and tap Book a table. Complete the details, then continue to the secure payment page. You can review your bookings under Reserve.",
+            "My payment or checkout was interrupted" to "Open Orders or Reserve and refresh the list before trying again. An interrupted request may already have completed. Pending reservations can offer a Resume payment button.",
+            "How do I update my account or sign out?" to "Open Account to review your profile, visit the website, or sign out. Do not send your password or authentication code when contacting support."
+        ).forEach { (question, answer) ->
+            page.addView(card().apply {
+                orientation = LinearLayout.VERTICAL
+                addView(sectionTitle(question))
+                addView(bodyText(answer), topMargin(dp(8)))
+            }, topMargin(dp(12)))
+        }
+    }
+
+    private fun openSupportApp(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (_: android.content.ActivityNotFoundException) {
+            toast("No compatible app is installed. Use the contact details shown on this screen.")
+        }
     }
 
     private fun showGallery() {

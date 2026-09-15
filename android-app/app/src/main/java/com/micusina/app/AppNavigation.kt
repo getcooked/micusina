@@ -8,21 +8,35 @@ object AppNavigation {
             "rider" -> listOf("dashboard", "staff_orders", "more")
             else -> listOf("dashboard", "inventory", "more")
         }
-        else -> listOf("menu", "cart", "orders", "reserve", "more")
+        else -> listOf("menu", "reserve", "orders", "help", "more")
     }
 
     fun home(role: String): String = if (isStaff(role)) "dashboard" else "menu"
 
     fun resolve(destination: String?, role: String, staffRole: String): String {
-        val allowed = destinations(role, staffRole)
-        if (destination != null && (destination in allowed || parent(destination, role) in allowed)) {
+        if (destination != null && authorizedTopLevel(destination, role, staffRole) != null) {
             return destination
         }
         return home(role)
     }
 
+    fun topLevel(destination: String, role: String, staffRole: String): String =
+        authorizedTopLevel(destination, role, staffRole) ?: home(role)
+
+    private fun authorizedTopLevel(destination: String, role: String, staffRole: String): String? {
+        val allowed = destinations(role, staffRole)
+        val visited = mutableSetOf<String>()
+        var current: String? = destination
+        while (current != null && visited.add(current)) {
+            if (current in allowed) return current
+            current = parent(current, role)
+        }
+        return null
+    }
+
     fun parent(destination: String, role: String): String? = when (destination) {
         "gallery" -> "more"
+        "cart" -> if (isStaff(role)) null else "menu"
         "checkout" -> if (isStaff(role)) null else "cart"
         "booking" -> if (isStaff(role)) null else "reserve"
         "success" -> if (isStaff(role)) null else "orders"

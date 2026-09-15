@@ -11,6 +11,7 @@ destinations. The former injected-WebView shell has been retired.
 - Administrator inventory updates
 - Role-aware bottom navigation and in-app loading, error, empty, and retry states
 - Scrollable navigation rail on wide screens, accessible controls, and a cart count badge
+- Customer Help tab with common questions, order/reservation shortcuts, and call/email handoff
 - Restored navigation, menu search, scroll position, and checkout/reservation drafts
 - External browser handoff for registration, website support, and payment pages
 
@@ -21,13 +22,22 @@ does not ask users to choose or impersonate a role.
 
 | Account | Main destinations |
 | --- | --- |
-| Customer | Menu, Cart, Orders, Reserve, Account |
+| Customer | Menu, Reserve, Orders, Help, Account |
 | Administrator / cashier | Home, Orders, Inventory, Account |
 | Rider | Home, Orders, Account |
 | Other staff | Home, Inventory, Account |
 
+The customer bar follows the reference's five-tab order while preserving
+Mi Cusina's original pink, purple, and white palette. The selected icon has a
+rounded indicator, with its label below. Cart is always available from the
+top-right toolbar on customer tabs, including its live item-count badge; it
+does not take up a sixth bottom tab. Cart keeps Menu selected, and tapping Menu
+from Cart returns to the menu. Help uses the contact details already published
+in `resources/views/home/footer.blade.php`; call/email buttons open the phone's
+dialer/mail app and never place a call or send a message automatically.
+
 Only administrators can edit inventory. Back returns from checkout to Cart,
-from a reservation form to Reserve, and from the gallery to Account. Reselecting
+then Menu, from a reservation form to Reserve, and from the gallery to Account. Reselecting
 the active tab scrolls to the top; the toolbar refresh action reloads current
 data without clearing the menu search. Tabs move into a scrollable side rail at
 600dp screen width; the content remains scrollable when the keyboard is open.
@@ -104,8 +114,8 @@ The website APK at `public/downloads/Mi-Cusina.apk` is the native v3 release.
 The previous v2.7.0 download was a debug-signed website wrapper that forced a
 1280px desktop viewport. It is not fixed by changing the website's phone CSS;
 customers must install the replacement APK. The new app opens a native sign-in
-screen and shows `Mi Cusina 3.0.0` below it. After sign-in, customers get Menu,
-Cart, Orders, Reserve, and Account tabs sized for the phone.
+screen and shows the installed version below it. After sign-in, customers get
+Menu, Reserve, Orders, Help, and Account tabs sized for the phone.
 
 Direct-install users must uninstall the old debug-signed app once before
 installing the first production-signed build. This clears on-device sessions
@@ -170,13 +180,16 @@ download or an already installed app. After deployment, download
 matches the staged artifact, and install it on a physical phone. Do not copy
 the private `.signing/` directory to the website host.
 
-The initial native customer release is version `3.0.0` (code `19`), 8,632,685
+The current native customer release is version `3.1.0` (code `20`), 8,635,217
 bytes. Its APK SHA-256 is
-`763BC332D10B2FC0456EE415349965AABF5236FFE24D53C9BD770EA8224514AC`.
+`C656EDA4E6F6AE59CFB3E4178F13BC3D14EA7124EFA271629FE3E4DB23FFA5D2`.
 The production certificate SHA-256 fingerprint is
 `F694D12923069530FE9540CF6C3852D6F1BBAB6A4B6192B0D7BA3B065A7562D5`.
 These are public verification values, not signing secrets. Update the APK
 checksum for each release; keep the signing certificate unchanged for updates.
+Version 3.1.0 uses the same certificate as native v3.0.0, so those installations
+can update without uninstalling. Only the old debug-signed v2.7.0 wrapper needs
+the one-time uninstall described above.
 
 ## Build and verify
 
@@ -217,6 +230,13 @@ payment callbacks/webhooks.
 ### Device smoke checks
 
 - Sign in as a customer, a cashier, and a rider; confirm each gets only its tabs.
+- Confirm the customer bar reads Menu, Reserve, Orders, Help, Account, with the
+  original colors, a visible selected indicator, and no clipping at 320dp width.
+- Open Cart from each customer tab; check its badge and Back to Menu. Checkout
+  must still open and Back must return to Cart. Tapping Menu from Cart returns
+  to the menu rather than only scrolling Cart.
+- After signing in, turn off connectivity and open Help; then test order/reservation shortcuts and
+  call/email handoff (also on a device without a dialer/mail app).
 - Complete the authenticator challenge for a two-factor-enabled account.
 - Add, increment, remove, and checkout items; confirm the badge and totals update.
 - Rotate during menu search and during an unfinished form; check the draft and tab.

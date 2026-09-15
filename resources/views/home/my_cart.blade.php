@@ -730,6 +730,11 @@
             padding: 24px clamp(18px, 5vw, 72px);
         }
 
+        /* Keep the standalone cart below the fixed navbar without a page title. */
+        body:not(.cart-embed) .cart-page {
+            padding-top: 120px;
+        }
+
         .cart-title {
             color: #20232b;
             font-size: 24px !important;
@@ -955,10 +960,6 @@
     @endif
 
     <main class="cart-page">
-        @if(!$embeddedCart)
-            <h1 class="cart-title">Cart Page</h1>
-        @endif
-
         <section class="cart-shell">
             @php
                 $total_price = 0;

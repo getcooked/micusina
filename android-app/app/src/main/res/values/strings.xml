@@ -4,4 +4,7 @@
     <string name="login_validation_error">Enter a valid email address and password.</string>
     <string name="two_factor_validation_error">Enter the 6-digit code from your authenticator app.</string>
     <string name="remove">Remove</string>
+    <string name="support_phone">09672045250</string>
+    <string name="support_email">micusina@gmail.com</string>
+    <string name="support_address">Barangay Bunakan, Madridejos, Cebu, in front of Madridejos Community College</string>
 </resources>
