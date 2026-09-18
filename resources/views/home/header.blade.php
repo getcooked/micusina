@@ -805,7 +805,7 @@
                 <a class="active" href="{{ url('/') }}">Home</a>
                 <a href="{{ url('/?section=food') }}">Menu</a>
                 <a href="{{ url('/?section=book') }}">Book Table</a>
-                <a class="burger-download" href="{{ route('mobile-app.download') }}">Download App</a>
+                <a class="burger-download" href="{{ route('mobile-app.install') }}">Download App</a>
             </nav>
             <div class="burger-login">
                 @if (Route::has('login'))

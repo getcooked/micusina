@@ -19,6 +19,8 @@ Route::middleware(['signed', 'throttle:20,1'])->group(function () {
 
 route::get('/', [HomeController::class, 'my_home']);
 
+Route::view('/install-app', 'home.install-app')->name('mobile-app.install');
+
 Route::get('/download-app', function () {
     return response()->download(public_path('downloads/Mi-Cusina.apk'), 'Mi-Cusina.apk', [
         'Content-Type' => 'application/vnd.android.package-archive',

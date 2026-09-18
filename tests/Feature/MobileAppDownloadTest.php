@@ -38,6 +38,14 @@ class MobileAppDownloadTest extends TestCase
         $this->assertApkDownload($response);
     }
 
+    public function test_guests_can_open_installation_instructions_before_downloading(): void
+    {
+        $this->get(route('mobile-app.install'))
+            ->assertOk()
+            ->assertSee('Install Mi Cusina')
+            ->assertSee(route('mobile-app.download'), false);
+    }
+
     public function test_customers_can_download_the_published_android_apk(): void
     {
         $customer = User::factory()->create(['usertype' => 'user']);
@@ -78,7 +86,7 @@ class MobileAppDownloadTest extends TestCase
         $document->loadHTML($html, LIBXML_NOERROR | LIBXML_NOWARNING);
 
         $links = (new DOMXPath($document))->query(
-            '//nav[@aria-label="Primary"]//a[@href="'.route('mobile-app.download').'"]'
+            '//nav[@aria-label="Primary"]//a[@href="'.route('mobile-app.install').'"]'
         );
 
         $this->assertCount(1, $links);
