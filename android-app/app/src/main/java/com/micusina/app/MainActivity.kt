@@ -34,6 +34,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -515,34 +516,60 @@ class MainActivity : Activity() {
         showShell("Menu", "menu")
         val generation = pageGeneration
         page.addView(title("What are you craving?", 27f))
-        page.addView(caption("Explore today's freshly prepared Mi Cusina favorites."), topMargin(dp(4)))
+        page.addView(caption("Choose a category, then add your favorites to cart."), topMargin(dp(4)))
+        val categoryScroll = HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false; overScrollMode = View.OVER_SCROLL_NEVER }
+        val categories = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        categoryScroll.addView(categories, ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
+        page.addView(categoryScroll, topMargin(dp(16)))
         val search = field("Search the menu", InputType.TYPE_CLASS_TEXT).apply {
             setCompoundDrawablesWithIntrinsicBounds(android.R.drawable.ic_menu_search, 0, 0, 0); compoundDrawablePadding = dp(10); imeOptions = EditorInfo.IME_ACTION_SEARCH
             setText(menuQuery)
         }
         search.addTextChangedListener(SimpleTextWatcher { menuQuery = it })
-        page.addView(search, topMargin(dp(18)))
+        page.addView(search, topMargin(dp(14)))
         val list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         page.addView(list, topMargin(dp(16)))
         showLoading(list, "Loading today's menu…")
         request("GET", "/foods", onSuccess = { response ->
             if (generation != pageGeneration) return@request
             val foods = response.getJSONArray("foods").objects()
+            var selectedCategory = "All"
             fun render(query: String = "") {
                 list.removeAllViews()
                 val filtered = foods.filter {
                     val haystack = "${it.optString("title")} ${it.optString("detail")}".lowercase(Locale.getDefault())
-                    haystack.contains(query.trim().lowercase(Locale.getDefault()))
+                    (selectedCategory == "All" || it.optString("category", "All menu") == selectedCategory) &&
+                        haystack.contains(query.trim().lowercase(Locale.getDefault()))
                 }
                 if (filtered.isEmpty()) showEmpty(list, "No dishes found", "Try a different search.")
                 else filtered.forEach { list.addView(foodCard(it), bottomMargin(dp(12))) }
             }
+            fun renderCategories() {
+                categories.removeAllViews()
+                (listOf("All") + foods.map { it.optString("category", "All menu").ifBlank { "All menu" } }.distinct()).forEach { category ->
+                    categories.addView(menuCategoryChip(category, category == selectedCategory) {
+                        selectedCategory = category
+                        scrollPositions.remove("menu")
+                        renderCategories()
+                        render(search.text.toString())
+                    }, marginParams(0, 0).apply { rightMargin = dp(8) })
+                }
+            }
+            renderCategories()
             render(search.text.toString())
             search.addTextChangedListener(SimpleTextWatcher {
                 scrollPositions.remove("menu")
                 render(it)
             })
         }, onError = { message, _ -> if (generation == pageGeneration) showRetry(list, "Menu unavailable", message) { showMenu() } })
+    }
+
+    private fun menuCategoryChip(label: String, active: Boolean, action: () -> Unit): TextView = TextView(this).apply {
+        text = label; textSize = 13f; typeface = Typeface.DEFAULT_BOLD; gravity = Gravity.CENTER; minHeight = dp(42)
+        setPadding(dp(16), 0, dp(16), 0); setTextColor(if (active) Color.WHITE else PRIMARY_DARK)
+        background = if (active) ripple(PRIMARY_DARK, dp(21).toFloat()) else ripple(SURFACE, dp(21).toFloat())
+        contentDescription = "Show $label menu items"; isFocusable = true; accessibilityDelegate = buttonAccessibility
+        setOnClickListener { action() }
     }
 
     private fun foodCard(food: JSONObject): View {

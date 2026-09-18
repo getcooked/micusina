@@ -77,22 +77,23 @@
     }
 
     .foods-table th:nth-child(1), .foods-table td:nth-child(1) { width:12%; }
-    .foods-table th:nth-child(2), .foods-table td:nth-child(2) { width:25%; }
-    .foods-table th:nth-child(3), .foods-table td:nth-child(3) { width:6%; }
+    .foods-table th:nth-child(2), .foods-table td:nth-child(2) { width:20%; }
+    .foods-table th:nth-child(3), .foods-table td:nth-child(3) { width:10%; }
     .foods-table th:nth-child(4), .foods-table td:nth-child(4) { width:5%; }
-    .foods-table th:nth-child(5), .foods-table td:nth-child(5) { width:13%; }
-    .foods-table th:nth-child(6), .foods-table td:nth-child(6) { width:13%; }
-    .foods-table th:nth-child(7),
-    .foods-table td:nth-child(7)
+    .foods-table th:nth-child(5), .foods-table td:nth-child(5) { width:5%; }
+    .foods-table th:nth-child(6), .foods-table td:nth-child(6) { width:12%; }
+    .foods-table th:nth-child(7), .foods-table td:nth-child(7) { width:12%; }
+    .foods-table th:nth-child(8),
+    .foods-table td:nth-child(8)
     {
         text-align:center;
         width:10%;
     }
 
-    .foods-table th:nth-child(8),
-    .foods-table td:nth-child(8),
     .foods-table th:nth-child(9),
-    .foods-table td:nth-child(9)
+    .foods-table td:nth-child(9),
+    .foods-table th:nth-child(10),
+    .foods-table td:nth-child(10)
     {
         text-align:center;
         width:8%;
@@ -231,6 +232,7 @@
               <tr>
                 <th>Food Title</th>
                 <th>Details</th>
+                <th>Category</th>
                 <th>Price</th>
                 <th>Stock</th>
                 <th>Added At</th>
@@ -249,6 +251,7 @@
               <tr>
                 <td>{{ $data->title }}</td>
                 <td>{{ $data->detail }}</td>
+                <td>{{ $data->category ?? 'All menu' }}</td>
                 <td>&#8369;{{ $data->price }}</td>
                 <td>{{ $data->stock }}</td>
                 <td>

@@ -145,6 +145,11 @@
                 </div>
 
                  <div class="div_deg">
+                    <label for="">Menu Category</label>
+                    <input type="text" name="category" maxlength="80" value="{{ $food->category ?? 'All menu' }}" required>
+                </div>
+
+                 <div class="div_deg">
                     <label for="">Price</label>
                     <input type="text" name="price" value="{{ $food->price }}">
                 </div>

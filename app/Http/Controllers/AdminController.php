@@ -52,9 +52,10 @@ class AdminController extends Controller
         $this->requireAdmin();
 
         $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'details' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
+              'title' => ['required', 'string', 'max:255'],
+              'details' => ['required', 'string'],
+              'category' => ['required', 'string', 'max:80'],
+              'price' => ['required', 'numeric', 'min:0'],
             'stock' => ['required', 'integer', 'min:0'],
             'img' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
         ], [
@@ -66,7 +67,9 @@ class AdminController extends Controller
 
         $data->title = $request->title;
 
-        $data->detail = $request->details;
+          $data->detail = $request->details;
+
+          $data->category = $request->category;
 
         $data->price = $request->price;
 
@@ -157,9 +160,10 @@ class AdminController extends Controller
     $this->requireAdmin();
 
     $request->validate([
-        'title' => ['required', 'string', 'max:255'],
-        'details' => ['required', 'string'],
-        'price' => ['required', 'numeric', 'min:0'],
+          'title' => ['required', 'string', 'max:255'],
+          'details' => ['required', 'string'],
+          'category' => ['required', 'string', 'max:80'],
+          'price' => ['required', 'numeric', 'min:0'],
         'stock' => ['required', 'integer', 'min:0'],
         'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:51200'],
     ], [
@@ -171,7 +175,9 @@ class AdminController extends Controller
 
     $data->title = $request->title;
 
-    $data->detail = $request->details;
+      $data->detail = $request->details;
+
+      $data->category = $request->category;
 
     $data->price  = $request->price;
 

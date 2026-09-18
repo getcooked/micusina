@@ -381,7 +381,7 @@ class MobileApiController extends Controller
 
     private function food(Food $food): array
     {
-        return ['id' => $food->id, 'title' => $food->title, 'detail' => $food->detail, 'price' => $this->price($food->price), 'stock' => (int) $food->stock, 'image' => $food->image, 'image_url' => $this->foodImageUrl($food->image)];
+        return ['id' => $food->id, 'title' => $food->title, 'detail' => $food->detail, 'category' => $food->category ?: 'All menu', 'price' => $this->price($food->price), 'stock' => (int) $food->stock, 'image' => $food->image, 'image_url' => $this->foodImageUrl($food->image)];
     }
 
     private function user(User $user): array

@@ -97,6 +97,11 @@
         </div>
 
         <div class="div_deg">
+          <label for="">Menu category</label>
+          <input type="text" name="category" maxlength="80" placeholder="e.g. Meals, Burgers, Drinks" autocomplete="off" required>
+        </div>
+
+        <div class="div_deg">
           <label for="">Price</label>
           <input type="number" name="price" min="0" step="0.01" autocomplete="off" required>
         </div>

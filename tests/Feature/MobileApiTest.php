@@ -178,6 +178,15 @@ class MobileApiTest extends TestCase
             ->assertJsonPath('foods.0.image_url', asset('food_img/meal.jpg'));
     }
 
+    public function test_foods_include_the_menu_category_for_the_mobile_filters(): void
+    {
+        $this->food(['category' => 'Rice meals']);
+
+        $this->getJson('/api/mobile/foods')
+            ->assertOk()
+            ->assertJsonPath('foods.0.category', 'Rice meals');
+    }
+
     public function test_riders_only_receive_their_assigned_orders(): void
     {
         $rider = User::factory()->create(['usertype' => 'staff', 'staff_role' => 'rider']);
@@ -258,6 +267,7 @@ class MobileApiTest extends TestCase
         $food = new Food;
         $food->title = $attributes['title'] ?? 'Test Meal';
         $food->detail = $attributes['detail'] ?? 'Freshly prepared';
+        $food->category = $attributes['category'] ?? 'All menu';
         $food->price = $attributes['price'] ?? '100';
         $food->stock = $attributes['stock'] ?? 10;
         $food->image = $attributes['image'] ?? 'test-meal.jpg';
