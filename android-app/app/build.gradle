@@ -90,6 +90,10 @@ android {
         buildConfig = true
     }
 
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
+
     defaultConfig {
         applicationId = 'com.micusina.app'
         minSdk = 24
@@ -121,6 +125,7 @@ android {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16.1'
 }
 
 // A normal release build may be unsigned for CI. Website downloads must never be.
