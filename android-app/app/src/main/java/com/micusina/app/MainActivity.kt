@@ -1411,16 +1411,15 @@ class MainActivity : Activity() {
     } catch (_: Exception) { false }
     @Suppress("DEPRECATION")
     private fun configureWindow() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.insetsController?.setSystemBarsAppearance(
-                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
-                android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
-            )
-        } else {
-            var systemUiFlags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) systemUiFlags = systemUiFlags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-            window.decorView.systemUiVisibility = systemUiFlags
-        }
+        // Some Android 15/16 devices create the insets controller only after a
+        // content view is attached. Accessing window.insetsController here can
+        // therefore crash the launcher before the sign-in screen is drawn.
+        // The decor-view flags are safe at this point on every supported API.
+        var systemUiFlags = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) systemUiFlags = systemUiFlags or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        window.decorView.systemUiVisibility = systemUiFlags
+        window.statusBarColor = SURFACE
+        window.navigationBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) SURFACE else PRIMARY_DARK
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             val content = findViewById<View>(android.R.id.content)
@@ -1430,9 +1429,6 @@ class MainActivity : Activity() {
                 insets
             }
             content.requestApplyInsets()
-        } else {
-            window.statusBarColor = SURFACE
-            window.navigationBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) SURFACE else PRIMARY_DARK
         }
     }
     private fun money(value: Double): String = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("en-PH")).format(value)
