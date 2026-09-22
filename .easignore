@@ -1,0 +1,4 @@
+# Laravel runtime data is not part of the Expo Android app. In particular,
+# storage/app/public is a Windows symbolic link that cannot be archived by EAS.
+/storage/
+/public/storage

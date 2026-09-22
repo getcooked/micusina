@@ -5,7 +5,17 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "android": { "package": "com.micusina.mobile", "versionCode": 1 },
-    "ios": { "bundleIdentifier": "com.micusina.mobile" }
+    "android": {
+      "package": "com.micusina.mobile",
+      "versionCode": 1
+    },
+    "ios": {
+      "bundleIdentifier": "com.micusina.mobile"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5ec4bc81-b2d9-44c8-a628-dee15ca5a5a4"
+      }
+    }
   }
 }
