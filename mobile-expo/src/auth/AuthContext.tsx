@@ -1,0 +1,8 @@
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { authApi } from '../services/api';
+import type { User } from '../types';
+type RegisterInput = { name: string; email: string; phone: string; address: string; password: string; password_confirmation: string };
+type Auth = { user: User | null; loading: boolean; signIn: (email: string, password: string, code?: string) => Promise<{ twoFactorRequired: boolean; message?: string }>; signUp: (input: RegisterInput) => Promise<void>; signOut: () => Promise<void> };
+const AuthContext = createContext<Auth | null>(null);
+export function AuthProvider({ children }: { children: ReactNode }) { const [user, setUser] = useState<User | null>(null); const [loading, setLoading] = useState(true); useEffect(() => { authApi.restore().then(setUser).catch(() => authApi.logout()).finally(() => setLoading(false)); }, []); const signIn: Auth['signIn'] = async (email, password, code) => { const result = await authApi.login(email, password, code); if (result.user) setUser(result.user); return { twoFactorRequired: Boolean(result.two_factor_required), message: result.message }; }; const signUp: Auth['signUp'] = async input => { setUser(await authApi.register(input)); }; const signOut = async () => { await authApi.logout(); setUser(null); }; return <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>{children}</AuthContext.Provider>; }
+export const useAuth = () => { const context = useContext(AuthContext); if (!context) throw new Error('AuthProvider is required'); return context; };

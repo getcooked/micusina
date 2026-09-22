@@ -71,6 +71,32 @@ class MobileApiController extends Controller
         ]);
     }
 
+    /** Create a customer account and sign it into this device. */
+    public function register(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['required', 'regex:/^(09[0-9]{9}|\+639[0-9]{9})$/'],
+            'address' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'string', 'min:8', 'max:15', 'confirmed'],
+            'device_name' => ['nullable', 'string', 'max:80'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'usertype' => 'user',
+            'password' => Hash::make($data['password']),
+        ]);
+        $deviceName = trim((string) ($data['device_name'] ?? '')) ?: 'Expo mobile app';
+        $token = $user->createToken('mobile-app: '.$deviceName, ['mobile:customer'], now()->addDays(30))->plainTextToken;
+
+        return response()->json(['token' => $token, 'user' => $this->user($user)], 201);
+    }
+
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()?->delete();

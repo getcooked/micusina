@@ -10,6 +10,7 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('mobile')->middleware('throttle:120,1,mobile-api:')->group(function () {
     Route::post('/login', [MobileApiController::class, 'login'])->middleware('throttle:5,1,mobile-login:');
+    Route::post('/register', [MobileApiController::class, 'register'])->middleware('throttle:5,1,mobile-register:');
     Route::get('/foods', [MobileApiController::class, 'foods']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [MobileApiController::class, 'logout']);
