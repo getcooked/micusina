@@ -6,8 +6,12 @@ use App\Models\Cart;
 use App\Models\Food;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\RegistrationOtpSender;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Mockery\MockInterface;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
 use Laravel\Fortify\Fortify;
@@ -185,6 +189,45 @@ class MobileApiTest extends TestCase
         $this->getJson('/api/mobile/foods')
             ->assertOk()
             ->assertJsonPath('foods.0.category', 'Rice meals');
+    }
+
+    public function test_mobile_registration_sends_the_existing_email_otp_before_creating_a_user(): void
+    {
+        $this->mock(RegistrationOtpSender::class, function (MockInterface $mock) {
+            $mock->shouldReceive('sendEmail')->once()->andReturnTrue();
+        });
+
+        $response = $this->postJson('/api/mobile/register/send-verification', [
+            'name' => 'Mobile Customer',
+            'email' => 'mobile@example.com',
+            'phone' => '09171234567',
+            'address' => 'Santa Fe, Cebu',
+            'password' => 'secret123',
+            'password_confirmation' => 'secret123',
+        ]);
+
+        $response->assertStatus(202)->assertJsonStructure(['registration_id', 'expires_in']);
+        $this->assertDatabaseMissing('users', ['email' => 'mobile@example.com']);
+        $pending = Cache::get('mobile-registration:'.$response->json('registration_id'));
+        $this->assertSame('+639171234567', $pending['phone']);
+        $this->assertTrue(Hash::check('secret123', $pending['password']));
+    }
+
+    public function test_mobile_registration_verifies_otp_then_creates_a_customer_and_token(): void
+    {
+        $registrationId = (string) Str::uuid();
+        Cache::put('mobile-registration:'.$registrationId, [
+            'name' => 'Mobile Customer', 'email' => 'mobile@example.com', 'phone' => '+639171234567',
+            'address' => 'Santa Fe, Cebu', 'password' => Hash::make('secret123'), 'email_code' => Hash::make('123456'),
+        ], now()->addMinutes(10));
+
+        $this->postJson('/api/mobile/register/verify', [
+            'registration_id' => $registrationId, 'email_code' => '123456', 'device_name' => 'Pixel 9',
+        ])->assertCreated()->assertJsonStructure(['token', 'user'])->assertJsonPath('user.email', 'mobile@example.com');
+
+        $this->assertDatabaseHas('users', ['email' => 'mobile@example.com', 'phone' => '+639171234567']);
+        $this->assertNotNull(User::where('email', 'mobile@example.com')->firstOrFail()->email_verified_at);
+        $this->assertNull(Cache::get('mobile-registration:'.$registrationId));
     }
 
     public function test_riders_only_receive_their_assigned_orders(): void

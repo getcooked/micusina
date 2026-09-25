@@ -2,12 +2,12 @@
   "expo": {
     "name": "Mi Cusina",
     "slug": "mi-cusina-mobile",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "android": {
       "package": "com.micusina.mobile",
-      "versionCode": 1
+      "versionCode": 4
     },
     "ios": {
       "bundleIdentifier": "com.micusina.mobile"

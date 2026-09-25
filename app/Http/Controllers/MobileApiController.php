@@ -8,10 +8,12 @@ use App\Models\Food;
 use App\Models\Order;
 use App\Models\User;
 use App\Services\PayMongoService;
+use App\Services\RegistrationOtpSender;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -71,26 +73,77 @@ class MobileApiController extends Controller
         ]);
     }
 
-    /** Create a customer account and sign it into this device. */
-    public function register(Request $request): JsonResponse
+    /** Send the same email registration code used by the web registration flow. */
+    public function sendRegistrationVerification(Request $request, RegistrationOtpSender $sender): JsonResponse
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'regex:/^(09[0-9]{9}|\+639[0-9]{9})$/'],
+            'phone' => ['required', 'regex:/^(09[0-9]{9}|\+639[0-9]{9})$/', 'unique:users,phone'],
             'address' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'max:15', 'confirmed'],
-            'device_name' => ['nullable', 'string', 'max:80'],
         ]);
 
-        $user = User::create([
+        $data['phone'] = $this->normalizePhilippinePhone($data['phone']);
+        if (User::where('phone', $data['phone'])->exists()) {
+            throw ValidationException::withMessages(['phone' => ['The mobile number has already been registered.']]);
+        }
+
+        $code = (string) random_int(100000, 999999);
+        if (! $sender->sendEmail($data['email'], $code)) {
+            return response()->json(['message' => 'The verification email could not be sent. Please try again later.'], 503);
+        }
+
+        $registrationId = (string) Str::uuid();
+        Cache::put($this->registrationCacheKey($registrationId), [
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'],
             'address' => $data['address'],
-            'usertype' => 'user',
             'password' => Hash::make($data['password']),
+            'email_code' => Hash::make($code),
+        ], now()->addMinutes(10));
+
+        return response()->json([
+            'message' => 'We sent a verification code to your email.',
+            'registration_id' => $registrationId,
+            'expires_in' => 600,
+        ], 202);
+    }
+
+    /** Verify a pending mobile registration and create a Sanctum-authenticated customer. */
+    public function verifyRegistration(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'registration_id' => ['required', 'uuid'],
+            'email_code' => ['required', 'digits:6'],
+            'device_name' => ['nullable', 'string', 'max:80'],
         ]);
+        $cacheKey = $this->registrationCacheKey($data['registration_id']);
+        $pending = Cache::get($cacheKey);
+
+        if (! $pending) {
+            return response()->json(['message' => 'The verification code has expired. Please register again.'], 422);
+        }
+        if (! Hash::check($data['email_code'], $pending['email_code'])) {
+            throw ValidationException::withMessages(['email_code' => ['The verification code is incorrect.']]);
+        }
+        if (User::where('email', $pending['email'])->orWhere('phone', $pending['phone'])->exists()) {
+            Cache::forget($cacheKey);
+            return response()->json(['message' => 'That email address or mobile number is already registered.'], 422);
+        }
+
+        $user = User::create([
+            'name' => $pending['name'],
+            'email' => $pending['email'],
+            'phone' => $pending['phone'],
+            'address' => $pending['address'],
+            'usertype' => 'user',
+            'password' => $pending['password'],
+        ]);
+        $user->forceFill(['email_verified_at' => now()])->save();
+        Cache::forget($cacheKey);
+
         $deviceName = trim((string) ($data['device_name'] ?? '')) ?: 'Expo mobile app';
         $token = $user->createToken('mobile-app: '.$deviceName, ['mobile:customer'], now()->addDays(30))->plainTextToken;
 
@@ -430,5 +483,15 @@ class MobileApiController extends Controller
         $path = ltrim(str_replace('\\', '/', $image), '/');
 
         return asset(str_starts_with($path, 'food_img/') ? $path : 'food_img/'.$path);
+    }
+
+    private function normalizePhilippinePhone(string $phone): string
+    {
+        return str_starts_with($phone, '09') ? '+63'.substr($phone, 1) : $phone;
+    }
+
+    private function registrationCacheKey(string $registrationId): string
+    {
+        return 'mobile-registration:'.$registrationId;
     }
 }

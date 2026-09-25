@@ -74,5 +74,21 @@ class FortifyServiceProvider extends ServiceProvider
                     ]);
                 });
         });
+
+        RateLimiter::for('mobile-registration-email', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by(Str::lower((string) $request->input('email')).'|'.$request->ip())
+                ->response(fn () => response()->json([
+                    'message' => 'Too many verification emails were requested. Please wait one minute and try again.',
+                ], 429));
+        });
+
+        RateLimiter::for('mobile-registration-code', function (Request $request) {
+            return Limit::perMinute(10)
+                ->by((string) $request->input('registration_id').'|'.$request->ip())
+                ->response(fn () => response()->json([
+                    'message' => 'Too many code attempts. Please wait one minute and try again.',
+                ], 429));
+        });
     }
 }

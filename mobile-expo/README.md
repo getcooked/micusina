@@ -23,4 +23,4 @@ npx eas-cli login
 npx eas-cli build --platform android --profile preview
 ```
 
-When the EAS build finishes, download its APK and replace `public/downloads/Mi-Cusina.apk` with that exact file. Then run `php artisan test --filter=MobileAppDownloadTest`, commit the new APK, and deploy Laravel. `preview` deliberately produces an APK for direct installation; the `production` profile produces an AAB for Google Play.
+When the EAS build finishes, download its APK and replace `public/downloads/Mi-Cusina.apk` with that exact file. Then run `php artisan test --filter=MobileAppDownloadTest`, commit the new APK, and deploy Laravel. The preview APK is optimized for modern 64-bit Android phones (`arm64-v8a`); it intentionally excludes emulator and legacy 32-bit libraries to keep the website download smaller. `production` produces an AAB for Google Play, which automatically delivers only the files each device needs.

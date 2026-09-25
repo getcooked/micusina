@@ -11,7 +11,9 @@ export function apiError(error: unknown): ApiError {
   if (!axios.isAxiosError(error)) return { message: 'Something went wrong. Please try again.' };
   const response = error as AxiosError<{ message?: string; errors?: Record<string, string[]> }>;
   if (!response.response) return { message: 'Unable to reach Mi Cusina. Check your internet connection.' };
-  return { message: response.response.data?.message ?? 'Request failed. Please try again.', fields: response.response.data?.errors, unauthorized: response.response.status === 401 };
+  const fields = response.response.data?.errors;
+  const firstFieldMessage = fields ? Object.values(fields).flat()[0] : undefined;
+  return { message: firstFieldMessage ?? response.response.data?.message ?? 'Request failed. Please try again.', fields, unauthorized: response.response.status === 401 };
 }
 export const authApi = {
   async login(email: string, password: string, twoFactorCode?: string) {
@@ -19,8 +21,12 @@ export const authApi = {
     if (data.token) await SecureStore.setItemAsync(TOKEN_KEY, data.token);
     return data;
   },
-  async register(payload: { name: string; email: string; phone: string; address: string; password: string; password_confirmation: string }) {
-    const { data } = await api.post<{ token: string; user: User }>('/register', { ...payload, device_name: 'Expo mobile app' });
+  async sendRegistrationVerification(payload: { name: string; email: string; phone: string; address: string; password: string; password_confirmation: string }) {
+    const { data } = await api.post<{ registration_id: string; message: string }>('/register/send-verification', payload);
+    return data;
+  },
+  async verifyRegistration(registrationId: string, emailCode: string) {
+    const { data } = await api.post<{ token: string; user: User }>('/register/verify', { registration_id: registrationId, email_code: emailCode, device_name: 'Expo mobile app' });
     await SecureStore.setItemAsync(TOKEN_KEY, data.token);
     return data.user;
   },
