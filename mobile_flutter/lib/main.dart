@@ -1,122 +1,45 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-void main() {
-  runApp(const MyApp());
-}
+const brand = Color(0xff9b167d);
+const apiBase = String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:8000');
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() => runApp(const MiCusinaApp());
 
-  // This widget is the root of your application.
+class MiCusinaApp extends StatelessWidget {
+  const MiCusinaApp({super.key});
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'Mi Cusina',
+    theme: ThemeData(colorSchemeSeed: brand, useMaterial3: true),
+    home: const LoginPage(),
+  );
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+class LoginPage extends StatefulWidget { const LoginPage({super.key}); @override State<LoginPage> createState() => _LoginPageState(); }
+class _LoginPageState extends State<LoginPage> {
+  final email = TextEditingController(); final password = TextEditingController(); bool loading = false; String? message;
+  Future<void> login() async {
+    setState(() => loading = true);
+    try {
+      final response = await http.post(Uri.parse('$apiBase/api/mobile/login'), headers: {'Accept': 'application/json'}, body: {'email': email.text.trim(), 'password': password.text, 'device_name': 'Mi Cusina Android'});
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode < 300 && body['token'] != null && mounted) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => MenuPage(token: body['token'] as String)));
+      else setState(() => message = body['message'] as String? ?? 'Unable to sign in.');
+    } catch (_) { setState(() => message = 'Cannot reach the Mi Cusina server.'); }
+    if (mounted) setState(() => loading = false);
+  }
+  @override Widget build(BuildContext context) => Scaffold(backgroundColor: const Color(0xfff7f8fb), body: SafeArea(child: ListView(padding: const EdgeInsets.all(28), children: [
+    Image.network('$apiBase/assets/imgs/burger-hero.png', height: 200, errorBuilder: (_, __, ___) => const Icon(Icons.restaurant, size: 120, color: brand)),
+    const Text('Welcome to Mi Cusina', textAlign: TextAlign.center, style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold)), const SizedBox(height: 8), const Text('Fresh local favorites, simple ordering, and delivery tracking.', textAlign: TextAlign.center), const SizedBox(height: 28),
+    Card(child: Padding(padding: const EdgeInsets.all(22), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [const Text('Sign in', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)), TextField(controller: email, decoration: const InputDecoration(labelText: 'Email address')), TextField(controller: password, obscureText: true, decoration: const InputDecoration(labelText: 'Password')), if (message != null) Text(message!, style: const TextStyle(color: Colors.red)), const SizedBox(height: 18), FilledButton(onPressed: loading ? null : login, style: FilledButton.styleFrom(backgroundColor: brand), child: Text(loading ? 'Signing in...' : 'Sign in'))])),
+    TextButton(onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterPage())), child: const Text('Create customer account')),
+  ])));
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class RegisterPage extends StatelessWidget { const RegisterPage({super.key}); @override Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Create Account')), body: const Center(child: Text('Registration stays inside the Mi Cusina app.'))); }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
+class MenuPage extends StatefulWidget { final String token; const MenuPage({super.key, required this.token}); @override State<MenuPage> createState() => _MenuPageState(); }
+class _MenuPageState extends State<MenuPage> { List<dynamic> foods = []; @override void initState(){super.initState(); load();} Future<void> load() async { final r=await http.get(Uri.parse('$apiBase/api/mobile/foods')); if(mounted)setState(()=>foods=(jsonDecode(r.body) as Map<String,dynamic>)['foods'] as List<dynamic>); } @override Widget build(BuildContext c)=>Scaffold(appBar:AppBar(title:const Text('Mi Cusina Menu')),body:foods.isEmpty?const Center(child:CircularProgressIndicator()):ListView(children:foods.map((f)=>ListTile(title:Text(f['title']),subtitle:Text('P${f['price']}'))).toList())); }
