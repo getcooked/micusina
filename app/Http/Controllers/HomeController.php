@@ -577,6 +577,59 @@ class HomeController extends Controller
         return view('home.track_order', ['order' => $displayOrder, 'relatedOrders' => $relatedOrders, 'rider' => $rider, 'allOrders' => $allOrders]);
     }
 
+    /** A small read-only endpoint used by the tracking page polling. */
+    public function order_status($id)
+    {
+        $order = $this->customerOrder($id);
+        $orders = $this->relatedCustomerOrders($order);
+        $status = $orders->contains('delivery_status', 'Canceled') ? 'Canceled'
+            : ($orders->every(fn (Order $item) => $item->delivery_status === 'Delivered') ? 'Delivered'
+            : ($orders->contains('delivery_status', 'On The Way') ? 'On The Way' : 'In Progress'));
+
+        return response()->json(['status' => $status, 'updated_at' => optional($orders->max('updated_at'))->toIso8601String()]);
+    }
+
+    public function cancel_order($id)
+    {
+        $order = $this->customerOrder($id);
+        $orders = $this->relatedCustomerOrders($order);
+        $canCancel = $orders->every(fn (Order $item) => $this->orderCanBeCancelled($item));
+        if (! $canCancel) {
+            return back()->with('message', 'This order can no longer be cancelled because it is already being prepared, paid, or dispatched.');
+        }
+
+        Order::whereKey($orders->pluck('id'))->update(['delivery_status' => 'Canceled']);
+        return redirect()->route('my_orders')->with('message', 'Your order has been cancelled.');
+    }
+
+    public function my_bookings()
+    {
+        $bookings = Book::where('user_id', Auth::id())->latest()->get();
+        return view('home.my_bookings', compact('bookings'));
+    }
+
+    public function track_booking($id)
+    {
+        $booking = Book::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        return view('home.track_booking', compact('booking'));
+    }
+
+    public function booking_status($id)
+    {
+        $booking = Book::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        return response()->json(['status' => $booking->status, 'payment_status' => $booking->payment_status, 'updated_at' => optional($booking->updated_at)->toIso8601String()]);
+    }
+
+    public function cancel_booking($id)
+    {
+        $booking = Book::where('id', $id)->where('user_id', Auth::id())->firstOrFail();
+        if (! $this->bookingCanBeCancelled($booking)) {
+            return back()->with('message', 'This reservation can no longer be cancelled.');
+        }
+        $booking->update(['status' => 'Canceled']);
+        return redirect()->route('bookings.index')->with('message', 'Your reservation has been cancelled. Reservation downpayments are non-refundable.');
+    }
+
     public function order_receipt()
     {
         $orderIds = session('receipt_order_ids', []);
@@ -798,6 +851,37 @@ class HomeController extends Controller
                 'payment' => 'Secure payment could not be started. Please try again.',
             ]);
         }
+    }
+
+    private function customerOrder($id): Order
+    {
+        return Order::where('id', $id)->where(function ($query) {
+            $query->where('user_id', Auth::id())->orWhere(function ($legacy) {
+                $legacy->whereNull('user_id')->where('email', Auth::user()->email);
+            });
+        })->firstOrFail();
+    }
+
+    private function relatedCustomerOrders(Order $order)
+    {
+        if (Schema::hasColumn('orders', 'checkout_group_id') && $order->checkout_group_id) {
+            return Order::where('checkout_group_id', $order->checkout_group_id)->where('user_id', Auth::id())->get();
+        }
+        return Order::where('email', Auth::user()->email)->whereBetween('created_at', [$order->created_at->copy()->subSeconds(5), $order->created_at->copy()->addSeconds(5)])->get();
+    }
+
+    private function orderCanBeCancelled(Order $order): bool
+    {
+        return in_array($order->delivery_status, ['In Progress', 'Pending', 'Awaiting Confirmation', 'Awaiting Payment'], true)
+            && strtolower((string) $order->payment_status) !== 'paid'
+            && empty($order->rider_id);
+    }
+
+    private function bookingCanBeCancelled(Book $booking): bool
+    {
+        if (in_array($booking->status, ['Completed', 'Canceled'], true)) return false;
+        try { return \Carbon\Carbon::parse($booking->date.' '.$booking->time, 'Asia/Manila')->isFuture(); }
+        catch (\Throwable) { return false; }
     }
 
     public function chatbot_message(Request $request)

@@ -72,4 +72,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function riderOrders()
+    {
+        return $this->hasMany(Order::class, 'rider_id');
+    }
 }

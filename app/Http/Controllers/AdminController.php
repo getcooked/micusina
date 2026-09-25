@@ -17,6 +17,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -215,10 +216,23 @@ class AdminController extends Controller
             ->orderByDesc('id')
             ->get();
         $availableRiders = User::where('staff_role', 'rider')
+            ->where('rider_available', true)
+            ->whereDoesntHave('riderOrders', function ($query) {
+                $query->whereNotIn('delivery_status', ['Delivered', 'Canceled']);
+            })
             ->orderBy('name')
             ->get();
 
         return view('admin.order', compact('data', 'availableRiders'));
+    }
+
+    public function order_updates()
+    {
+        $this->requireStaffOrAdmin();
+        return response()->json([
+            'latest' => optional(Order::latest('updated_at')->first())->updated_at?->toIso8601String(),
+            'pending' => Order::where('delivery_status', 'In Progress')->count(),
+        ]);
     }
 
     public function markNotificationsRead(Request $request)
@@ -379,26 +393,17 @@ class AdminController extends Controller
             'rider_id' => ['required', 'exists:users,id'],
         ]);
 
-        $order = Order::findOrFail($id);
-        $rider = User::where('id', $request->rider_id)
-            ->where('staff_role', 'rider')
-            ->firstOrFail();
-
-        $this->matchingOrderRows($order)->update([
-            'rider_id' => $rider->id,
-            'confirmed_by' => auth()->id(),
-            'confirmed_at' => now(),
-            'delivery_status' => 'On The Way',
-        ]);
-
-        Order::where('id', $order->id)->update([
-            'rider_id' => $rider->id,
-            'confirmed_by' => auth()->id(),
-            'confirmed_at' => now(),
-            'delivery_status' => 'On The Way',
-        ]);
-
-        $rider->forceFill(['rider_available' => false])->save();
+        DB::transaction(function () use ($request, $id) {
+            $order = Order::query()->lockForUpdate()->findOrFail($id);
+            $rider = User::query()->whereKey($request->rider_id)->where('staff_role', 'rider')->lockForUpdate()->firstOrFail();
+            $activeDelivery = Order::query()->where('rider_id', $rider->id)
+                ->whereNotIn('delivery_status', ['Delivered', 'Canceled'])->lockForUpdate()->exists();
+            abort_if(! $rider->rider_available || $activeDelivery, 422, 'This rider is unavailable or already assigned to an active delivery.');
+            $orders = $this->matchingOrderRows($order)->lockForUpdate()->get();
+            abort_if($orders->contains(fn (Order $item) => in_array($item->delivery_status, ['Delivered', 'Canceled'], true)), 422, 'This order is already final.');
+            Order::whereKey($orders->pluck('id'))->update(['rider_id' => $rider->id, 'confirmed_by' => auth()->id(), 'confirmed_at' => now(), 'delivery_status' => 'On The Way']);
+            $rider->forceFill(['rider_available' => false])->save();
+        }, 3);
 
         return redirect()->back()->with('message', $rider->name . ' assigned to this delivery.');
     }
@@ -453,7 +458,7 @@ class AdminController extends Controller
 
         if($riderId)
         {
-            User::where('id', $riderId)->update(['rider_available' => true]);
+            $this->refreshRiderAvailability($riderId);
         }
 
         return redirect()->back();
@@ -472,7 +477,7 @@ class AdminController extends Controller
 
         if($riderId)
         {
-            User::where('id', $riderId)->update(['rider_available' => true]);
+            $this->refreshRiderAvailability($riderId);
         }
 
         return redirect()->back();
@@ -492,6 +497,9 @@ class AdminController extends Controller
         }
 
         $rider = User::where('id', $id)->where('staff_role', 'rider')->firstOrFail();
+        if ($request->boolean('rider_available') && Order::where('rider_id', $rider->id)->whereNotIn('delivery_status', ['Delivered', 'Canceled'])->exists()) {
+            return back()->with('message', 'A rider with an active delivery cannot be marked available.');
+        }
         $rider->forceFill(['rider_available' => (bool) $request->rider_available])->save();
 
         return redirect()->back()->with('message', $rider->name . ' availability updated.');
@@ -635,6 +643,12 @@ class AdminController extends Controller
                 $order->created_at->copy()->subSeconds(5),
                 $order->created_at->copy()->addSeconds(5),
             ]);
+    }
+
+    private function refreshRiderAvailability(int $riderId): void
+    {
+        $hasActiveDelivery = Order::where('rider_id', $riderId)->whereNotIn('delivery_status', ['Delivered', 'Canceled'])->exists();
+        User::whereKey($riderId)->update(['rider_available' => ! $hasActiveDelivery]);
     }
 
 }

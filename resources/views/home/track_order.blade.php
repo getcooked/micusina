@@ -716,6 +716,7 @@
         $isDelivered = $status === 'Delivered';
         $isOnWay = $status === 'On The Way';
         $isCanceled = $status === 'Canceled';
+        $canCancel = !$isCanceled && !$isDelivered && !$isOnWay && !$rider && strtolower((string) $order->payment_status) !== 'paid' && in_array($order->delivery_status, ['In Progress', 'Pending', 'Awaiting Confirmation', 'Awaiting Payment'], true);
         $eta = $isDelivered ? '0 mins' : ($isOnWay ? '3 mins' : '20 mins');
         $headline = $isDelivered ? 'Your food was delivered.' : ($isOnWay ? 'Your rider has picked up your food.' : ($isCanceled ? 'Your order was canceled.' : 'Your order is being prepared.'));
         $progress = $isDelivered ? [100,100,100,100] : ($isOnWay ? [100,100,100,35] : ($isCanceled ? [0,0,0,0] : [100,35,0,0]));
@@ -869,6 +870,12 @@
                         <span>&#8369;{{ number_format($orderTotal, 2) }}</span>
                     </div>
                     <button class="all-orders-button" id="openOrders" type="button">All Orders</button>
+                    @if($canCancel)
+                        <form method="POST" action="{{ route('orders.cancel', $order->id) }}" onsubmit="return confirm('Cancel this order?');">
+                            @csrf
+                            <button class="all-orders-button" type="submit" title="Cancel Order" aria-label="Cancel Order" style="margin-top:10px;background:#b91c1c;"> <i class="ti-close"></i> Cancel Order</button>
+                        </form>
+                    @endif
                 </div>
 
                 <div class="track-items">
@@ -995,6 +1002,14 @@
                     hideRiderChat();
                 }
             });
+
+            var lastStatus = @json($status);
+            window.setInterval(function () {
+                fetch(@json(url('track_order', $order->id).'/status'), { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+                    .then(function (response) { return response.ok ? response.json() : null; })
+                    .then(function (data) { if (data && data.status !== lastStatus) window.location.reload(); })
+                    .catch(function () {});
+            }, 15000);
         });
     </script>
 </body>

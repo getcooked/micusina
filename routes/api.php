@@ -24,8 +24,10 @@ Route::prefix('mobile')->middleware('throttle:120,1,mobile-api:')->group(functio
         Route::delete('/cart/{cart}', [MobileApiController::class, 'removeCart']);
         Route::post('/checkout', [MobileApiController::class, 'checkout']);
         Route::get('/orders', [MobileApiController::class, 'orders']);
+        Route::delete('/orders/{order}', [MobileApiController::class, 'cancelOrder']);
         Route::get('/reservations', [MobileApiController::class, 'reservations']);
         Route::post('/reservations', [MobileApiController::class, 'createReservation']);
+        Route::delete('/reservations/{booking}', [MobileApiController::class, 'cancelReservation']);
         Route::get('/staff/dashboard', [MobileApiController::class, 'staffDashboard']);
         Route::get('/staff/orders', [MobileApiController::class, 'staffOrders']);
         Route::patch('/staff/orders/{order}', [MobileApiController::class, 'updateOrder']);

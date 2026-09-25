@@ -20,7 +20,7 @@
       <div class="admin-actions">
       @if(Auth::check() && Auth::user()->usertype === 'admin')
       <div class="admin-notifications dropdown">
-        <button class="admin-notification-trigger dropdown-toggle" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Admin notifications">
+        <button class="admin-notification-trigger" type="button" id="adminNotificationMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Admin notifications" title="Notifications">
           <i class="fa fa-bell" aria-hidden="true"></i>
           @if($headerNotificationCount > 0)<span id="adminNotificationCount" class="admin-notification-count" aria-label="{{ $headerNotificationCount }} notifications">{{ $headerNotificationCount }}</span>@endif
         </button>

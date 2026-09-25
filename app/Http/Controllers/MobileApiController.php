@@ -302,6 +302,20 @@ class MobileApiController extends Controller
         return response()->json(['orders' => $orders]);
     }
 
+    public function cancelOrder(Request $request, Order $order): JsonResponse
+    {
+        $user = $request->user();
+        abort_unless((int) $order->user_id === (int) $user->id || (empty($order->user_id) && $order->email === $user->email), 404);
+        $orders = $order->checkout_group_id
+            ? Order::where('checkout_group_id', $order->checkout_group_id)->where('user_id', $user->id)->get()
+            : Order::where('email', $user->email)->whereBetween('created_at', [$order->created_at->copy()->subSeconds(5), $order->created_at->copy()->addSeconds(5)])->get();
+        $allowed = $orders->every(fn (Order $item) => in_array($item->delivery_status, ['In Progress', 'Pending', 'Awaiting Confirmation', 'Awaiting Payment'], true)
+            && strtolower((string) $item->payment_status) !== 'paid' && empty($item->rider_id));
+        abort_unless($allowed, 422, 'This order can no longer be cancelled because it is already being prepared, paid, or dispatched.');
+        Order::whereKey($orders->pluck('id'))->update(['delivery_status' => 'Canceled']);
+        return response()->json(['message' => 'Order cancelled.']);
+    }
+
     public function reservations(Request $request): JsonResponse
     {
         $reservations = Book::where('user_id', $request->user()->id)
@@ -353,6 +367,19 @@ class MobileApiController extends Controller
 
             return response()->json(['message' => 'Secure payment could not be started. Please try again.'], 422);
         }
+    }
+
+    public function cancelReservation(Request $request, Book $booking): JsonResponse
+    {
+        abort_unless((int) $booking->user_id === (int) $request->user()->id, 404);
+        abort_if(in_array($booking->status, ['Completed', 'Canceled'], true), 422, 'This reservation can no longer be cancelled.');
+        try {
+            abort_unless(Carbon::parse($booking->date.' '.$booking->time, 'Asia/Manila')->isFuture(), 422, 'This reservation can no longer be cancelled.');
+        } catch (\Throwable) {
+            abort(422, 'This reservation can no longer be cancelled.');
+        }
+        $booking->update(['status' => 'Canceled']);
+        return response()->json(['message' => 'Reservation cancelled. Reservation downpayments are non-refundable.', 'reservation' => $booking->fresh()]);
     }
 
     public function staffDashboard(Request $request): JsonResponse

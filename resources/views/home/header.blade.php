@@ -810,7 +810,8 @@
             <div class="burger-login">
                 @if (Route::has('login'))
                     @auth
-                        <a class="track-order-link" href="{{ url('my_orders') }}">Track Order</a>
+                        <a class="track-order-link" href="{{ url('my_orders') }}" title="Track Order"><i class="ti-truck"></i> Track Order</a>
+                        <a class="track-order-link" href="{{ route('bookings.index') }}" title="Track Booking"><i class="ti-calendar"></i> Track Booking</a>
                         <details class="front-user-menu">
                             <summary aria-label="Open user menu">@if(Auth::user()->profile_photo_path)<img src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}">@else{{ $userInitial }}@endif</summary>
                             <div class="front-user-dropdown">
@@ -1177,7 +1178,8 @@
         </ul>
         <ul class="navbar-nav">
             @auth
-                <li class="nav-item"><a class="nav-link track-order-link" href="{{ url('my_orders') }}">Track Order</a></li>
+                <li class="nav-item"><a class="nav-link track-order-link" href="{{ url('my_orders') }}" title="Track Order"><i class="ti-truck"></i> Track Order</a></li>
+                <li class="nav-item"><a class="nav-link track-order-link" href="{{ route('bookings.index') }}" title="Track Booking"><i class="ti-calendar"></i> Track Booking</a></li>
             @endauth
             @if (Route::has('login'))
                 @auth

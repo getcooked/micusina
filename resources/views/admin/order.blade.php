@@ -674,7 +674,7 @@
     @include('admin.js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function () {
         const riderToggles = document.querySelectorAll('.rider-toggle');
         const pickerGap = 8;
 
@@ -806,6 +806,16 @@
             });
           });
         });
+
+        // Read-only polling keeps the table current without submitting or duplicating data.
+        var orderVersion = @json(optional($data->first())->updated_at?->toIso8601String());
+        window.setInterval(function () {
+          fetch(@json(route('orders.updates')), {headers: {'Accept': 'application/json'}, credentials: 'same-origin'})
+            .then(function (response) { return response.ok ? response.json() : null; })
+            .then(function (payload) {
+              if (payload && payload.latest && payload.latest !== orderVersion) window.location.reload();
+            }).catch(function () {});
+        }, 15000);
       });
     </script>
   </body>

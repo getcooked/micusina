@@ -66,10 +66,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/remove_cart/{id}', [HomeController::class, 'remove_cart']);
     Route::get('/my_orders', [HomeController::class, 'my_orders']);
     Route::get('/track_order/{id}', [HomeController::class, 'track_order']);
+    Route::get('/track_order/{id}/status', [HomeController::class, 'order_status']);
+    Route::post('/orders/{id}/cancel', [HomeController::class, 'cancel_order'])->name('orders.cancel');
     Route::get('/order_receipt', [HomeController::class, 'order_receipt'])->name('order.receipt');
     Route::post('/confirm_order', [HomeController::class, 'confirm_order']);
 
     Route::get('/orders', [AdminController::class, 'orders']);
+    Route::get('/orders/updates', [AdminController::class, 'order_updates'])->name('orders.updates');
     Route::get('/sales-report', [AdminController::class, 'sales_report'])->name('admin.sales-report');
     Route::get('/sales-report/pdf', [AdminController::class, 'sales_report_pdf'])->name('admin.sales-report.pdf');
     Route::get('/transaction-history', [AdminController::class, 'transaction_history'])->name('admin.transaction-history');
@@ -84,6 +87,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/paid/{id}', [AdminController::class, 'paid']);
 
     Route::post('/book_table', [HomeController::class, 'book_table'])->middleware('throttle:10,1');
+    Route::get('/my_bookings', [HomeController::class, 'my_bookings'])->name('bookings.index');
+    Route::get('/track_booking/{id}', [HomeController::class, 'track_booking'])->name('bookings.track');
+    Route::get('/track_booking/{id}/status', [HomeController::class, 'booking_status']);
+    Route::post('/bookings/{id}/cancel', [HomeController::class, 'cancel_booking'])->name('bookings.cancel');
     Route::get('/reservations', [AdminController::class, 'reservations']);
     Route::post('/approve_reservation/{id}', [AdminController::class, 'approve_reservation']);
     Route::get('/add_staff', [AdminController::class, 'add_staff']);
